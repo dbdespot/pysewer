@@ -1,0 +1,772 @@
+from dataclasses import dataclass, field
+from typing import Optional
+
+import geopandas as gpd
+import networkx as nx
+import numpy as np
+import rasterio as rio
+from pyproj.crs import CRS
+from shapely.geometry import LineString, Point, Polygon
+from shapely.ops import linemerge, nearest_points
+from sklearn.cluster import AgglomerativeClustering
+
+from .helper import (
+    ckdnearest,
+    get_closest_edge,
+    get_closest_edge_multiple,
+    get_edge_gdf,
+    get_node_gdf,
+    get_node_keys,
+    get_path_distance,
+    remove_third_dimension,
+)
+from .optimization import needs_pump
+from .simplify import simplify_graph
+
+
+# validate the input data using pydantic and geopandas pandera
+@dataclass
+class DEM:
+    file_path: Optional[str] = None
+    raster: rio.DatasetReader = field(init=False, default=None)
+    no_dem: bool = field(init=False, default=True)
+
+    def __post_init__(self):
+        if self.file_path:
+            self.raster = rio.open(self.file_path)
+            self.no_dem = False
+
+    def get_elevation(self, point):
+        """
+        Returns elevation data in meters for a given point rounded to two decimals.
+
+        Parameters
+        ----------
+        point : shapely.geometry.Point
+            The point for which to retrieve elevation data.
+
+        Returns
+        -------
+        int
+            The elevation in meters.
+
+        Raises
+        ------
+        ValueError
+            If the query point is out of bounds or if there is no elevation data for the given coordinates.
+        """
+        if self.no_dem:
+            return 0
+        elevation = list(self.raster.sample([(point.x, point.y)]))[0][0]
+        elevation = round(float(elevation), 2)
+        if elevation == self.raster.nodata:
+            raise ValueError(
+                "No Elevation Data for Coordinates {} {} ".format(point.x, point.y)
+            )
+        return elevation
+
+    def get_profile(self, line, dx=10):
+        """
+        Extracts elevation data from a digital elevation model (DEM) along a given path.
+
+        Parameters
+        ----------
+        line : shapely.geometry.LineString
+            The path along which to extract elevation data.
+        dx : float, optional
+            The sampling resolution in meters. Default is 10.
+
+        Returns
+        -------
+        List of Touples
+            A list of (x, elevation) tuples representing the x-coordinate and elevation data of the profile.
+            The x-coordinate values start at 0 and are spaced at intervals of dx meters.
+        """
+        x = np.arange(0, line.length, dx)
+        x = np.append(x, line.length)
+        interpolated_points = [line.interpolate(dist) for dist in x]
+        elevation = [self.get_elevation(ip) for ip in interpolated_points]
+        return list(zip(x, elevation))
+
+    @property
+    def get_crs(self) -> Optional[CRS]:
+        """Returns the coordinate system of the DEM Object"""
+        if self.no_dem:
+            return None
+        return CRS(self.raster.crs)
+
+    # add method to reproject the raster to a given crs in case there is a mismatch between the crs of the raster and the crs of the other input data
+    def reproject_dem(self, crs: CRS):
+        """
+        Reprojects the DEM raster to the given CRS.
+
+        Parameters
+        ----------
+        crs : CRS
+            The target CRS to reproject the raster to.
+
+        Raises
+        ------
+        ValueError
+            If no DEM is loaded, cannot reproject DEM.
+        """
+        if self.no_dem:
+            raise ValueError("No DEM loaded, cannot reproject DEM")
+
+        with rio.open(self.file_path) as src:
+            transform, width, height = rio.warp.calculate_default_transform(
+                src.crs, crs, src.width, src.height, *src.bounds
+            )
+            kwargs = src.meta.copy()
+            kwargs.update(
+                {
+                    "crs": crs,
+                    "transform": transform,
+                    "width": width,
+                    "height": height,
+                    "nodata": 0,
+                }
+            )
+
+            # create a new file or overwrite the exisiting DEM with reprojected crs
+            with rio.open(self.file_path, "w", **kwargs) as dst:
+                for i in range(1, src.count + 1):
+                    rio.warp.reproject(
+                        source=rio.band(src, i),
+                        destination=rio.band(dst, i),
+                        src_transform=src.transform,
+                        src_crs=src.crs,
+                        dst_transform=transform,
+                        dst_crs=crs,
+                        resampling=rio.warp.Resampling.nearest,
+                    )
+
+        # reload the raster
+        self.raster = rio.open(self.file_path)
+
+
+class Roads:
+    """
+    A class to represent road data from either a shapefile or a geopandas dataframe.
+    Attributes:
+    ----------
+    gdf : geopandas.GeoDataFrame
+        A geopandas dataframe containing road data.
+    merged_roads : shapely.geometry.MultiLineString
+        A shapely MultiLineString object representing the merged road data.
+    Methods:
+    -------
+    __init__(self, input_data: str or geopandas.GeoDataFrame) -> None
+        Initializes a Roads object with road data from either a shapefile or a geopandas dataframe.
+    """
+    def __init__(self, input_data):
+        """
+        Initializes a Roads object with road data from either a shapefile or a geopandas dataframe.
+        Parameters
+        ----------
+        input_data : str or geopandas.GeoDataFrame
+            Path to shapefile or geopandas dataframe containing road data.
+        """
+        if isinstance(input_data, str):
+            self.gdf = gpd.read_file(input_data)
+        else:
+            self.gdf = input_data
+        self.gdf["geometry"] = [remove_third_dimension(g) for g in self.gdf["geometry"]]
+        self.merged_roads = self.gdf.unary_union
+
+    def get_nearest_point(self, point):
+        """
+        Returns the nearest location to the input point on the street network.
+        Parameters
+        ----------
+        point : shapely.geometry.Point
+            Point to find nearest location to.
+        Returns
+        -------
+        shapely.geometry.Point
+            Nearest location to the input point on the street network.
+        """
+        return nearest_points(self.get_merged_roads(), point)[0]
+
+    def get_gdf(self):
+        """
+        Returns the road data as a geopandas dataframe.
+        Returns
+        -------
+        geopandas.GeoDataFrame
+            The road data as a geopandas dataframe.
+        """
+        return self.gdf
+
+    def get_crs(self):
+        """
+        Gets the coordinate reference system (CRS) of the Roads object.
+
+        Returns
+        -------
+        dict
+            The coordinate system of the Roads object.
+        """
+        return self.gdf.crs
+
+    def get_merged_roads(self):
+        """
+        Merge the road network as a shapely MultiLineString.
+
+        Returns
+        -------
+        shapely MultiLineString
+            merged road network as a shapely MultiLineString
+        """
+        return self.merged_roads
+
+
+class Buildings:
+    def __init__(self, input_data, roads_obj):
+        """
+        Initialize a Preprocessor object.
+
+        Parameters
+        ----------
+        input_data : str or geopandas.GeoDataFrame
+            Path to a shapefile or a GeoDataFrame containing the input data.
+        roads_obj : pysewer.Roads
+            A Roads object containing the road network data.
+
+        Returns
+        -------
+        None.
+
+        """
+        # ... (existing code)
+    def __init__(self, input_data, roads_obj):
+        # Digest and clean input Data
+        # Allow input to be either path to shp file or gdf
+        if type(input_data) == str:
+            self.gdf = gpd.read_file(input_data)
+        else:
+            self.gdf = input_data
+        self.gdf["geometry"] = [remove_third_dimension(g) for g in self.gdf["geometry"]]
+        # Convert to Point if Shapefile has MultiPoint Data
+        if "MultiPoint" in self.gdf.geometry.type.unique():
+            convert = (
+                lambda MultiP: Point(MultiP.geoms[0].x, MultiP.geoms[0].y)
+                if MultiP.geom_type == "MultiPoint"
+                else MultiP
+            )
+            self.gdf["geometry"] = self.gdf["geometry"].apply(convert)
+        self.roads_obj = roads_obj
+
+    def get_gdf(self):
+        """Returns building data as geopandas dataframe"""
+        return self.gdf
+
+    def get_crs(self):
+        """Returns the Coordinate System of the DEM Object"""
+        return self.gdf.crs
+
+
+    def cluster_centers(self, max_connection_length):
+        """
+        Returns a list of cluster centers for all buildings with greater than max_connection_length distance to the nearest street
+
+        Parameters        
+        -----------
+        max_connection_length : float
+            The maximum distance between a building and the nearest street for it to be included in the cluster centers list       
+
+        Returns    
+        --------
+        cluster_centers : GeoDataFrame
+            A GeoDataFrame containing the cluster centers and their distances to the nearest street, sorted by distance
+        """
+        ####Clustering####
+        # get nearest point to street for each building
+        self.gdf["nearest_point"] = ""
+        self.gdf["distance"] = ""
+        self.gdf["cluster"] = "0"
+        for index, row in self.gdf.iterrows():
+            self.gdf.loc[index, "nearest_point"] = self.roads_obj.get_nearest_point(
+                row.geometry
+            )
+            self.gdf.loc[index, "distance"] = row.geometry.distance(
+                self.gdf.loc[index, "nearest_point"]
+            )
+        c_buildings_coords = []
+        for b in self.gdf.loc[
+            self.gdf["distance"] > max_connection_length
+        ].geometry:  # for first feature/row
+            coords = np.dstack(b.coords.xy).tolist()[0][0]
+            c_buildings_coords.append(coords)
+            # Run Scipy Clustering
+        try:
+            clustering = AgglomerativeClustering(
+                n_clusters=None, distance_threshold=max_connection_length
+            ).fit(c_buildings_coords)
+        except:
+            return gpd.GeoDataFrame(geometry=[])
+        self.gdf.loc[
+            self.gdf["distance"] >= max_connection_length, "cluster"
+        ] = clustering.labels_        # Find Centroid of Clusters
+        cluster_centers = []
+        for cluster_id in clustering.labels_:
+            building_points = self.gdf.loc[
+                self.gdf["cluster"] == cluster_id
+            ].geometry.tolist()
+            if len(building_points) == 2:
+                P = LineString(building_points)
+            if len(building_points) > 2:
+                P = Polygon(building_points)
+            if "P" in locals():
+                cluster_centers.append(P.centroid)        # sort by distance and connect from close to far away to keep flow direction
+        cluster_centers = gpd.GeoDataFrame(geometry=cluster_centers)
+        cluster_centers["distance"] = ""
+        for i, row in cluster_centers.iterrows():
+            cluster_centers.loc[i, "distance"] = row.geometry.distance(
+                self.roads_obj.get_merged_roads()
+            )       
+        cluster_centers.sort_values(by="distance", inplace=True)
+        return cluster_centers
+    
+
+class ModelDomain:
+    """
+    Class for preprocessing input data for the sewer network.
+
+    Parameters
+    ----------
+    dem : str
+        Path to the digital elevation model file.
+    roads : str
+        Path to the roads shapefile.
+    buildings : str
+        Path to the buildings shapefile.
+    clustering : str, optional
+        Clustering method for connecting buildings to the sewer network. Default is "centers".
+    pump_penalty : int, optional
+        Penalty for adding a pump to the sewer network. Default is 1000.
+    connect_buildings : bool, optional
+        Whether to connect buildings to the sewer network. Default is True.
+
+    Attributes
+    ----------
+    roads : Roads
+        Roads object.
+    buildings : Buildings
+        Buildings object.
+    dem : DEM
+        DEM object.
+    connection_graph : nx.Graph
+        Graph representing the road network.
+    pump_penalty : int
+        Penalty for adding a pump to the sewer network.
+    """
+
+    def __init__(
+        self,
+        dem: str,
+        roads: str,
+        buildings: str,
+        clustering: str = "centers",
+        pump_penalty: int = 1000,
+        connect_buildings: bool = True,
+    ):
+        self.roads = Roads(roads)
+        self.buildings = Buildings(buildings, roads_obj=self.roads)
+        self.dem = DEM(dem)
+        # print(self.roads.get_crs())
+        # print(self.buildings.get_crs())
+        # print(self.dem.get_crs())
+
+        # Check for coordinate system
+        # assert self.roads.get_crs() == self.buildings.get_crs() and self.dem.get_crs() == self.roads.get_crs(), "CRS of input Data does not match"
+        assert self.roads.get_crs().is_projected
+
+        # create unsilplified graph
+        self.connection_graph = self.create_unsimplified_graph(self.roads.get_gdf())
+
+        self.connection_graph = nx.Graph(self.connection_graph)
+        # connecting subgraphs if there are any
+        sub_graphs = list(
+            (
+                self.connection_graph.subgraph(c).copy()
+                for c in nx.connected_components(self.connection_graph)
+            )
+        )
+        if len(sub_graphs) > 1:
+            print("connecting subgraphs")
+            self.connect_subgraphs()
+        # set pump penalty
+        self.pump_penalty = pump_penalty
+        # set node attributes
+        nx.set_node_attributes(self.connection_graph, True, "road_network")
+        nx.set_node_attributes(self.connection_graph, "", "node_type")
+
+        # check connectivity of G
+        # self.sewer_graph = nx.DiGraph()       # what is the purpouse of this line?
+        if connect_buildings:
+            self.connect_buildings(clustering=clustering)
+
+    def create_unsimplified_graph(self, roads_gdf: gpd.GeoDataFrame) -> nx.Graph:
+        """
+        Create an unsimplified graph from a GeoDataFrame of roads.
+        Parameters
+        ----------
+        roads_gdf : gpd.GeoDataFrame
+            A GeoDataFrame containing road data.
+        Returns
+        -------
+        nx.Graph
+            An unsimplified graph containing nodes and edges from the GeoDataFrame.
+        """
+        # Initialize an empty undirected graph
+        G_unsimplified = nx.Graph()
+
+        # Populate the graph with nodes and edges from the GeoDataFrame
+        for index, row in roads_gdf.iterrows():
+            line = row["geometry"]
+            road_attrs = row.drop(
+                "geometry"
+            ).to_dict()  # Include all attributes, including 'geometry'
+
+            for i in range(len(line.coords) - 1):
+                start_point = line.coords[i]
+                end_point = line.coords[i + 1]
+
+                # Create a LineString geometry for the segment
+                segment_geometry = LineString([start_point, end_point])
+
+                # Add edge to the graph, include the segment geometry
+                G_unsimplified.add_edge(
+                    start_point, end_point, geometry=segment_geometry, **road_attrs
+                )
+
+        return G_unsimplified
+
+    def connect_buildings(
+            self, max_connection_length: int = 30, clustering: str = "centers"
+        ):
+        """
+        Connects the buildings in the network by adding nodes to the graph.
+        Parameters
+        ----------
+        max_connection_length : int, optional
+            The maximum distance between two buildings for them to be connected. The default is 30.
+        clustering : str, optional
+            The method used to cluster the buildings. Can be "centers" or "none". The default is "centers".
+        Returns
+        -------
+        None
+        Notes
+        -----
+        This method adds nodes to the graph to connect the buildings in the network. It first gets the building points
+        and then clusters them based on the specified method. If clustering is set to "centers", it gets the cluster
+        centers and finds the closest edges to them. It then adds nodes to the graph for each cluster center, with the
+        closest edge as an attribute. If clustering is set to "none", it simply adds nodes to the graph for each building.
+        In both cases, it finds the closest edges to the buildings and adds nodes to the graph for each building, with
+        the closest edge as an attribute.
+        Examples
+        --------
+        >>> network = Network()
+        >>> network.connect_buildings(max_connection_length=50, clustering="centers")
+        """
+        # get building points:
+        building_gdf = self.buildings.get_gdf()
+        building_points = building_gdf.geometry.to_list()
+        if clustering == "centers":
+            cluster_centers_gdf = self.buildings.cluster_centers(max_connection_length)
+            cluster_centers = cluster_centers_gdf.geometry.to_list()
+            if len(cluster_centers) > 0:
+                # cloest edges to cluster centers
+                closest_edges_cc = get_closest_edge_multiple(
+                    self.connection_graph, cluster_centers
+                )
+                for k in range(len(cluster_centers)):
+                    try:
+                        self.add_node(
+                            cluster_centers[k], "cluster_center", closest_edges_cc[k]
+                        )
+                    except:
+                        self.add_node(cluster_centers[k], "cluster_center")
+            # closest edges to buildings
+            closest_edges_b = get_closest_edge_multiple(
+                self.connection_graph, building_points
+            )
+            for _, i in building_gdf.iterrows():
+                try:
+                    self.add_node(
+                        i.geometry, "building", closest_edges_b[i], i.to_dict()
+                    )
+                except:
+                    self.add_node(i.geometry, "building", node_attributes=i.to_dict())
+        else:
+            for _, i in building_gdf.iterrows():
+                self.add_node(i.geometry, "building", node_attributes=i.to_dict())
+                
+
+    def add_node(self, point, node_type, closest_edge=None, node_attributes=None):
+            """
+            Adds a node to the connection graph.
+
+            Parameters
+            ----------
+            point : shapely.geometry.Point
+                The point to add as a node.
+            node_type : str
+                The type of node to add.
+            closest_edge : shapely.geometry.LineString, optional
+                The closest edge to the point. Defaults to None.
+            node_attributes : dict, optional
+                Additional attributes to add to the node. Defaults to None.
+
+            Returns
+            -------
+            None
+
+            Notes
+            -----
+            This method adds a node to the connection graph. If `closest_edge` is not provided, it finds the closest edge to
+            the point and uses that as the `closest_edge`. It then disconnects edges from the node and adds the node to the
+            connection graph. If there are any cluster centers, it connects the node to the nearest cluster center. If there
+            are no cluster centers, it connects the node to the road network.
+
+            """
+            # when called for single nodes, get closest edge:
+            if closest_edge is None:
+                edge_gdf = get_edge_gdf(self.connection_graph)
+                edge_gdf["closest_edge"] = edge_gdf.geometry.to_list()
+                closest_edge = ckdnearest(
+                    gpd.GeoDataFrame(geometry=[point]), edge_gdf, ["closest_edge"]
+                ).iloc[0, 1]
+            conn_point = nearest_points(closest_edge, point)[0]
+            # dissconect edges from node
+            cluster_nodes = get_node_keys(
+                self.connection_graph, field="node_type", value="cluster_center"
+            )
+            if node_attributes is None:
+                self.connection_graph.add_node((point.x, point.y), node_type=node_type)
+            else:
+                self.connection_graph.add_node(
+                    (point.x, point.y), node_type=node_type, **node_attributes
+                )
+
+            if len(cluster_nodes) > 0:
+                x, y = zip(*cluster_nodes)
+                cluster_centroids_gdf = gpd.GeoDataFrame(geometry=gpd.points_from_xy(x, y))
+                next_cluster_center = nearest_points(
+                    cluster_centroids_gdf.unary_union, point
+                )[0]
+
+                if conn_point.distance(point) < next_cluster_center.distance(point):
+                    self.connect_to_roadnetwork(
+                        self.connection_graph, point, conn_point, closest_edge
+                    )
+                else:
+                    self.connection_graph.add_edge(
+                        (point.x, point.y), (next_cluster_center.x, next_cluster_center.y)
+                    )
+
+            else:
+                self.connect_to_roadnetwork(
+                    self.connection_graph, point, conn_point, closest_edge
+                )
+
+    def connect_to_roadnetwork(
+        self, G: nx.Graph, new_node, conn_point, closest_edge, add_private_sewer=True
+    ):
+        """
+        Connects a new node to the road network by inserting a connection point on the closest edge and adjusting edges.
+
+        Args:
+            G (networkx.Graph): The road network graph.
+            new_node (pysewer.Node): The new node to be connected to the road network.
+            conn_point (pysewer.Point): The point where the new node will be connected to the road network.
+            closest_edge (pysewer.Edge): The closest edge to the new node.
+            add_private_sewer (bool, optional): Whether to add a private sewer between the new node and the connection point. Defaults to True.
+
+        Returns:
+            bool: True if the connection was successful, False otherwise.
+        """
+        u = closest_edge.coords[0]
+        v = closest_edge.coords[1]
+        # inserts new connection point on a edge and adjusts edges
+        # Find Edge intersecting conn_point
+
+        G.remove_edge(u, v)
+
+        G.add_node((conn_point.x, conn_point.y), connection_node=True)
+
+        # add edges
+        G.add_edge(u, (conn_point.x, conn_point.y))
+        G.add_edge((conn_point.x, conn_point.y), v)
+        if add_private_sewer:
+            G.add_edge(
+                (new_node.x, new_node.y),
+                (conn_point.x, conn_point.y),
+                private_sewer=True,
+            )
+        return True
+
+    def generate_connection_graph(self) -> nx.MultiDiGraph:
+        """
+        
+        Generates a connection graph from the given connection data and returns it.
+        This method simplifies the connection graph, removes any self loops, sets trench depth node attributes to 0,
+        calculates the geometry, distance, profile, needs_pump, weight, and elevation attributes for each edge and node
+        in the connection graph.
+
+        Returns:
+        --------
+        nx.MultiDiGraph
+            A directed graph representing the connections between the different points in the network.
+        """
+
+        simplified_graph = simplify_graph(self.connection_graph)
+        self.junction_graph = simplified_graph
+        connection_digraph = nx.MultiDiGraph(simplified_graph)
+        # remove any self loops
+        connection_digraph.remove_edges_from(
+            list(nx.selfloop_edges(connection_digraph))
+        )
+        nx.set_node_attributes(connection_digraph, 0, name="trench_depth")
+        for u, v, a in connection_digraph.edges(data=True):
+            # ensure that edge exists before accessing its attributes
+            if connection_digraph.has_edge(u, v):
+                detailed_path = nx.shortest_path(self.connection_graph, u, v)
+                connection_digraph[u][v][0]["geometry"] = LineString(detailed_path)
+                dist = get_path_distance(detailed_path)
+                connection_digraph[u][v][0]["distance"] = dist
+                connection_digraph[u][v][0]["profile"] = self.dem.get_profile(
+                    LineString(detailed_path)
+                )
+                # checking if the profile attribute exist before using it
+                if "profile" in connection_digraph[u][v][0]:
+                    connection_digraph[u][v][0]["needs_pump"], _, _ = needs_pump(
+                        connection_digraph[u][v][0]["profile"]
+                    )
+
+                    if connection_digraph[u][v][0]["needs_pump"]:
+                        connection_digraph[u][v][0]["weight"] = dist * self.pump_penalty
+                    else:
+                        connection_digraph[u][v][0]["weight"] = dist
+        for n in connection_digraph.nodes():
+            attr = {n: {"elevation": self.dem.get_elevation(Point(n))}}
+            nx.set_node_attributes(connection_digraph, attr)
+        return connection_digraph
+        # add additional attributes and estimate connection costs
+
+    def add_sink(self, sink_location):
+        """
+        Adds a sink node to the graph at the specified location.
+
+        Parameters
+        ----------
+        sink_location : tuple
+            A tuple containing the x and y coordinates of the sink location.
+
+        Returns
+        -------
+        None
+        """
+        self.add_node(Point(sink_location), "wwtp")
+
+    def reset_sinks(self):
+        """
+        Resets the sinks in the connection graph by setting their node_type attribute to an empty string.
+        Returns
+        -------
+        None
+            This method does not return anything.
+        """
+        sinks = self.get_sinks()
+        if len(sinks) > 0:
+            for s in sinks:
+                node_attrs = {s: {"node_type": ""}}
+            nx.set_node_attributes(self.connection_graph, node_attrs)
+
+
+    def set_sink_lowest(self, candidate_nodes=None):
+        """
+        Sets the sink node to the lowest point in the graph.
+        
+        Parameters
+        ----------
+        candidate_nodes : list, optional
+            A list of candidate nodes to consider for the sink node. If None, all nodes except buildings are considered.
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This method sets the sink node to the lowest point in the graph. If candidate_nodes is not None, only the nodes in candidate_nodes that are not buildings are considered.
+        """
+
+        r = {}
+        buildings = self.get_buildings()
+        if candidate_nodes == None:
+            for n in [k for k in self.connection_graph.nodes if k not in buildings]:
+                r[self.dem.get_elevation(Point(n))] = n
+        else:
+            for n in [
+                k
+                for k in self.connection_graph.nodes
+                if k not in buildings and k in candidate_nodes
+            ]:
+                r[self.dem.get_elevation(Point(n))] = n
+        try:
+            lowest_node = r[min(r.keys())]
+            # shift lowest by a meter to allow connection point and maintain graph topology
+            lowest_node = (lowest_node[0] + 1, lowest_node[1])
+            self.add_sink(lowest_node)
+        except:
+            pass
+
+    def get_sinks(self):
+        """Returns a list of node keys for all wastewater treatment plants (wwtp) in the connection graph."""
+        return get_node_keys(self.connection_graph, field="node_type", value="wwtp")
+
+    def set_pump_penalty(self, pp):
+        """
+        Set the pump penalty for the current instance of the Preprocessing class.
+        Parameters
+        ----------
+        pp : float
+            The pump penalty to set.
+        Returns
+        -------
+        None
+        """
+        self.pump_penalty = pp
+
+    def get_buildings(self):
+        """Returns a list of node keys for all buildings in the connection graph."""
+        return get_node_keys(self.connection_graph, field="node_type", value="building")
+
+    def connect_subgraphs(self):
+        """Identifies unconnect street subnetworks and connects them based on shortest distance"""
+        G = self.connection_graph
+        sub_graphs = list((G.subgraph(c).copy() for c in nx.connected_components(G)))
+        while len(sub_graphs) > 1:
+            # select one subgraph
+            sg = sub_graphs.pop()
+            G_without_sg = sub_graphs.pop()
+
+            while len(sub_graphs) > 0:
+                G_without_sg = nx.compose(G_without_sg, sub_graphs.pop())
+
+            # get shortest edge between sg and G_withouto_sg:
+            sg_gdf = get_node_gdf(sg).unary_union
+            G_without_sg_gdf = get_node_gdf(G_without_sg).unary_union
+            connection_points = nearest_points(sg_gdf, G_without_sg_gdf)
+
+            # add edge
+            G.add_edge(
+                (connection_points[0].x, connection_points[0].y),
+                (connection_points[1].x, connection_points[1].y),
+                road_network=True,
+            )
+            # get updated subgraph list
+            sub_graphs = list(
+                (G.subgraph(c).copy() for c in nx.connected_components(G))
+            )

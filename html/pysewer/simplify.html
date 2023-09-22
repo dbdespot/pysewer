@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>pysewer.simplify API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>pysewer.simplify</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import networkx as nx
+from shapely.geometry import LineString, Point
+
+from .helper import get_node_keys
+
+## Code Adapted from:
+# Boeing, G. 2017. &#34;OSMnx: New Methods for Acquiring, Constructing, Analyzing, and Visualizing Complex Street Networks.&#34; Computers, Environment and Urban Systems 65, 126-139. doi:10.1016/j.compenvurbsys.2017.05.004
+
+
+def simplify_graph(
+    G: nx.MultiDiGraph, strict: bool = True, remove_rings: bool = True
+) -&gt; nx.MultiDiGraph:
+    &#34;&#34;&#34;
+    Simplify a graph&#39;s topology by removing interstitial nodes.
+    Simplify graph topology by removing all nodes that are not intersections
+    or dead-ends. Create an edge directly between the end points that
+    encapsulate them, but retain the geometry of the original edges, saved as
+    an attribute in new edge. Some of the resulting consolidated edges may
+    comprise multiple OSM ways, and if so, their multiple attribute values are
+    stored as a list.
+    Parameters
+    ----------
+    G : networkx.MultiDiGraph
+        input graph
+    strict : bool
+        if False, allow nodes to be end points even if they fail all other
+        rules but have incident edges with different OSM IDs. Lets you keep
+        nodes at elbow two-way intersections, but sometimes individual blocks
+        have multiple OSM IDs within them too.
+    remove_rings : bool
+        if True, remove isolated self-contained rings that have no endpoints
+    Returns
+    -------
+    G : networkx.MultiDiGraph
+        topologically simplified graph
+    &#34;&#34;&#34;
+    # if _is_simplified(G):
+    #    raise Exception(&#34;This graph has already been simplified, cannot simplify it again.&#34;)
+
+    # utils.log(&#34;Begin topologically simplifying the graph...&#34;)
+
+    # make a copy to not edit the original graph object the caller passed in
+    G = G.copy()
+    initial_node_count = len(G)
+    initial_edge_count = len(G.edges)
+    all_nodes_to_remove = []
+    all_edges_to_add = []
+
+    # generate each path that needs to be simplified
+    for path in _get_paths_to_simplify(G):
+        # add the interstitial edges we&#39;re removing to a list so we can retain
+        # their spatial geometry
+        edge_attributes = dict()
+        for u, v in zip(path[:-1], path[1:]):
+            # there should rarely be multiple edges between interstitial nodes
+            # usually happens if OSM has duplicate ways digitized for just one
+            # street... we will keep only one of the edges (see below)
+            if not G.number_of_edges(u, v) == 1:
+                # utils.log(f&#34;Found multiple edges between {u} and {v} when simplifying&#34;)
+                pass
+            # get edge between these nodes: if multiple edges exist between
+            # them (see above), we retain only one in the simplified graph
+            edge = G.edges[u, v]
+            for key in edge:
+                if key in edge_attributes:
+                    # if this key already exists in the dict, append it to the
+                    # value list
+                    edge_attributes[key].append(edge[key])
+                else:
+                    # if this key doesn&#39;t already exist, set the value to a list
+                    # containing the one value
+                    edge_attributes[key] = [edge[key]]
+
+        for key in edge_attributes:
+            # don&#39;t touch the length attribute, we&#39;ll sum it at the end
+            if len(set(edge_attributes[key])) == 1 and not key == &#34;length&#34;:
+                # if there&#39;s only 1 unique value in this attribute list,
+                # consolidate it to the single value (the zero-th)
+                edge_attributes[key] = edge_attributes[key][0]
+            elif not key == &#34;length&#34;:
+                # otherwise, if there are multiple values, keep one of each value
+                edge_attributes[key] = list(set(edge_attributes[key]))
+
+        # construct the geometry and sum the lengths of the segments
+        edge_attributes[&#34;geometry&#34;] = LineString([Point(node) for node in path])
+        edge_attributes[&#34;length&#34;] = edge_attributes[&#34;geometry&#34;].length
+
+        # add the nodes and edges to their lists for processing at the end
+        all_nodes_to_remove.extend(path[1:-1])
+        all_edges_to_add.append(
+            {&#34;origin&#34;: path[0], &#34;destination&#34;: path[-1], &#34;attr_dict&#34;: edge_attributes}
+        )
+
+    # for each edge to add in the list we assembled, create a new edge between
+    # the origin and destination
+    for edge in all_edges_to_add:
+        G.add_edge(edge[&#34;origin&#34;], edge[&#34;destination&#34;])
+
+    # finally remove all the interstitial nodes between the new edges
+    G.remove_nodes_from(set(all_nodes_to_remove))
+
+    # mark graph as having been simplified
+    G.graph[&#34;simplified&#34;] = True
+
+    msg = (
+        f&#34;Simplified graph: {initial_node_count} to {len(G)} nodes, &#34;
+        f&#34;{initial_edge_count} to {len(G.edges)} edges&#34;
+    )
+    print(msg)
+    return G
+
+
+def _get_paths_to_simplify(G):
+    &#34;&#34;&#34;
+    Generate all the paths to be simplified between endpoint nodes.
+    The path is ordered from the first endpoint, through the interstitial nodes,
+    to the second endpoint.
+    Parameters
+    ----------
+    G : networkx.MultiDiGraph
+        input graph
+    strict : bool
+        if False, allow nodes to be end points even if they fail all other rules
+        but have edges with different OSM IDs
+    Returns
+    ------
+    path_to_simplify : list
+    &#34;&#34;&#34;
+    # first identify all the nodes that are endpoints
+    endpoints = get_essential_nodes(G)
+
+    # for each endpoint node, look at each of its successor nodes
+    for endpoint in endpoints:
+        for successor in G.neighbors(endpoint):
+            if successor not in endpoints:
+                # if endpoint node&#39;s successor is not an endpoint, build a path
+                # from the endpoint node, through the successor, and on to the
+                # next endpoint node
+                yield _build_path(G, endpoint, successor, endpoints)
+
+
+def _build_path(G, endpoint, endpoint_successor, endpoints):
+    &#34;&#34;&#34;
+    Build a path of nodes from one endpoint node to next endpoint node.
+    Parameters
+    ----------
+    G : networkx.MultiDiGraph
+        input graph
+    endpoint : int
+        the endpoint node from which to start the path
+    endpoint_successor : int
+        the successor of endpoint through which the path to the next endpoint
+        will be built
+    endpoints : set
+        the set of all nodes in the graph that are endpoints
+    Returns
+    -------
+    path : list
+        the first and last items in the resulting path list are endpoint
+        nodes, and all other items are interstitial nodes that can be removed
+        subsequently
+    &#34;&#34;&#34;
+    # start building path from endpoint node through its successor
+    path = [endpoint, endpoint_successor]
+
+    # for each successor of the endpoint&#39;s successor
+    for successor in G.neighbors(endpoint_successor):
+        if successor not in path:
+            # if this successor is already in the path, ignore it, otherwise add
+            # it to the path
+            path.append(successor)
+            while successor not in endpoints:
+                # find successors (of current successor) not in path
+                successors = [n for n in G.neighbors(successor) if n not in path]
+
+                # 99%+ of the time there will be only 1 successor: add to path
+                if len(successors) == 1:
+                    successor = successors[0]
+                    path.append(successor)
+
+                # handle relatively rare cases or OSM digitization quirks
+                elif len(successors) == 0:
+                    if endpoint in G.neighbors(successor):
+                        # we have come to the end of a self-looping edge, so
+                        # add first node to end of path to close it and return
+                        return path + [endpoint]
+                    else:
+                        # this can happen due to OSM digitization error where
+                        # a one-way street turns into a two-way here, but
+                        # duplicate incoming one-way edges are present
+                        # utils.log(
+                        #    f&#34;Unexpected simplify pattern handled near {successor}&#34;, level=lg.WARN
+                        # )
+                        return path
+                else:
+                    # if successor has &gt;1 successors, then successor must have
+                    # been an endpoint because you can go in 2 new directions.
+                    # this should never occur in practice
+                    raise Exception(
+                        f&#34;Unexpected simplify pattern failed near {successor}&#34;
+                    )
+
+            # if this successor is an endpoint, we&#39;ve completed the path
+            return path
+
+    # if endpoint_successor has no successors not already in the path, return
+    # the current path: this is usually due to a digitization quirk on OSM
+    return path
+
+
+def get_essential_nodes(G):
+    &#34;&#34;&#34;
+    Returns a list of essential nodes to build the simplified graph. This includes all junctions (degree &gt; 2), buildings, and connection points.
+
+    Parameters
+    ----------
+    G : networkx.Graph
+        NetworkX street graph with connected buildings.
+
+    Returns
+    -------
+    List
+        List of node keys.
+
+    Examples
+    --------
+    &gt;&gt;&gt; G = nx.Graph()
+    &gt;&gt;&gt; G.add_node(1, road_network=True)
+    &gt;&gt;&gt; G.add_node(2, road_network=True)
+    &gt;&gt;&gt; G.add_node(3, road_network=False)
+    &gt;&gt;&gt; G.add_node(4, connection_node=True)
+    &gt;&gt;&gt; G.add_node(5, connection_node=False)
+    &gt;&gt;&gt; G.add_edge(1, 2)
+    &gt;&gt;&gt; G.add_edge(2, 3)
+    &gt;&gt;&gt; G.add_edge(2, 4)
+    &gt;&gt;&gt; G.add_edge(4, 5)
+    &gt;&gt;&gt; get_essential_nodes(G)
+    [1, 2, 3, 5]
+
+    &#34;&#34;&#34;
+    connection_nodes = [
+        x for x, y in G.nodes(data=&#34;connection_node&#34;, default=False) if y == True
+    ]
+    contract_nodes = [
+        n for n in G.nodes if G.degree(n) == 2 and n not in connection_nodes
+    ]
+    print(len(G.nodes))
+    de_nodes = [
+        x
+        for x, y in G.nodes(data=&#34;road_network&#34;, default=False)
+        if y and G.degree(x) == 1
+    ]
+
+    essential_nodes = [n for n in G.nodes if n not in contract_nodes] + de_nodes
+    print(len(essential_nodes))
+
+    return essential_nodes</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="pysewer.simplify.get_essential_nodes"><code class="name flex">
+<span>def <span class="ident">get_essential_nodes</span></span>(<span>G)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a list of essential nodes to build the simplified graph. This includes all junctions (degree &gt; 2), buildings, and connection points.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>G</code></strong> :&ensp;<code>networkx.Graph</code></dt>
+<dd>NetworkX street graph with connected buildings.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List</code></dt>
+<dd>List of node keys.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; G = nx.Graph()
+&gt;&gt;&gt; G.add_node(1, road_network=True)
+&gt;&gt;&gt; G.add_node(2, road_network=True)
+&gt;&gt;&gt; G.add_node(3, road_network=False)
+&gt;&gt;&gt; G.add_node(4, connection_node=True)
+&gt;&gt;&gt; G.add_node(5, connection_node=False)
+&gt;&gt;&gt; G.add_edge(1, 2)
+&gt;&gt;&gt; G.add_edge(2, 3)
+&gt;&gt;&gt; G.add_edge(2, 4)
+&gt;&gt;&gt; G.add_edge(4, 5)
+&gt;&gt;&gt; get_essential_nodes(G)
+[1, 2, 3, 5]
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_essential_nodes(G):
+    &#34;&#34;&#34;
+    Returns a list of essential nodes to build the simplified graph. This includes all junctions (degree &gt; 2), buildings, and connection points.
+
+    Parameters
+    ----------
+    G : networkx.Graph
+        NetworkX street graph with connected buildings.
+
+    Returns
+    -------
+    List
+        List of node keys.
+
+    Examples
+    --------
+    &gt;&gt;&gt; G = nx.Graph()
+    &gt;&gt;&gt; G.add_node(1, road_network=True)
+    &gt;&gt;&gt; G.add_node(2, road_network=True)
+    &gt;&gt;&gt; G.add_node(3, road_network=False)
+    &gt;&gt;&gt; G.add_node(4, connection_node=True)
+    &gt;&gt;&gt; G.add_node(5, connection_node=False)
+    &gt;&gt;&gt; G.add_edge(1, 2)
+    &gt;&gt;&gt; G.add_edge(2, 3)
+    &gt;&gt;&gt; G.add_edge(2, 4)
+    &gt;&gt;&gt; G.add_edge(4, 5)
+    &gt;&gt;&gt; get_essential_nodes(G)
+    [1, 2, 3, 5]
+
+    &#34;&#34;&#34;
+    connection_nodes = [
+        x for x, y in G.nodes(data=&#34;connection_node&#34;, default=False) if y == True
+    ]
+    contract_nodes = [
+        n for n in G.nodes if G.degree(n) == 2 and n not in connection_nodes
+    ]
+    print(len(G.nodes))
+    de_nodes = [
+        x
+        for x, y in G.nodes(data=&#34;road_network&#34;, default=False)
+        if y and G.degree(x) == 1
+    ]
+
+    essential_nodes = [n for n in G.nodes if n not in contract_nodes] + de_nodes
+    print(len(essential_nodes))
+
+    return essential_nodes</code></pre>
+</details>
+</dd>
+<dt id="pysewer.simplify.simplify_graph"><code class="name flex">
+<span>def <span class="ident">simplify_graph</span></span>(<span>G: networkx.classes.multidigraph.MultiDiGraph, strict: bool = True, remove_rings: bool = True) ‑> networkx.classes.multidigraph.MultiDiGraph</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Simplify a graph's topology by removing interstitial nodes.
+Simplify graph topology by removing all nodes that are not intersections
+or dead-ends. Create an edge directly between the end points that
+encapsulate them, but retain the geometry of the original edges, saved as
+an attribute in new edge. Some of the resulting consolidated edges may
+comprise multiple OSM ways, and if so, their multiple attribute values are
+stored as a list.
+Parameters</p>
+<hr>
+<dl>
+<dt><strong><code>G</code></strong> :&ensp;<code>networkx.MultiDiGraph</code></dt>
+<dd>input graph</dd>
+<dt><strong><code>strict</code></strong> :&ensp;<code>bool</code></dt>
+<dd>if False, allow nodes to be end points even if they fail all other
+rules but have incident edges with different OSM IDs. Lets you keep
+nodes at elbow two-way intersections, but sometimes individual blocks
+have multiple OSM IDs within them too.</dd>
+<dt><strong><code>remove_rings</code></strong> :&ensp;<code>bool</code></dt>
+<dd>if True, remove isolated self-contained rings that have no endpoints</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>G</code></strong> :&ensp;<code>networkx.MultiDiGraph</code></dt>
+<dd>topologically simplified graph</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def simplify_graph(
+    G: nx.MultiDiGraph, strict: bool = True, remove_rings: bool = True
+) -&gt; nx.MultiDiGraph:
+    &#34;&#34;&#34;
+    Simplify a graph&#39;s topology by removing interstitial nodes.
+    Simplify graph topology by removing all nodes that are not intersections
+    or dead-ends. Create an edge directly between the end points that
+    encapsulate them, but retain the geometry of the original edges, saved as
+    an attribute in new edge. Some of the resulting consolidated edges may
+    comprise multiple OSM ways, and if so, their multiple attribute values are
+    stored as a list.
+    Parameters
+    ----------
+    G : networkx.MultiDiGraph
+        input graph
+    strict : bool
+        if False, allow nodes to be end points even if they fail all other
+        rules but have incident edges with different OSM IDs. Lets you keep
+        nodes at elbow two-way intersections, but sometimes individual blocks
+        have multiple OSM IDs within them too.
+    remove_rings : bool
+        if True, remove isolated self-contained rings that have no endpoints
+    Returns
+    -------
+    G : networkx.MultiDiGraph
+        topologically simplified graph
+    &#34;&#34;&#34;
+    # if _is_simplified(G):
+    #    raise Exception(&#34;This graph has already been simplified, cannot simplify it again.&#34;)
+
+    # utils.log(&#34;Begin topologically simplifying the graph...&#34;)
+
+    # make a copy to not edit the original graph object the caller passed in
+    G = G.copy()
+    initial_node_count = len(G)
+    initial_edge_count = len(G.edges)
+    all_nodes_to_remove = []
+    all_edges_to_add = []
+
+    # generate each path that needs to be simplified
+    for path in _get_paths_to_simplify(G):
+        # add the interstitial edges we&#39;re removing to a list so we can retain
+        # their spatial geometry
+        edge_attributes = dict()
+        for u, v in zip(path[:-1], path[1:]):
+            # there should rarely be multiple edges between interstitial nodes
+            # usually happens if OSM has duplicate ways digitized for just one
+            # street... we will keep only one of the edges (see below)
+            if not G.number_of_edges(u, v) == 1:
+                # utils.log(f&#34;Found multiple edges between {u} and {v} when simplifying&#34;)
+                pass
+            # get edge between these nodes: if multiple edges exist between
+            # them (see above), we retain only one in the simplified graph
+            edge = G.edges[u, v]
+            for key in edge:
+                if key in edge_attributes:
+                    # if this key already exists in the dict, append it to the
+                    # value list
+                    edge_attributes[key].append(edge[key])
+                else:
+                    # if this key doesn&#39;t already exist, set the value to a list
+                    # containing the one value
+                    edge_attributes[key] = [edge[key]]
+
+        for key in edge_attributes:
+            # don&#39;t touch the length attribute, we&#39;ll sum it at the end
+            if len(set(edge_attributes[key])) == 1 and not key == &#34;length&#34;:
+                # if there&#39;s only 1 unique value in this attribute list,
+                # consolidate it to the single value (the zero-th)
+                edge_attributes[key] = edge_attributes[key][0]
+            elif not key == &#34;length&#34;:
+                # otherwise, if there are multiple values, keep one of each value
+                edge_attributes[key] = list(set(edge_attributes[key]))
+
+        # construct the geometry and sum the lengths of the segments
+        edge_attributes[&#34;geometry&#34;] = LineString([Point(node) for node in path])
+        edge_attributes[&#34;length&#34;] = edge_attributes[&#34;geometry&#34;].length
+
+        # add the nodes and edges to their lists for processing at the end
+        all_nodes_to_remove.extend(path[1:-1])
+        all_edges_to_add.append(
+            {&#34;origin&#34;: path[0], &#34;destination&#34;: path[-1], &#34;attr_dict&#34;: edge_attributes}
+        )
+
+    # for each edge to add in the list we assembled, create a new edge between
+    # the origin and destination
+    for edge in all_edges_to_add:
+        G.add_edge(edge[&#34;origin&#34;], edge[&#34;destination&#34;])
+
+    # finally remove all the interstitial nodes between the new edges
+    G.remove_nodes_from(set(all_nodes_to_remove))
+
+    # mark graph as having been simplified
+    G.graph[&#34;simplified&#34;] = True
+
+    msg = (
+        f&#34;Simplified graph: {initial_node_count} to {len(G)} nodes, &#34;
+        f&#34;{initial_edge_count} to {len(G.edges)} edges&#34;
+    )
+    print(msg)
+    return G</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="pysewer" href="index.html">pysewer</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="pysewer.simplify.get_essential_nodes" href="#pysewer.simplify.get_essential_nodes">get_essential_nodes</a></code></li>
+<li><code><a title="pysewer.simplify.simplify_graph" href="#pysewer.simplify.simplify_graph">simplify_graph</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
