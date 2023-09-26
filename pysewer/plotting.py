@@ -1,7 +1,7 @@
 import os
-
-# import earthpy.plot as ep
-# import earthpy.spatial as es
+from typing import Optional
+import earthpy.plot as ep
+import earthpy.spatial as es
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -14,7 +14,10 @@ from rasterio.plot import plotting_extent
 from shapely.geometry import LineString, MultiLineString, Point, Polygon
 from shapely.ops import linemerge, nearest_points
 
-from pysewer.helper import *
+from .helper import get_edge_gdf, get_node_gdf
+from .config.settings import load_config
+
+DEFAULT_CONFIG = load_config()
 
 # def get_plot_pos(G):
 #    pos = dict(G.nodes)
@@ -25,15 +28,15 @@ from pysewer.helper import *
 
 def plot_model_domain(
     modelDomain,
-    plot_connection_graph=False,
-    plot_junction_graph=False,
-    plot_sink=True,
-    plot_sewer=False,
-    sewer_graph=None,
-    info_table=None,
+    plot_connection_graph:bool=DEFAULT_CONFIG.plotting.plot_connection_graph,
+    plot_junction_graph:bool=DEFAULT_CONFIG.plotting.plot_junction_graph,
+    plot_sink:bool=DEFAULT_CONFIG.plotting.plot_sink,
+    plot_sewer:bool=DEFAULT_CONFIG.plotting.plot_sewer,
+    sewer_graph:nx.Graph=DEFAULT_CONFIG.plotting.sewer_graph,
+    info_table:Optional[dict]=DEFAULT_CONFIG.plotting.info_table,
     hs_alt=30,
     hs_az=0,
-    hillshade=False,
+    hillshade:bool=DEFAULT_CONFIG.plotting.hillshade,
 ):
     """
     Plots the sewer network model domain.

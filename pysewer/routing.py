@@ -7,6 +7,7 @@ from .helper import get_node_keys
 NodeType = Union[int, str, Hashable]
 
 
+
 def rsph_tree(
     connection_graph: nx.Graph,
     sinks: List[NodeType],
@@ -81,8 +82,8 @@ def rsph_tree(
 
 def find_rsph_path(
     connection_graph: nx.Graph,
-    subgraph_nodes: List,
-    terminals: List,
+    subgraph_nodes: List[NodeType],
+    terminals: List[NodeType],
     all_paths: dict,
     all_lengths: dict,
 ) -> List[NodeType]:

@@ -13,39 +13,59 @@ from typing import List, Tuple
 import fiona
 import geopandas as gpd
 
+from .config.settings import load_config
 
-def is_list_of_tuples(lst: List) -> bool:
+DEFAULT_CONFIG = load_config()
+
+
+def map_dtype_to_fiona(dtype):
+    """Map pandas data type to Fiona/OGR data type."""
+    if "int" in dtype:
+        return "int"
+    elif "float" in dtype:
+        return "float"
+    else:
+        return "str"
+
+
+def is_list_of_tuples(column):
+    """Check if a pandas Series contains lists of tuples."""
+    return all(
+        isinstance(item, (list, tuple))
+        and all(isinstance(sub_item, tuple) for sub_item in item)
+        for item in column
+    )
+
+
+def tuple_list_to_json(tuple_list):
+    """Serialize a list of tuples to a JSON string."""
+    return json.dumps(tuple_list)
+
+
+def generate_schema(gdf: gpd.GeoDataFrame):
     """
-    Check if a list contains only tuples.
+    Generate a schema based on the GeoDataFrame.
 
     Parameters
     ----------
-    lst : list
-        List to check.
+    gdf : gpd.GeoDataFrame
+        The GeoDataFrame to generate the schema from.
 
     Returns
     -------
-    bool
-        True if the list contains only tuples, False otherwise.
+    dict
+        The schema dictionary.
+
     """
-    return all(isinstance(item, tuple) for item in lst)
-
-
-def tuple_list_to_json(lst: List[Tuple]) -> str:
-    """
-    Convert a list of tuples to a JSON string.
-
-    Parameters
-    ----------
-    lst : list of tuples
-        List of tuples to convert.
-
-    Returns
-    -------
-    str
-        JSON string representation of the list of tuples.
-    """
-    return json.dumps([list(item) for item in lst])
+    schema = {
+        "geometry": gdf.geometry.type.iloc[0],
+        "properties": {
+            col: map_dtype_to_fiona(gdf[col].dtype.name)
+            for col in gdf.columns
+            if col != "geometry"
+        },
+    }
+    return schema
 
 
 def write_gdf_to_gpkg(gdf: gpd.GeoDataFrame, filepath: str):
@@ -54,14 +74,18 @@ def write_gdf_to_gpkg(gdf: gpd.GeoDataFrame, filepath: str):
 
     Parameters
     ----------
-    gdf : geopandas.GeoDataFrame
-        GeoDataFrame to write to file.
+    gdf : gpd.GeoDataFrame
+        The GeoDataFrame to be written to the GPKG file.
     filepath : str
-        Path to the output file.
+        The file path to the GPKG file.
 
     Returns
     -------
     None
+
+    Notes
+    -----
+    This function converts any columns with list of tuples to JSON strings before writing to the GPKG file.
     """
     # Convert only columns with list of tuples to JSON strings
     for col in gdf.columns:
@@ -70,14 +94,7 @@ def write_gdf_to_gpkg(gdf: gpd.GeoDataFrame, filepath: str):
                 gdf[col] = gdf[col].apply(tuple_list_to_json)
 
     # Define the schema based on the GeoDataFrame
-    schema = {
-        "geometry": gdf.geometry.type.iloc[0],
-        "properties": {
-            col: "str" if is_list_of_tuples(gdf[col]) else gdf[col].dtype.name
-            for col in gdf.columns
-            if col != "geometry"
-        },
-    }
+    schema = generate_schema(gdf)
 
     # Open a new GPKG file in write mode
     with fiona.open(filepath, mode="w", driver="GPKG", schema=schema) as dst:
@@ -91,16 +108,16 @@ def write_gdf_to_gpkg(gdf: gpd.GeoDataFrame, filepath: str):
             dst.write(feature)
 
 
-def write_gdf_to_shp(gdf: gpd.GeoDataFrame, filepath: str) -> None:
+def write_gdf_to_shp(gdf: gpd.GeoDataFrame, filepath: str):
     """
-    Write a GeoDataFrame to a shapefile using Fiona, converting lists of tuples to JSON strings.
+    Write a GeoDataFrame to an ESRI Shapefile (SHP) file using Fiona, converting lists of tuples to JSON strings.
 
     Parameters
     ----------
     gdf : gpd.GeoDataFrame
-        The GeoDataFrame to be written to a shapefile.
+        The GeoDataFrame to be written to the SHP file.
     filepath : str
-        The file path to write the shapefile to.
+        The file path to save the SHP file.
 
     Returns
     -------
@@ -108,10 +125,7 @@ def write_gdf_to_shp(gdf: gpd.GeoDataFrame, filepath: str) -> None:
 
     Notes
     -----
-    This function converts any columns in the GeoDataFrame that contain lists of tuples to JSON strings before writing
-    the GeoDataFrame to a shapefile. The schema of the shapefile is defined based on the GeoDataFrame, with the geometry
-    column being defined as the geometry type of the first row of the GeoDataFrame, and all other columns being defined
-    as either 'str' or the dtype of the column, depending on whether the column contains lists of tuples or not.
+    This function converts any columns in the GeoDataFrame that contain lists of tuples to JSON strings before writing to the SHP file.
     """
     # Convert only columns with list of tuples to JSON strings
     for col in gdf.columns:
@@ -120,16 +134,9 @@ def write_gdf_to_shp(gdf: gpd.GeoDataFrame, filepath: str) -> None:
                 gdf[col] = gdf[col].apply(tuple_list_to_json)
 
     # Define the schema based on the GeoDataFrame
-    schema = {
-        "geometry": gdf.geometry.type.iloc[0],
-        "properties": {
-            col: "str" if is_list_of_tuples(gdf[col]) else gdf[col].dtype.name
-            for col in gdf.columns
-            if col != "geometry"
-        },
-    }
+    schema = generate_schema(gdf)
 
-    # Open a new shapefile in write mode
+    # Open a new SHP file in write mode
     with fiona.open(filepath, mode="w", driver="ESRI Shapefile", schema=schema) as dst:
         for _, row in gdf.iterrows():
             feature = {
@@ -138,13 +145,17 @@ def write_gdf_to_shp(gdf: gpd.GeoDataFrame, filepath: str) -> None:
                     col: row[col] for col in gdf.columns if col != "geometry"
                 },
             }
-            dst.write(feature)
+            try:
+                dst.write(feature)
+            except Exception as e:
+                print(f"Error writing feature to SHP file: {e}")
 
 
-import geopandas as gpd
-
-
-def export_sewer_network(gdf: gpd.GeoDataFrame, filepath: str, file_format: str):
+def export_sewer_network(
+    gdf: gpd.GeoDataFrame,
+    filepath: str,
+    file_format: str = DEFAULT_CONFIG.export.file_format,
+):
     """
     Export a sewer network GeoDataFrame to a file.
 
@@ -155,8 +166,8 @@ def export_sewer_network(gdf: gpd.GeoDataFrame, filepath: str, file_format: str)
     filepath : str
         The path to the file to which the sewer network should be exported.
     file_format : str
-        The file format to which the sewer network should be exported.
-        Currently supported formats are 'gpkg' (GeoPackage) and 'shp' (ESRI Shapefile).
+        The file format to which the sewer network should be exported. Default is 'gpkg' (GeoPackage).
+        Currently supported formats are 'gpkg' (GeoPackage), 'shp' (ESRI Shapefile) and Geoparquet 'parquet'.
 
     Raises
     ------

@@ -1,4 +1,8 @@
 import logging
+from typing import Hashable, List, Tuple, Union
+
+import yaml
+
 logger = logging.getLogger(__name__)
 
 import math
@@ -14,7 +18,13 @@ import shapely
 from shapely.geometry import LineString, MultiLineString, Point, Polygon
 from shapely.ops import linemerge, nearest_points
 
+from .config.settings import load_config
 from .helper import get_mean_slope, get_node_keys, get_upstream_nodes
+
+# load default settings
+DEFAULT_CONFIG = load_config()
+
+NodeType = Union[str, int, Hashable, None]
 
 
 def place_lifting_station(G, node):
@@ -24,7 +34,7 @@ def place_lifting_station(G, node):
     return G
 
 
-def get_max_upstream_diameter(G, edge):
+def get_max_upstream_diameter(G, edge: tuple):
     """
     Returns the maximum diameter of all upstream edges of the given edge in the directed graph G.
 
@@ -44,9 +54,6 @@ def get_max_upstream_diameter(G, edge):
     for u, v, data in G.in_edges(edge[0], data=True):
         diameters.append(data["diameter"])
     return max(diameters)
-
-
-import networkx as nx
 
 
 def place_pump(G, node):
@@ -75,7 +82,7 @@ def place_pump(G, node):
     return G
 
 
-def set_diameter(G:nx.Graph, edge:tuple, diameter:float):
+def set_diameter(G: nx.Graph, edge: tuple, diameter: float):
     """
     Set the diameter of an edge in a graph.
 
@@ -101,7 +108,7 @@ def set_diameter(G:nx.Graph, edge:tuple, diameter:float):
     return G
 
 
-def get_downstream_junction(G:nx.Graph, node:int):
+def get_downstream_junction(G: nx.Graph, node: int):
     """
     Returns the next downstream junction from the specified node in G.
 
@@ -127,7 +134,7 @@ def get_downstream_junction(G:nx.Graph, node:int):
     return junction
 
 
-def get_junction_front(G:nx.Graph, junctions):
+def get_junction_front(G: nx.Graph, junctions):
     """
     Returns a list of junctions or terminals which have as many entries for inflow trench depths as they have incoming edges.
 
@@ -151,7 +158,7 @@ def get_junction_front(G:nx.Graph, junctions):
     return r
 
 
-def reverse_bfs(G, sink, include_private_sewer=True):
+def reverse_bfs(G, sink: str, include_private_sewer: bool = True):
     """
     Returns an iterator over edges in a sequential fashion, starting at the terminals (i.e. buildings) and returning all upstream edges of a junction before moving downstream
 
@@ -182,7 +189,12 @@ def reverse_bfs(G, sink, include_private_sewer=True):
 
 
 def calculate_hydraulic_parameters(
-    G, sinks, pressurized_diameter, diameters, roughness, include_private_sewer=True
+    G,
+    sinks: list,
+    pressurized_diameter: float = DEFAULT_CONFIG.optimization.pressurized_diameter,
+    diameters: List[float] = DEFAULT_CONFIG.optimization.diameters,
+    roughness: float = DEFAULT_CONFIG.optimization.roughness,
+    include_private_sewer: bool = DEFAULT_CONFIG.preprocessing.add_private_sewer,
 ):
     """
     Calculates hydraulic parameters for a sewer network graph.
@@ -216,7 +228,7 @@ def calculate_hydraulic_parameters(
     2. Terrain does not require pump but lowest inflow trench depth is too low for gravitational flow -> place lifting station
     3. Gravity flow is possible within given constraints
     """
-    min_trench_depth = 0
+    min_trench_depth = DEFAULT_CONFIG.optimization.min_trench_depth
     nx.set_node_attributes(G, [0], name="inflow_trench_depths")
     nx.set_node_attributes(G, [0], name="inflow_diameters")
     nx.set_edge_attributes(G, False, name="pressurized")
@@ -328,7 +340,10 @@ def calculate_hydraulic_parameters(
 
 
 def estimate_peakflow(
-    G, inhabitants_dwelling, daily_wastewater_person, peak_factor=2.3
+    G: nx.Graph,
+    inhabitants_dwelling: int = DEFAULT_CONFIG.optimization.inhabitants_dwelling,
+    daily_wastewater_person: float = DEFAULT_CONFIG.optimization.daily_wastewater_person,
+    peak_factor: float = DEFAULT_CONFIG.optimization.peak_factor,
 ):
     """
     Estimate the peakflow in m³/s for a node n in Graph G.
@@ -412,7 +427,9 @@ def mannings_equation(pipe_diameter: float, roughness: float, slope: float) -> f
     return q
 
 
-def select_diameter(target_flow, diameters, roughness, slope):
+def select_diameter(
+    target_flow: float, diameters: List[float], roughness: float, slope: float
+):
     """
     Returns the minimum pipe diameter.
 
@@ -448,7 +465,13 @@ def select_diameter(target_flow, diameters, roughness, slope):
     return selected_diameter
 
 
-def needs_pump(profile, min_slope=-0.01, tmax=8, tmin=0.25, inflow_trench_depth=0):
+def needs_pump(
+    profile,
+    min_slope: float = DEFAULT_CONFIG.optimization.min_slope,
+    tmax: float = DEFAULT_CONFIG.optimization.tmax,
+    tmin: float = DEFAULT_CONFIG.optimization.tmin,
+    inflow_trench_depth: float = DEFAULT_CONFIG.optimization.inflow_trench_depth,
+):
     """
     Traces a profile to determine if gravitational flow can be achieved within slope and trench depth constraints.
 
