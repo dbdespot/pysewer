@@ -11,12 +11,13 @@
   - [Routing Solver](#routing-solver)
   - [Plotting](#plotting)
   - [Export](#export)
+- [License](#license)
 
 <!-- /TOC -->
 
 ## Summary
 
-![Example of an automatically generated Sewer Network](example_data/plots/modeldomain_pumps.png)
+![Example of an automatically generated Sewer Network](notebooks/example_data/plots/modeldomain_pumps.png)
 
 The aim of pysewer is to provide a framework automatically generate cost-efficient sewer network layouts on minimal data requirements. 
 
@@ -25,7 +26,7 @@ It is build around an algorithm for generation of viable sewer-network layouts. 
 
 
 ## Installation
-Currently the installation is easiest managed via Anaconda, because GDAL bindings are a pain on Windows. Anaconda 3 can be downloaded [here.](https://www.anaconda.com/products/individual)
+Currently the installation is easiest managed via Anaconda. Anaconda 3 can be downloaded [here.](https://www.anaconda.com/products/individual)
 
 
 ### Create a new conda environment and install GDAL
@@ -38,15 +39,18 @@ We can then install GDAL, rasterio and fiona :
 
 ```
 conda activate pysewer
-conda install gdal rasterio fiona
+conda install -c conda-forge gdal rasterio fiona
 ```
+Note that the exact package version can be found in the [environment.yml](environment.yml) file.
 
 ### Install pysewer via pip
 You can either get pysewer and install it using git and pip with:
-```
-git clone https://git.ufz.de/sanne/pysewer.git
+```shell
+git clone https://git.ufz.de/despot/pysewer_dev.git
 cd pysewer
 pip install .
+# for the development version
+python -m pip install -e .
 ```
 
 ## Input Data and data representation 
@@ -59,16 +63,16 @@ The following input data is required:
 
 ### Preprocessing
 
-The main objective of sewer layout generation is to connect all buildings to a waste water treatment plant (wwtp) while keeping system cost low. The initial graph represents all potential sewer lines in our model domain. 
+The main objective of sewer layout generation is to connect all buildings to a waste water treatment plant (WWTP) while keeping system cost low. The initial graph represents all potential sewer lines in our model domain. 
 
 Preprocessing comes down to:
 
 - "connecting" buildings to the street network
-    - clustering of buildings surpasing a predefined threshold 
-- contracting the street nework for more efficient graph traversal
+- clustering of buildings surpassing a predefined threshold 
+- contracting the street network for more efficient graph traversal
 
 
-After preprocessing, all relevant data is and stored as a MultiDiGraph to allow for assymmetric edge values (e.g. elevation profile and subsequently costs). 
+After preprocessing, all relevant data is and stored as a MultiDiGraph to allow for asymmetric edge values (e.g. elevation profile and subsequently costs). 
 
 
 ### Graph Attributes
@@ -91,7 +95,7 @@ Edge Attributes:
 
 ## Routing Solver
 
-![Routing Animation](example_data/plots/rsph.gif)
+![Routing Animation](/notebooks/example_data/plots/rsph.gif)
 
 The package comes with two solvers to find estimates for the underlying steiner tree problem (more specifically minimum steiner arboresence). 
 
@@ -106,19 +110,22 @@ The *RSPH Fast* solver derives the network by combining all shortest paths to a 
 
 
 ## Plotting
-```
+```python
 info = pysewer.get_sewer_info(G)
 info["Routing Solver"] = "RSPH"
 info["Pump Penalty"] = test_model_domain.pump_penalty
 fig,ax = pysewer.plot_model_domain(test_model_domain, plot_sewer=True,sewer_graph = G, info_table=info)
 ```
 
-```
+```python
 pysewer.plot_sewer_attributes(test_model_domain,G,attribute="peak_flow",title="Peak Flow Estimation m³/s")
 plt.show()
 ```
 
 ## Export
+```python
+sewer_network_gdf = pysewer.get_edge_gdf(G,detailed=True)
+export_sewer_network(sewer_network_gdf, "sewer_network.gpkg")
 ```
-pysewer.get_edge_gdf(G,detailed=True).to_file("sewer.shp")
-```
+# License
+GNU GPLv3-modified-UFZ. See [LICENSE](LICENSE) for details.
