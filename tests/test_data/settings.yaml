@@ -1,0 +1,34 @@
+# default settings 
+
+# preprocessing
+preprocessing:
+  dx: 10 # sampling resolution, get_profile (DEM Class)
+  pump_penalty: 1000 # penalty for pumping
+  max_connection_length: 30 # connect buildings within this distance
+  clustering: "centers" # 
+  connect_buildings: True # connect buildings
+  add_private_sewer: True # add private sewer
+  field_get_sinks: "node_type" # field name for sinks
+  value_get_sinks: "wwtp" # value for sinks
+  field_get_buildings: "node_type" # field name for buildings
+  value_get_buildings: "building" # value for buildings
+
+optimization:
+  inhabitants_dwelling: 3
+  daily_wastewater_person: 0.2
+  peak_factor: 2.3  # peak factor for wastewater
+  roughness_coefficient: 0.013
+  min_slope: -0.01 # min slope required for gravitational flow
+  tmax: 8 # max trench depth allowed
+  tmin: 0.25 # min trench depth allowed
+  inflow_trench_depth: 0
+
+plotting:
+  plot_connection_graph: false
+  plot_junction_graph: false
+  plot_sink: false
+  plot_sewer: false
+  info_table: null
+  hillshade: false
+  colormap: "jet"
+
