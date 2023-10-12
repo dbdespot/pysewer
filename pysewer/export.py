@@ -1,4 +1,7 @@
 """
+SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
+SPDX-License-Identifier: GNU GPLv3
+
 Since the profile and trench_depth_profile are list of tuples, they cannot be exported 
 to a shapefile or GeoPackage directly using the native GeoPandas function (to_file). 
 This module contains functions to convert the list of tuples to JSON strings, 

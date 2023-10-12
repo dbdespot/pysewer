@@ -1,3 +1,8 @@
+"""
+SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
+SPDX-License-Identifier: GNU GPLv3
+
+"""
 from typing import Hashable, List, Union
 
 import networkx as nx
@@ -5,7 +10,6 @@ import networkx as nx
 from .helper import get_node_keys
 
 NodeType = Union[int, str, Hashable]
-
 
 
 def rsph_tree(

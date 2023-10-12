@@ -1,3 +1,8 @@
+"""
+SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
+SPDX-License-Identifier: GNU GPLv3
+
+"""
 from dataclasses import dataclass, field
 from typing import Hashable, List, Optional, Union
 
@@ -30,9 +35,35 @@ DEFAULT_CONFIG = load_config()
 NodeType = Union[int, str, Hashable]
 
 
-# validate the input data using pydantic and geopandas pandera
 @dataclass
 class DEM:
+    """
+    A class for handling digital elevation model (DEM) data.
+
+    Attributes
+    ----------
+    file_path : str, optional
+        The file path to the DEM raster file.
+    raster : rasterio.DatasetReader, optional
+        The rasterio dataset reader object for the DEM raster file.
+    no_dem : bool
+        A flag indicating whether or not a DEM has been loaded.
+
+    Methods
+    -------
+    get_elevation(point: shapely.geometry.Point) -> int:
+        Returns elevation data in meters for a given point rounded to two decimals.
+    get_profile(line: shapely.geometry.LineString, dx: int = 10) -> List[Tuple[float, int]]:
+        Extracts elevation data from a digital elevation model (DEM) along a given path.
+    reproject_dem(crs: CRS) -> None:
+        Reprojects the DEM raster to the given CRS.
+
+    Properties
+    ----------
+    get_crs : CRS
+        Returns the coordinate system of the DEM object.
+    """
+
     file_path: Optional[str] = None
     raster: rio.DatasetReader = field(init=False, default=None)
     no_dem: bool = field(init=False, default=True)
@@ -88,7 +119,7 @@ class DEM:
 
         Returns
         -------
-        List of Touples
+        List of Tuples
             A list of (x, elevation) tuples representing the x-coordinate and elevation data of the profile.
             The x-coordinate values start at 0 and are spaced at intervals of dx meters.
         """
@@ -233,21 +264,37 @@ class Roads:
 
 
 class Buildings:
+    """
+    A class to preprocess building data.
+
+    Parameters
+    ----------
+    input_data : str or geopandas.GeoDataFrame
+        Path to a shapefile or a GeoDataFrame containing the input data.
+    roads_obj : pysewer.Roads
+        A Roads object containing the road network data.
+
+    Attributes
+    ----------
+    gdf : geopandas.GeoDataFrame
+        The input building data.
+    roads_obj : pysewer.Roads
+        The road network data.
+
+    Methods
+    -------
+    get_gdf():
+        Returns building data as geopandas dataframe.
+    get_crs():
+        Returns the Coordinate System of the DEM Object.
+    cluster_centers(max_connection_length):
+        Returns a list of cluster centers for all buildings with greater than max_connection_length distance to the nearest street.
+
+    """
+
     def __init__(self, input_data: Union[str, gpd.GeoDataFrame], roads_obj: Roads):
         """
-        Initialize a Preprocessor object.
-
-        Parameters
-        ----------
-        input_data : str or geopandas.GeoDataFrame
-            Path to a shapefile or a GeoDataFrame containing the input data.
-        roads_obj : pysewer.Roads
-            A Roads object containing the road network data.
-
-        Returns
-        -------
-        None.
-
+        Initialize a Buildings object with building data from either a shapefile or a geopandas dataframe.
         """
         # Digest and clean input Data
         # Allow input to be either path to shp file or gdf
@@ -267,26 +314,43 @@ class Buildings:
         self.roads_obj = roads_obj
 
     def get_gdf(self):
-        """Returns building data as geopandas dataframe"""
+        """
+        Returns building data as geopandas dataframe.
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
+            The building data.
+
+        """
         return self.gdf
 
     def get_crs(self):
-        """Returns the Coordinate System of the DEM Object"""
-        return self.gdf.crs
-
-    def cluster_centers(self, max_connection_length):
         """
-        Returns a list of cluster centers for all buildings with greater than max_connection_length distance to the nearest street
-
-        Parameters
-        -----------
-        max_connection_length : float
-            The maximum distance between a building and the nearest street for it to be included in the cluster centers list
+        Returns the Coordinate System of the DEM Object.
 
         Returns
-        --------
-        cluster_centers : GeoDataFrame
-            A GeoDataFrame containing the cluster centers and their distances to the nearest street, sorted by distance
+        -------
+        dict
+            The Coordinate Reference System (CRS) of the building data.
+
+        """
+        return self.gdf.crs
+
+    def cluster_centers(self, max_connection_length: float):
+        """
+        Returns a list of cluster centers for all buildings with greater than max_connection_length distance to the nearest street.
+
+        Parameters
+        ----------
+        max_connection_length : float
+            The maximum distance between a building and the nearest street for it to be included in the cluster centers list.
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
+            A GeoDataFrame containing the cluster centers and their distances to the nearest street, sorted by distance.
+
         """
         ####Clustering####
         # get nearest point to street for each building
@@ -381,6 +445,7 @@ class ModelDomain:
         pump_penalty: int = DEFAULT_CONFIG.preprocessing.pump_penalty,
         connect_buildings: bool = DEFAULT_CONFIG.preprocessing.connect_buildings,
     ):
+        """Initialize Model Domain using the input data."""
         self.roads = Roads(roads)
         self.buildings = Buildings(buildings, roads_obj=self.roads)
         self.dem = DEM(dem)
@@ -413,7 +478,7 @@ class ModelDomain:
         nx.set_node_attributes(self.connection_graph, "", "node_type")
 
         # check connectivity of G
-        # self.sewer_graph = nx.DiGraph()       # what is the purpouse of this line?
+        self.sewer_graph = nx.DiGraph()  # what is the purpouse of this line?
         if connect_buildings:
             self.connect_buildings(clustering=clustering)
 
@@ -463,7 +528,8 @@ class ModelDomain:
         Parameters
         ----------
         max_connection_length : int, optional
-            The maximum distance between two buildings for them to be connected. The default is 30.
+            The maximum distance between a building and the nearest street for it to be included in the cluster
+            centers list. The default is 30.
         clustering : str, optional
             The method used to cluster the buildings. Can be "centers" or "none". The default is "centers".
         Returns
@@ -749,7 +815,7 @@ class ModelDomain:
 
     def set_pump_penalty(self, pp):
         """
-        Set the pump penalty for the current instance of the Preprocessing class.
+        Set the pump penalty for the current instance of the ModelDomain class.
         Parameters
         ----------
         pp : float

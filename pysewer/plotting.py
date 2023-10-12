@@ -1,3 +1,8 @@
+"""
+SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
+SPDX-License-Identifier: GNU GPLv3
+
+"""
 import os
 from typing import Optional
 import earthpy.plot as ep
@@ -37,6 +42,7 @@ def plot_model_domain(
     hs_alt=30,
     hs_az=0,
     hillshade:bool=DEFAULT_CONFIG.plotting.hillshade,
+    fig_size:tuple=(20, 20),
 ):
     """
     Plots the sewer network model domain.
@@ -69,7 +75,7 @@ def plot_model_domain(
     fig, ax : matplotlib.figure.Figure, matplotlib.axes.Axes
         The figure and axes of the plot.
     """
-    fig, ax = plt.subplots(figsize=(20, 20))
+    fig, ax = plt.subplots(figsize=fig_size)
     bbox = get_edge_gdf(modelDomain.connection_graph).total_bounds
 
     ax.set_xlim(bbox[0] - 100, bbox[2] + 100)
@@ -139,14 +145,15 @@ def plot_model_domain(
                 label="Pumping Station",
             )
 
-            get_node_gdf(sewer_graph, field="pumping_station", value=True).plot(
-                ax=ax,
-                marker="^",
-                color="red",
-                markersize=50,
-                zorder=6,
-                label="Pumping Station",
-            )
+            # get_node_gdf(sewer_graph, field="pumping_station", value=True).plot(
+            #     ax=ax,
+            #     marker="^",
+            #     color="red",
+            #     markersize=50,
+            #     zorder=6,
+            #     label="Pumping Station",
+            # )
+
             get_node_gdf(sewer_graph, field="lifting_station", value=True).plot(
                 ax=ax,
                 marker="^",
@@ -190,6 +197,7 @@ def plot_sewer_attributes(
     colormap="jet",
     title="Sewer Network Plot",
     hillshade=False,
+    fig_size=(20, 20),
 ):
     """
     Plots the sewer network with the specified attribute.
@@ -218,7 +226,7 @@ def plot_sewer_attributes(
     """
     hs_alt = 30
     hs_az = 0
-    fig, ax = plt.subplots(figsize=(20, 20))
+    fig, ax = plt.subplots(figsize=fig_size)
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.2)  # depends on the user needs

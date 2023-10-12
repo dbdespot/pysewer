@@ -1,3 +1,8 @@
+"""
+SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
+SPDX-License-Identifier: GNU GPLv3
+
+"""
 import networkx as nx
 from shapely.geometry import LineString, Point
 
@@ -33,6 +38,7 @@ def simplify_graph(
     -------
     G : networkx.MultiDiGraph
         topologically simplified graph
+
     """
     # if _is_simplified(G):
     #    raise Exception("This graph has already been simplified, cannot simplify it again.")

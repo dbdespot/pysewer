@@ -1,3 +1,8 @@
+"""
+SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
+SPDX-License-Identifier: GNU GPLv3
+
+"""
 import os
 from dataclasses import asdict, dataclass
 from pathlib import Path

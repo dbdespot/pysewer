@@ -1,3 +1,8 @@
+"""
+SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
+SPDX-License-Identifier: GNU GPLv3
+
+"""
 import logging
 from typing import Hashable, List, Tuple, Union
 
@@ -27,8 +32,24 @@ DEFAULT_CONFIG = load_config()
 NodeType = Union[str, int, Hashable, None]
 
 
+import networkx as nx
+
 def place_lifting_station(G, node):
-    """Places lifting station at specified node in G"""
+    """
+    Places a lifting station at the specified node in the graph.
+
+    Parameters
+    ----------
+    G : networkx.Graph
+        The graph to add the lifting station to.
+    node : int
+        The node to add the lifting station to.
+
+    Returns
+    -------
+    networkx.Graph
+        The graph with the added lifting station.
+    """
     node_attrs = {node: {"lifting_station": True}}
     nx.set_node_attributes(G, node_attrs)
     return G

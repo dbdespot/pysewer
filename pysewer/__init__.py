@@ -1,3 +1,8 @@
+"""
+SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
+SPDX-License-Identifier: GNU GPLv3
+
+"""
 try:
     from osgeo import ogr
 except ImportError as e:
@@ -11,6 +16,7 @@ from .optimization import *
 from .plotting import *
 from .preprocessing import *
 from .routing import *
+from .export import *
 
 from .config.settings import load_config
 
