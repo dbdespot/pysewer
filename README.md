@@ -11,7 +11,10 @@
   - [Routing Solver](#routing-solver)
   - [Plotting](#plotting)
   - [Export](#export)
-- [License](#license)
+  - [License](#license)
+- [How to contribute to pysewer?](#how-to-contribute-to-pysewer)
+  - [Code of conduct](#code-of-conduct)
+  - [How to cite?](#how-to-cite)
 
 <!-- /TOC -->
 
@@ -125,7 +128,15 @@ plt.show()
 ## Export
 ```python
 sewer_network_gdf = pysewer.get_edge_gdf(G,detailed=True)
-export_sewer_network(sewer_network_gdf, "sewer_network.gpkg")
+pysewer.export_sewer_network(sewer_network_gdf, "sewer_network.gpkg")
 ```
-# License
+## License
 GNU GPLv3-modified-UFZ. See [LICENSE](LICENSE) for details.
+
+# How to contribute to pysewer?
+Please check out how [Contributing](CONTRIBUTING.md) for on how to contribute to pysewer.
+
+## Code of conduct
+Please check out our [Code of Conduct](CODE_OF_CONDUCT.md) for details.
+
+## How to cite?
