@@ -11,7 +11,7 @@ preprocessing:
   dx: 10 # sampling resolution, get_profile (DEM Class)
   pump_penalty: 1000 # penalty for pumping
   max_connection_length: 30 # connect buildings within this distance
-  clustering: "centers" # 
+  clustering: "centers" # set how to cluster buildings
   connect_buildings: True # connect buildings
   add_private_sewer: True # add private sewer
   field_get_sinks: "node_type" # field name for sinks

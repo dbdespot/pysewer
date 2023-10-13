@@ -1,12 +1,12 @@
-"""
-SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
-SPDX-License-Identifier: GNU GPLv3
+# SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)  
+# SPDX-License-Identifier: GNU GPLv3
 
-"""
 import itertools
+import json
 from operator import itemgetter
 from typing import Any, List
 
+import fiona
 import geopandas as gpd
 import networkx as nx
 import numpy as np
@@ -15,8 +15,6 @@ import shapely
 from scipy.spatial import cKDTree, distance
 from shapely.geometry import *
 from shapely.geometry import LineString, Point
-import json
-import fiona
 
 
 def get_upstream_nodes(G: nx.DiGraph, start_node, field: str, value: str) -> List:
@@ -303,6 +301,9 @@ def get_mean_slope(
 def ckdnearest(
     gdfA: gpd.GeoDataFrame, gdfB: gpd.GeoDataFrame, gdfB_cols=["closest_edge"]
 ) -> gpd.GeoDataFrame:
+    """
+    Returns a GeoDataFrame containing the closest geometry and attributes from gdfB to each geometry in gdfA.
+    """
     # resetting the index of gdfA and gdfB here.
     gdfA = gdfA.reset_index(drop=True)
     gdfB = gdfB.reset_index(drop=True)
@@ -329,6 +330,9 @@ def ckdnearest(
 
 
 def remove_third_dimension(geom):
+    """
+    remove the third dimension of a shapely geometry
+    """
     if geom.is_empty:
         return geom
 
@@ -391,23 +395,39 @@ def remove_third_dimension(geom):
             "Currently this type of geometry is not supported: {}".format(type(geom))
         )
 
+
 def get_sewer_info(G):
-    '''Returns dictonary with length of pressurized/gravity sewers, number of pumps and lifting stations'''
+    """
+    Returns a dictionary with information about the sewer network.
+
+    Parameters
+    ----------
+    G : networkx.Graph
+        The sewer network graph.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the following information:
+        - Total Buildings: Total number of buildings in the network.
+        - Pressurized Sewer Length [m]: Total length of pressurized sewers in meters.
+        - Gravity Sewer Length [m]: Total length of gravity sewers in meters.
+        - Lifting Stations: Total number of lifting stations in the network.
+        - Pumping Stations: Total number of pumping stations in the network (excluding those located in buildings).
+        - Private Pumps: Total number of pumps located in buildings.
+
+    """
     info = {}
-    buildings = get_node_keys(G, field = "node_type", value="building")
+    buildings = get_node_keys(G, field="node_type", value="building")
     info["Total Buildings"] = len(buildings)
-    p_sewer_gdf = get_edge_gdf(G,field="pressurized",value=True)
-    g_sewer_gdf = get_edge_gdf(G,field="pressurized",value=False)
+    p_sewer_gdf = get_edge_gdf(G, field="pressurized", value=True)
+    g_sewer_gdf = get_edge_gdf(G, field="pressurized", value=False)
     info["Pressurized Sewer Length [m]"] = round(p_sewer_gdf.geometry.length.sum())
     info["Gravity Sewer Length [m]"] = round(g_sewer_gdf.geometry.length.sum())
-    pumps = get_node_keys(G,field = "pumping_station",value=True)
-    lifting_stations = get_node_keys(G,field = "lifting_station",value=True)
+    pumps = get_node_keys(G, field="pumping_station", value=True)
+    lifting_stations = get_node_keys(G, field="lifting_station", value=True)
     info["Lifting Stations"] = len(lifting_stations)
     info["Pumping Stations"] = len([n for n in pumps if n not in buildings])
-    info["Private Pumps"] = len([ n for n in buildings if n in pumps])
+    info["Private Pumps"] = len([n for n in buildings if n in pumps])
     # info["Onsite Treatment"] = len(get_node_gdf(G,field="onsite",value=True))
-    return(info)
-
-
-
-
+    return info

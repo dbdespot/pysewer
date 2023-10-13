@@ -616,7 +616,7 @@ class ModelDomain:
                 gpd.GeoDataFrame(geometry=[point]), edge_gdf, ["closest_edge"]
             ).iloc[0, 1]
         conn_point = nearest_points(closest_edge, point)[0]
-        # dissconect edges from node
+        # disconnect edges from node
         cluster_nodes = get_node_keys(
             self.connection_graph, field="node_type", value="cluster_center"
         )

@@ -5,8 +5,8 @@ SPDX-License-Identifier: GNU GPLv3
 """
 import os
 from typing import Optional
-import earthpy.plot as ep
-import earthpy.spatial as es
+# import earthpy.plot as ep
+# import earthpy.spatial as es
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import networkx as nx
