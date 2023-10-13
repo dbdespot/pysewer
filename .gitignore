@@ -164,6 +164,7 @@ fabric.properties
 *.o
 *.so
 *.pyc
+*.dot
 
 # Packages #
 ############
