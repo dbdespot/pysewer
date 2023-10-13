@@ -7,7 +7,7 @@ setup(
     name="pysewer",
     version="0.1.13",
     description="A Python Package for automated routing and optimization of sewer networks",
-    license="GPLv3",
+    license="GNU GPLv3",
     packages=["pysewer"],  # same as name
     long_description=long_description,
     long_description_content_type="text/markdown",
