@@ -8,6 +8,7 @@ preprocessing:
   dx: 10 # sampling resolution, get_profile (DEM Class)
   pump_penalty: 1000 # penalty for pumping
   max_connection_length: 30 # connect buildings within this distance
+  clustering: "none" # set how to cluster buildings
 
 optimization:
   inhabitants_dwelling: 3
