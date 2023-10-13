@@ -1,0 +1,14 @@
+
+
+stages:          # List of stages for jobs, and their order of execution
+  - lint
+
+
+license_compliance:
+    image: python: 3.10
+    stage: lint
+    before_script:
+        - pip install --upgrade pip
+
+
+
