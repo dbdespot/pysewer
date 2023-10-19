@@ -4,13 +4,13 @@ pages:
   script:
     - pip install --upgrade pip
     - pip install sphinx sphinx_rtd_theme
-    - mkdir .public
+    - mkdir public
     - cd docs
     - make clean html
     - make html
     - make latexpdf
-    - cp -r build/html/* ../.public
-    - cp build/latex/pysewer.pdf ../.public
+    - cp -r build/html/* ../public
+    - cp build/latex/pysewer.pdf ../public
   artifacts:
     paths:
       - .public
