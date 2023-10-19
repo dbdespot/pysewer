@@ -1,10 +1,9 @@
-"""
-SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
-SPDX-License-Identifier: GNU GPLv3
+# SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
+# SPDX-License-Identifier: GPL-3.0-only
 
-"""
 import os
 from typing import Optional
+
 # import earthpy.plot as ep
 # import earthpy.spatial as es
 import geopandas as gpd
@@ -19,8 +18,8 @@ from rasterio.plot import plotting_extent
 from shapely.geometry import LineString, MultiLineString, Point, Polygon
 from shapely.ops import linemerge, nearest_points
 
-from .helper import get_edge_gdf, get_node_gdf
 from .config.settings import load_config
+from .helper import get_edge_gdf, get_node_gdf
 
 DEFAULT_CONFIG = load_config()
 
@@ -33,16 +32,16 @@ DEFAULT_CONFIG = load_config()
 
 def plot_model_domain(
     modelDomain,
-    plot_connection_graph:bool=DEFAULT_CONFIG.plotting.plot_connection_graph,
-    plot_junction_graph:bool=DEFAULT_CONFIG.plotting.plot_junction_graph,
-    plot_sink:bool=DEFAULT_CONFIG.plotting.plot_sink,
-    plot_sewer:bool=DEFAULT_CONFIG.plotting.plot_sewer,
-    sewer_graph:nx.Graph=DEFAULT_CONFIG.plotting.sewer_graph,
-    info_table:Optional[dict]=DEFAULT_CONFIG.plotting.info_table,
+    plot_connection_graph: bool = DEFAULT_CONFIG.plotting.plot_connection_graph,
+    plot_junction_graph: bool = DEFAULT_CONFIG.plotting.plot_junction_graph,
+    plot_sink: bool = DEFAULT_CONFIG.plotting.plot_sink,
+    plot_sewer: bool = DEFAULT_CONFIG.plotting.plot_sewer,
+    sewer_graph: nx.Graph = DEFAULT_CONFIG.plotting.sewer_graph,
+    info_table: Optional[dict] = DEFAULT_CONFIG.plotting.info_table,
     hs_alt=30,
     hs_az=0,
-    hillshade:bool=DEFAULT_CONFIG.plotting.hillshade,
-    fig_size:tuple=(20, 20),
+    hillshade: bool = DEFAULT_CONFIG.plotting.hillshade,
+    fig_size: tuple = (20, 20),
 ):
     """
     Plots the sewer network model domain.

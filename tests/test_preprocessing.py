@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
+# SPDX-License-Identifier: GPL-3.0-only
+
 import networkx as nx
 
 # test dem
@@ -51,7 +54,7 @@ def test_get_profile(dem_data):
 
 def test_get_crs_dem():
     dem = pysewer.DEM("tests/test_data/dem.tif")
-    assert dem.get_crs.to_authority() == ('EPSG', '32640')
+    assert dem.get_crs.to_authority() == ("EPSG", "32640")
 
 
 @pytest.fixture

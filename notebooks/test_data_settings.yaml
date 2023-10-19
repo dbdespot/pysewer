@@ -1,17 +1,13 @@
-# SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
-# SPDX-License-Identifier: GPL-3.0-only
-
 # default settings
 
 # preprocessing
 preprocessing:
-  dem_file_path: "example_data/1_DEM/dem_10m1.tif"
-  roads_input_data: "example_data/3_Roads/roads_projected.shp"
-  buildings_input_data: "example_data/2_Buildings/buildings_projected.shp"
+  dem_file_path: ../tests/test_data/dem.tif
+  roads_input_data: ../tests/test_data/roads_clipped.shp
+  buildings_input_data: ../tests/test_data/buildings_clipped.shp
   dx: 10 # sampling resolution, get_profile (DEM Class)
   pump_penalty: 1000 # penalty for pumping
   max_connection_length: 30 # connect buildings within this distance
-  clustering: "none" # set how to cluster buildings
 
 optimization:
   inhabitants_dwelling: 3
@@ -22,7 +18,7 @@ optimization:
   tmin: 0.25 # min trench depth allowed
   inflow_trench_depth: 0
   min_trench_depth: 0
-  diameters: [0.1, 0.15, 0.2, 0.25, 0.3, 0.4] # diameters to be considered
+  diameters: [0.3, 0.4, 0.5] # diameters to be considered
   roughness: 0.013 # roughness coefficient
   pressurized_diameter: 0.2
 

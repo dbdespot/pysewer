@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
-# SPDX-License-Identifier: GNU GPLv3
+# SPDX-License-Identifier: GPL-3.0-only
 
-# default settings 
+# default settings
 
 # preprocessing
 preprocessing:
@@ -22,7 +22,7 @@ preprocessing:
 optimization:
   inhabitants_dwelling: 3
   daily_wastewater_person: 0.2
-  peak_factor: 2.3  # peak factor for wastewater
+  peak_factor: 2.3 # peak factor for wastewater
   min_slope: -0.01 # min slope required for gravitational flow
   tmax: 8 # max trench depth allowed
   tmin: 0.25 # min trench depth allowed

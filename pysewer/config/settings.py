@@ -1,8 +1,6 @@
-"""
-SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
-SPDX-License-Identifier: GNU GPLv3
+# SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
+# SPDX-License-Identifier: GPL-3.0-only
 
-"""
 import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -181,11 +179,13 @@ def config_to_dataframe(config: Config) -> pd.DataFrame:
     df = pd.DataFrame(list(flat_config.items()), columns=["Setting", "Value"])
     return df
 
+
 # view defaults settings
 def view_default_settings():
     default_settings = override_setting_to_config(DEFAULT_SETTINGS_PATH)
     df = config_to_dataframe(default_settings)
     return df
+
 
 # if __name__ == "__main__":
 #     # test the deault settings using config class

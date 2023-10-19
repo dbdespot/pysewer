@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
+SPDX-License-Identifier: GPL-3.0-only -->
+
 # Contributing to [Your Project Name]
 
 👍🎉 First off, thanks for taking the time to contribute! 🎉👍
