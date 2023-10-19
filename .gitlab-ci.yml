@@ -10,7 +10,7 @@ pages:
     - make html
     - make latexpdf
     - cp -r build/html/* ../.public
-    - cp build/latex/SEWER_WaQaSim.pdf ../.public
+    - cp build/latex/pysewer.pdf ../.public
   artifacts:
     paths:
       - .public
