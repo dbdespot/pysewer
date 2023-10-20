@@ -9,6 +9,7 @@ pages:
     - pip install sphinx sphinx_rtd_theme
     - mkdir public
     - cd docs
+    - sphinx-apidoc -f -o source/ ../pysewer/
     - make clean html
     - make html
     # - make latexpdf
