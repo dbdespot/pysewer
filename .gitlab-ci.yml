@@ -6,10 +6,9 @@ pages:
   image: python:3.10
   script:
     - pip install --upgrade pip
-    - pip install sphinx sphinx_rtd_theme myst-parser
+    - pip install sphinx sphinx_rtd_theme
     - mkdir public
     - cd docs
-    - sphinx-apidoc -o source/ ../pysewer
     - make clean html
     - make html
     # - make latexpdf

@@ -35,14 +35,9 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
-    "myst_parser",
 ]
 napoleon_google_docstring = False
-source_suffix = {
-    '.rst': 'restructuredtext',
-    '.txt': 'markdown',
-    '.md': 'markdown',
-}
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
