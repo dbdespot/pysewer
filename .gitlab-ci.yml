@@ -1,6 +1,11 @@
-image: python:3.10
+stages:
+  - deploy  
+
+
+
 
 pages:
+  image: python:3.10
   script:
     - pip install --upgrade pip
     - pip install sphinx sphinx_rtd_theme
@@ -10,10 +15,10 @@ pages:
     - make html
     - make latexpdf
     - cp -r build/html/* ../public
-    - cp build/latex/pysewer.pdf ../public
+    # - cp build/latex/pysewer.pdf ../public
   artifacts:
     paths:
       - .public
     expire_in: 1 month
-  only:
-    - master
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
