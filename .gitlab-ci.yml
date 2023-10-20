@@ -16,7 +16,7 @@ pages:
     # - cp build/latex/pysewer.pdf ../public
   artifacts:
     paths:
-      - .public
+      - public
     expire_in: 1 month
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
