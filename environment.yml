@@ -25,7 +25,7 @@ dependencies:
   - sphinx ==5.0.2
   - pandas ==2.1.0
   - pyyaml ==6.0
-  - fiona ==1.9.4.post1
+  - fiona ==1.9.5
   - nbconvert == 7.7.4
   - types-pyyaml ==6.0.12.12
   - scikit-image ==0.21.0
