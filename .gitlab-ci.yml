@@ -7,11 +7,14 @@ pages:
   script:
     - pip install --upgrade pip
     - pip install sphinx sphinx_rtd_theme
+    - pip install .
     - mkdir public
     - cd docs
-    - sphinx-apidoc -f -o source/ ../pysewer/
-    - make clean html
+    - sphinx-apidoc -o source/ ../pysewer/
+    - ls source/
+    - make clean
     - make html
+    - ls build/html/
     # - make latexpdf
     - cp -r build/html/* ../public
     # - cp build/latex/pysewer.pdf ../public
