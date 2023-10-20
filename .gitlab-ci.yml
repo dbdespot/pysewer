@@ -1,10 +1,8 @@
 stages:
   - deploy  
 
-
-
-
 pages:
+  stage: deploy
   image: python:3.10
   script:
     - pip install --upgrade pip
