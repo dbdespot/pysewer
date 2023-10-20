@@ -4,7 +4,7 @@ stages:
 
 install_dependencies:
   stage: install
-  image: continuumio/miniconda3
+  image: continuumio/anaconda3
   script:
     - pip install --upgrade pip
     - conda env create -f environment.yml
@@ -15,9 +15,8 @@ install_dependencies:
 
 pages:
   stage: deploy
-  image: continuumio/miniconda3
+  image: continuumio/anaconda3
   script:
- 
     - conda env create -f environment.yml
     - conda activate pysewer
     - pip install --upgrade pip
