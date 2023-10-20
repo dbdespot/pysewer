@@ -6,7 +6,7 @@ pages:
   image: python:3.10
   script:
     - pip install --upgrade pip
-    - pip install sphinx sphinx_rtd_theme
+    - pip install sphinx sphinx_rtd_theme myst-parser
     - mkdir public
     - cd docs
     - make clean html
