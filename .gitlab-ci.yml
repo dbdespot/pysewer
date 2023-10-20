@@ -11,7 +11,7 @@ pages:
     - cd docs
     - make clean html
     - make html
-    - make latexpdf
+    # - make latexpdf
     - cp -r build/html/* ../public
     # - cp build/latex/pysewer.pdf ../public
   artifacts:
