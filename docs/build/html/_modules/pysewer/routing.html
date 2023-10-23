@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pysewer.routing &mdash; pysewer 0.1.13 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=8d02545a"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pysewer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Pysewer Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pysewer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pysewer.routing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pysewer.routing</h1><div class="highlight"><pre>
+<span></span><span class="c1"># SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)</span>
+<span class="c1"># SPDX-License-Identifier: GPL-3.0-only</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+
+<span class="kn">from</span> <span class="nn">.helper</span> <span class="kn">import</span> <span class="n">get_node_keys</span>
+
+<span class="n">NodeType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Hashable</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="rsph_tree">
+<a class="viewcode-back" href="../../pysewer.html#pysewer.routing.rsph_tree">[docs]</a>
+<span class="k">def</span> <span class="nf">rsph_tree</span><span class="p">(</span>
+    <span class="n">connection_graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span>
+    <span class="n">sinks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">NodeType</span><span class="p">],</span>
+    <span class="n">from_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;building&quot;</span><span class="p">,</span>
+    <span class="n">to_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;wwtp&quot;</span><span class="p">,</span>
+    <span class="n">skip_nodes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">NodeType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the directed routed steiner tree that connects all terminal nodes to the sink using the repeated shortest path heuristic.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    connection_graph : nx.Graph</span>
+<span class="sd">        The graph representing the sewer network.</span>
+<span class="sd">    sinks : List[NodeType]</span>
+<span class="sd">        The nodes representing the sinks in the sewer network.</span>
+<span class="sd">    from_type : str, optional</span>
+<span class="sd">        The type of the source nodes, by default &quot;building&quot;.</span>
+<span class="sd">    to_type : str, optional</span>
+<span class="sd">        The type of the sink nodes, by default &quot;wwtp&quot;.</span>
+<span class="sd">    skip_nodes : List[NodeType], optional</span>
+<span class="sd">        The nodes to skip in the routing, by default [].</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    nx.DiGraph</span>
+<span class="sd">        The directed routed steiner tree that connects all terminal nodes to the sink using the repeated shortest path heuristic.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sewer_graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">create_empty_copy</span><span class="p">(</span><span class="n">connection_graph</span><span class="p">))</span>
+    <span class="n">terminals</span> <span class="o">=</span> <span class="n">get_node_keys</span><span class="p">(</span><span class="n">connection_graph</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s2">&quot;node_type&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">from_type</span><span class="p">)</span>
+    <span class="n">terminals</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">terminals</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">skip_nodes</span><span class="p">]</span>
+    <span class="n">subgraph_nodes</span> <span class="o">=</span> <span class="n">sinks</span>
+
+    <span class="c1"># sageguard against sinks not being in the connection graph</span>
+    <span class="k">for</span> <span class="n">sink</span> <span class="ow">in</span> <span class="n">sinks</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sink</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">connection_graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sink </span><span class="si">{</span><span class="n">sink</span><span class="si">}</span><span class="s2"> not found in the connection graph.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Handling single sink case</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subgraph_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">subgraph_nodes</span> <span class="o">=</span> <span class="n">sinks</span> <span class="o">+</span> <span class="n">sinks</span>
+    <span class="n">all_paths</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">all_pairs_dijkstra_path</span><span class="p">(</span><span class="n">connection_graph</span><span class="p">))</span>
+    <span class="n">all_lengths</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">all_pairs_dijkstra_path_length</span><span class="p">(</span><span class="n">connection_graph</span><span class="p">))</span>
+
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">terminals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">find_rsph_path</span><span class="p">(</span>
+                <span class="n">connection_graph</span><span class="p">,</span> <span class="n">subgraph_nodes</span><span class="p">,</span> <span class="n">terminals</span><span class="p">,</span> <span class="n">all_paths</span><span class="p">,</span> <span class="n">all_lengths</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error finding path: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">break</span>  <span class="c1"># exit the loop if no viable terminal is found</span>
+
+        <span class="c1"># add edges of path to sewer graph while keeping edge attributes</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="n">sewer_graph</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+        <span class="n">edgesinpath</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">edgesinpath</span><span class="p">:</span>
+            <span class="n">nx</span><span class="o">.</span><span class="n">set_edge_attributes</span><span class="p">(</span>
+                <span class="n">sewer_graph</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span> <span class="n">connection_graph</span><span class="o">.</span><span class="n">get_edge_data</span><span class="p">(</span>
+                        <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+        <span class="n">subgraph_nodes</span> <span class="o">=</span> <span class="n">subgraph_nodes</span> <span class="o">+</span> <span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">terminals</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">sewer_graph</span></div>
+
+
+
+<div class="viewcode-block" id="find_rsph_path">
+<a class="viewcode-back" href="../../pysewer.html#pysewer.routing.find_rsph_path">[docs]</a>
+<span class="k">def</span> <span class="nf">find_rsph_path</span><span class="p">(</span>
+    <span class="n">connection_graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span>
+    <span class="n">subgraph_nodes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">NodeType</span><span class="p">],</span>
+    <span class="n">terminals</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">NodeType</span><span class="p">],</span>
+    <span class="n">all_paths</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">all_lengths</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">NodeType</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Identifies the closest terminal node to the growing tree and returns the connection path.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    connection_graph : nx.Graph</span>
+<span class="sd">        The graph representing the entire network.</span>
+<span class="sd">    subgraph_nodes : List[NodeType]</span>
+<span class="sd">        The nodes in the subgraph being grown.</span>
+<span class="sd">    terminals : List[NodeType]</span>
+<span class="sd">        The terminal nodes in the network.</span>
+<span class="sd">    all_paths : dict</span>
+<span class="sd">        A dictionary containing all the shortest paths between terminal nodes.</span>
+<span class="sd">    all_lengths : dict</span>
+<span class="sd">        A dictionary containing the lengths of all the shortest paths between terminal nodes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[NodeType]</span>
+<span class="sd">        The shortest path between the closest terminal node and the growing subgraph.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If there is no recorded path from the closest terminal node to the growing subgraph in the all_paths dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">terminal_distances</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">closest_tree_node</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">terminal</span> <span class="ow">in</span> <span class="n">terminals</span><span class="p">:</span>
+        <span class="c1"># check if there is a recorded distance between the terminal and nodes in the subgraph</span>
+        <span class="n">missing_nodes</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">subgraph_nodes</span> <span class="k">if</span> <span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_lengths</span><span class="p">[</span><span class="n">terminal</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">missing_nodes</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Terminal </span><span class="si">{</span><span class="n">terminal</span><span class="si">}</span><span class="s2"> missing distances to nodes: </span><span class="si">{</span><span class="n">missing_nodes</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="c1"># if any(node not in all_lengths[terminal] for node in subgraph_nodes):</span>
+        <span class="c1">#     continue  # Skip this terminal as it doesn&#39;t have distances to all subgraph_nodes</span>
+        <span class="c1"># get distances from the terminal node to all nodes in the subgraph</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_lengths</span><span class="p">[</span><span class="n">terminal</span><span class="p">][</span><span class="n">node</span><span class="p">]</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">subgraph_nodes</span><span class="p">]</span>
+        <span class="n">min_dist</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span>
+        <span class="n">tree_node</span> <span class="o">=</span> <span class="n">subgraph_nodes</span><span class="p">[</span><span class="n">distances</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">min_dist</span><span class="p">)]</span>
+        <span class="n">terminal_distances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">min_dist</span><span class="p">)</span>
+        <span class="n">closest_tree_node</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree_node</span><span class="p">)</span>
+
+    <span class="c1"># safe guard if no terminal distances are found</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">terminal_distances</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;No viable terminal found to connect to the subgraph nodes: </span><span class="si">{</span><span class="n">subgraph_nodes</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="n">min_dist_global</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">terminal_distances</span><span class="p">)</span>
+    <span class="n">result_index</span> <span class="o">=</span> <span class="n">terminal_distances</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">min_dist_global</span><span class="p">)</span>
+    <span class="n">closest_terminal</span> <span class="o">=</span> <span class="n">terminals</span><span class="p">[</span><span class="n">result_index</span><span class="p">]</span>
+    <span class="n">tree_node</span> <span class="o">=</span> <span class="n">closest_tree_node</span><span class="p">[</span><span class="n">result_index</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">tree_node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_paths</span><span class="p">[</span><span class="n">closest_terminal</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;No recorded path from </span><span class="si">{</span><span class="n">closest_terminal</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">tree_node</span><span class="si">}</span><span class="s2"> in the all_paths dictionary.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">all_paths</span><span class="p">[</span><span class="n">closest_terminal</span><span class="p">][</span><span class="n">tree_node</span><span class="p">]</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, UFZ.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

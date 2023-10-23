@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pysewer.config.settings &mdash; pysewer 0.1.13 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=8d02545a"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../../../about.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pysewer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Pysewer Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pysewer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pysewer.config.settings</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pysewer.config.settings</h1><div class="highlight"><pre>
+<span></span><span class="c1"># SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)</span>
+<span class="c1"># SPDX-License-Identifier: GPL-3.0-only</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="c1"># get the directory of the current file</span>
+<span class="n">current_directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)))</span>
+
+<span class="n">DEFAULT_SETTINGS_PATH</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">current_directory</span> <span class="o">/</span> <span class="s2">&quot;settings.yaml&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Preporocessing">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.Preporocessing">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Preporocessing</span><span class="p">:</span>
+    <span class="n">dem_file_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">roads_input_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">]]</span>
+    <span class="n">buildings_input_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">]]</span>
+    <span class="n">dx</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">pump_penalty</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">max_connection_length</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">clustering</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">connect_buildings</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">add_private_sewer</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">field_get_sinks</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">field_get_buildings</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">value_get_sinks</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">value_get_buildings</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="Optimization">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.Optimization">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Optimization</span><span class="p">:</span>
+    <span class="n">inhabitants_dwelling</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">daily_wastewater_person</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">peak_factor</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">min_slope</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">tmax</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">tmin</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">inflow_trench_depth</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">min_trench_depth</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">diameters</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">roughness</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">pressurized_diameter</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+
+<div class="viewcode-block" id="Plotting">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.Plotting">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Plotting</span><span class="p">:</span>
+    <span class="n">plot_connection_graph</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">plot_junction_graph</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">plot_sink</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">plot_sewer</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">hillshade</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">colormap</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">sewer_graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">info_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="Export">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.Export">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Export</span><span class="p">:</span>
+    <span class="n">file_format</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="Config">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.Config">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+    <span class="n">preprocessing</span><span class="p">:</span> <span class="n">Preporocessing</span>
+    <span class="n">optimization</span><span class="p">:</span> <span class="n">Optimization</span>
+    <span class="n">plotting</span><span class="p">:</span> <span class="n">Plotting</span>
+    <span class="n">export</span><span class="p">:</span> <span class="n">Export</span></div>
+
+
+
+<div class="viewcode-block" id="load_settings">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.load_settings">[docs]</a>
+<span class="k">def</span> <span class="nf">load_settings</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">settings</span></div>
+
+
+
+<div class="viewcode-block" id="deep_merge">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.deep_merge">[docs]</a>
+<span class="k">def</span> <span class="nf">deep_merge</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">destination</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">destination</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">deep_merge</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">destination</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">destination</span></div>
+
+
+
+<div class="viewcode-block" id="override_settings">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.override_settings">[docs]</a>
+<span class="k">def</span> <span class="nf">override_settings</span><span class="p">(</span>
+    <span class="n">custom_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">custom_setting_dict</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Override the settings with a custom settings file or a custom dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">settings</span> <span class="o">=</span> <span class="n">load_settings</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">DEFAULT_SETTINGS_PATH</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">custom_path</span><span class="p">:</span>
+        <span class="n">custom_settings</span> <span class="o">=</span> <span class="n">load_settings</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">custom_path</span><span class="p">)</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">deep_merge</span><span class="p">(</span><span class="n">custom_settings</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">custom_setting_dict</span><span class="p">:</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">custom_setting_dict</span><span class="p">)</span>
+        <span class="n">deep_merge</span><span class="p">(</span><span class="n">custom_setting_dict</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Either custom_path or custom_setting_dict should be provided.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">settings</span></div>
+
+
+
+<div class="viewcode-block" id="override_setting_to_config">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.override_setting_to_config">[docs]</a>
+<span class="k">def</span> <span class="nf">override_setting_to_config</span><span class="p">(</span>
+    <span class="n">custom_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">custom_setting_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">):</span>
+    <span class="c1"># load the settings as dictionary</span>
+    <span class="n">settings_dict</span> <span class="o">=</span> <span class="n">override_settings</span><span class="p">(</span>
+        <span class="n">custom_path</span><span class="o">=</span><span class="n">custom_path</span><span class="p">,</span> <span class="n">custom_setting_dict</span><span class="o">=</span><span class="n">custom_setting_dict</span>
+    <span class="p">)</span>
+
+    <span class="c1"># convert the dictionary to a Config object</span>
+    <span class="n">processing_config</span> <span class="o">=</span> <span class="n">Preporocessing</span><span class="p">(</span><span class="o">**</span><span class="n">settings_dict</span><span class="p">[</span><span class="s2">&quot;preprocessing&quot;</span><span class="p">])</span>
+    <span class="n">optimization_config</span> <span class="o">=</span> <span class="n">Optimization</span><span class="p">(</span><span class="o">**</span><span class="n">settings_dict</span><span class="p">[</span><span class="s2">&quot;optimization&quot;</span><span class="p">])</span>
+    <span class="n">plotting_config</span> <span class="o">=</span> <span class="n">Plotting</span><span class="p">(</span><span class="o">**</span><span class="n">settings_dict</span><span class="p">[</span><span class="s2">&quot;plotting&quot;</span><span class="p">])</span>
+    <span class="n">export_config</span> <span class="o">=</span> <span class="n">Export</span><span class="p">(</span><span class="o">**</span><span class="n">settings_dict</span><span class="p">[</span><span class="s2">&quot;export&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">Config</span><span class="p">(</span>
+        <span class="n">preprocessing</span><span class="o">=</span><span class="n">processing_config</span><span class="p">,</span>
+        <span class="n">optimization</span><span class="o">=</span><span class="n">optimization_config</span><span class="p">,</span>
+        <span class="n">plotting</span><span class="o">=</span><span class="n">plotting_config</span><span class="p">,</span>
+        <span class="n">export</span><span class="o">=</span><span class="n">export_config</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="load_config">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.load_config">[docs]</a>
+<span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">custom_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">custom_setting_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Config</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load the default settings and override them with custom settings if needed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">default_settings</span> <span class="o">=</span> <span class="n">override_setting_to_config</span><span class="p">(</span><span class="n">DEFAULT_SETTINGS_PATH</span><span class="p">)</span>
+
+    <span class="c1"># if default settings if of class .Conifg</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_settings</span><span class="p">,</span> <span class="n">Config</span><span class="p">):</span>
+        <span class="c1"># print(&quot;default_settings is of class Config&quot;)</span>
+        <span class="k">if</span> <span class="n">custom_path</span><span class="p">:</span>
+            <span class="n">custom_settings</span> <span class="o">=</span> <span class="n">override_setting_to_config</span><span class="p">(</span><span class="n">custom_path</span><span class="p">)</span>
+            <span class="n">default_settings</span><span class="o">.</span><span class="n">preprocessing</span> <span class="o">=</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">preprocessing</span>
+            <span class="n">default_settings</span><span class="o">.</span><span class="n">optimization</span> <span class="o">=</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">optimization</span>
+            <span class="n">default_settings</span><span class="o">.</span><span class="n">plotting</span> <span class="o">=</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">plotting</span>
+            <span class="n">default_settings</span><span class="o">.</span><span class="n">export</span> <span class="o">=</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">export</span>
+        <span class="k">elif</span> <span class="n">custom_setting_dict</span><span class="p">:</span>
+            <span class="n">default_settings</span><span class="o">.</span><span class="n">preprocessing</span> <span class="o">=</span> <span class="n">custom_setting_dict</span><span class="p">[</span><span class="s2">&quot;preprocessing&quot;</span><span class="p">]</span>
+            <span class="n">default_settings</span><span class="o">.</span><span class="n">optimization</span> <span class="o">=</span> <span class="n">custom_setting_dict</span><span class="p">[</span><span class="s2">&quot;optimization&quot;</span><span class="p">]</span>
+            <span class="n">default_settings</span><span class="o">.</span><span class="n">plotting</span> <span class="o">=</span> <span class="n">custom_setting_dict</span><span class="p">[</span><span class="s2">&quot;plotting&quot;</span><span class="p">]</span>
+            <span class="n">default_settings</span><span class="o">.</span><span class="n">export</span> <span class="o">=</span> <span class="n">custom_setting_dict</span><span class="p">[</span><span class="s2">&quot;export&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Either custom_path or custom_setting_dict should be provided.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">default_settings</span></div>
+
+
+
+<div class="viewcode-block" id="flatten_config">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.flatten_config">[docs]</a>
+<span class="k">def</span> <span class="nf">flatten_config</span><span class="p">(</span><span class="n">config_dict</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">config_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">new_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parent_key</span><span class="si">}{</span><span class="n">sep</span><span class="si">}{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">parent_key</span> <span class="k">else</span> <span class="n">k</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">flatten_config</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">new_key</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">items</span><span class="p">[</span><span class="n">new_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="n">items</span></div>
+
+
+
+<div class="viewcode-block" id="config_to_dataframe">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.config_to_dataframe">[docs]</a>
+<span class="k">def</span> <span class="nf">config_to_dataframe</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">config_dict</span> <span class="o">=</span> <span class="n">asdict</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">flat_config</span> <span class="o">=</span> <span class="n">flatten_config</span><span class="p">(</span><span class="n">config_dict</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">flat_config</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Setting&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<span class="c1"># view defaults settings</span>
+<div class="viewcode-block" id="view_default_settings">
+<a class="viewcode-back" href="../../../pysewer.config.html#pysewer.config.settings.view_default_settings">[docs]</a>
+<span class="k">def</span> <span class="nf">view_default_settings</span><span class="p">():</span>
+    <span class="n">default_settings</span> <span class="o">=</span> <span class="n">override_setting_to_config</span><span class="p">(</span><span class="n">DEFAULT_SETTINGS_PATH</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">config_to_dataframe</span><span class="p">(</span><span class="n">default_settings</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<span class="c1"># if __name__ == &quot;__main__&quot;:</span>
+<span class="c1">#     # test the deault settings using config class</span>
+
+<span class="c1">#     Config1 = load_config()</span>
+<span class="c1">#     print(Config1)</span>
+<span class="c1">#     print(type(Config1))</span>
+
+<span class="c1">#     # assessing values</span>
+<span class="c1">#     print(Config1.preprocessing.dx)</span>
+
+<span class="c1">#     print(&quot;Done!!&quot;)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, UFZ.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

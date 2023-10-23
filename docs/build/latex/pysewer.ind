@@ -1,0 +1,258 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter A
+  \item \spxentry{add\_node()}\spxextra{pysewer.preprocessing.ModelDomain method}, \hyperpage{21}
+  \item \spxentry{add\_private\_sewer}\spxextra{pysewer.config.settings.Preporocessing attribute}, 
+		\hyperpage{6}
+  \item \spxentry{add\_sink()}\spxextra{pysewer.preprocessing.ModelDomain method}, \hyperpage{22}
+
+  \indexspace
+  \bigletter B
+  \item \spxentry{Buildings}\spxextra{class in pysewer.preprocessing}, \hyperpage{18}
+  \item \spxentry{buildings}\spxextra{pysewer.preprocessing.ModelDomain attribute}, \hyperpage{21}
+  \item \spxentry{buildings\_input\_data}\spxextra{pysewer.config.settings.Preporocessing attribute}, 
+		\hyperpage{6}
+
+  \indexspace
+  \bigletter C
+  \item \spxentry{calculate\_hydraulic\_parameters()}\spxextra{in module pysewer.optimization}, 
+		\hyperpage{13}
+  \item \spxentry{ckdnearest()}\spxextra{in module pysewer.helper}, \hyperpage{8}
+  \item \spxentry{cluster\_centers()}\spxextra{pysewer.preprocessing.Buildings method}, 
+		\hyperpage{18}
+  \item \spxentry{clustering}\spxextra{pysewer.config.settings.Preporocessing attribute}, 
+		\hyperpage{6}
+  \item \spxentry{colormap}\spxextra{pysewer.config.settings.Plotting attribute}, \hyperpage{6}
+  \item \spxentry{Config}\spxextra{class in pysewer.config.settings}, \hyperpage{5}
+  \item \spxentry{config\_to\_dataframe()}\spxextra{in module pysewer.config.settings}, 
+		\hyperpage{7}
+  \item \spxentry{connect\_buildings}\spxextra{pysewer.config.settings.Preporocessing attribute}, 
+		\hyperpage{6}
+  \item \spxentry{connect\_buildings()}\spxextra{pysewer.preprocessing.ModelDomain method}, 
+		\hyperpage{22}
+  \item \spxentry{connect\_subgraphs()}\spxextra{pysewer.preprocessing.ModelDomain method}, 
+		\hyperpage{22}
+  \item \spxentry{connect\_to\_roadnetwork()}\spxextra{pysewer.preprocessing.ModelDomain method}, 
+		\hyperpage{22}
+  \item \spxentry{connection\_graph}\spxextra{pysewer.preprocessing.ModelDomain attribute}, 
+		\hyperpage{21}
+  \item \spxentry{create\_unsimplified\_graph()}\spxextra{pysewer.preprocessing.ModelDomain method}, 
+		\hyperpage{23}
+
+  \indexspace
+  \bigletter D
+  \item \spxentry{daily\_wastewater\_person}\spxextra{pysewer.config.settings.Optimization attribute}, 
+		\hyperpage{5}
+  \item \spxentry{deep\_merge()}\spxextra{in module pysewer.config.settings}, \hyperpage{7}
+  \item \spxentry{DEM}\spxextra{class in pysewer.preprocessing}, \hyperpage{19}
+  \item \spxentry{dem}\spxextra{pysewer.preprocessing.ModelDomain attribute}, \hyperpage{21}
+  \item \spxentry{dem\_file\_path}\spxextra{pysewer.config.settings.Preporocessing attribute}, 
+		\hyperpage{6}
+  \item \spxentry{diameters}\spxextra{pysewer.config.settings.Optimization attribute}, 
+		\hyperpage{5}
+  \item \spxentry{dx}\spxextra{pysewer.config.settings.Preporocessing attribute}, \hyperpage{6}
+
+  \indexspace
+  \bigletter E
+  \item \spxentry{estimate\_peakflow()}\spxextra{in module pysewer.optimization}, \hyperpage{13}
+  \item \spxentry{Export}\spxextra{class in pysewer.config.settings}, \hyperpage{5}
+  \item \spxentry{export}\spxextra{pysewer.config.settings.Config attribute}, \hyperpage{5}
+  \item \spxentry{export\_sewer\_network()}\spxextra{in module pysewer.export}, \hyperpage{7}
+
+  \indexspace
+  \bigletter F
+  \item \spxentry{field\_get\_buildings}\spxextra{pysewer.config.settings.Preporocessing attribute}, 
+		\hyperpage{6}
+  \item \spxentry{field\_get\_sinks}\spxextra{pysewer.config.settings.Preporocessing attribute}, 
+		\hyperpage{6}
+  \item \spxentry{file\_format}\spxextra{pysewer.config.settings.Export attribute}, \hyperpage{5}
+  \item \spxentry{file\_path}\spxextra{pysewer.preprocessing.DEM attribute}, \hyperpage{19}
+  \item \spxentry{find\_rsph\_path()}\spxextra{in module pysewer.routing}, \hyperpage{25}
+  \item \spxentry{flatten\_config()}\spxextra{in module pysewer.config.settings}, \hyperpage{7}
+
+  \indexspace
+  \bigletter G
+  \item \spxentry{gdf}\spxextra{pysewer.preprocessing.Buildings attribute}, \hyperpage{18}
+  \item \spxentry{generate\_connection\_graph()}\spxextra{pysewer.preprocessing.ModelDomain method}, 
+		\hyperpage{23}
+  \item \spxentry{generate\_schema()}\spxextra{in module pysewer.export}, \hyperpage{7}
+  \item \spxentry{get\_buildings()}\spxextra{pysewer.preprocessing.ModelDomain method}, 
+		\hyperpage{23}
+  \item \spxentry{get\_closest\_edge()}\spxextra{in module pysewer.helper}, \hyperpage{8}
+  \item \spxentry{get\_closest\_edge\_multiple()}\spxextra{in module pysewer.helper}, \hyperpage{9}
+  \item \spxentry{get\_crs}\spxextra{pysewer.preprocessing.DEM property}, \hyperpage{19}
+  \item \spxentry{get\_crs()}\spxextra{pysewer.preprocessing.Buildings method}, \hyperpage{18}
+  \item \spxentry{get\_crs()}\spxextra{pysewer.preprocessing.Roads method}, \hyperpage{24}
+  \item \spxentry{get\_downstream\_junction()}\spxextra{in module pysewer.optimization}, 
+		\hyperpage{13}
+  \item \spxentry{get\_edge\_gdf()}\spxextra{in module pysewer.helper}, \hyperpage{9}
+  \item \spxentry{get\_edge\_keys()}\spxextra{in module pysewer.helper}, \hyperpage{9}
+  \item \spxentry{get\_elevation()}\spxextra{pysewer.preprocessing.DEM method}, \hyperpage{19}
+  \item \spxentry{get\_essential\_nodes()}\spxextra{in module pysewer.simplify}, \hyperpage{26}
+  \item \spxentry{get\_gdf()}\spxextra{pysewer.preprocessing.Buildings method}, \hyperpage{19}
+  \item \spxentry{get\_gdf()}\spxextra{pysewer.preprocessing.Roads method}, \hyperpage{24}
+  \item \spxentry{get\_junction\_front()}\spxextra{in module pysewer.optimization}, \hyperpage{14}
+  \item \spxentry{get\_max\_upstream\_diameter()}\spxextra{in module pysewer.optimization}, 
+		\hyperpage{14}
+  \item \spxentry{get\_mean\_slope()}\spxextra{in module pysewer.helper}, \hyperpage{10}
+  \item \spxentry{get\_merged\_roads()}\spxextra{pysewer.preprocessing.Roads method}, 
+		\hyperpage{24}
+  \item \spxentry{get\_nearest\_point()}\spxextra{pysewer.preprocessing.Roads method}, 
+		\hyperpage{24}
+  \item \spxentry{get\_node\_gdf()}\spxextra{in module pysewer.helper}, \hyperpage{10}
+  \item \spxentry{get\_node\_keys()}\spxextra{in module pysewer.helper}, \hyperpage{11}
+  \item \spxentry{get\_path\_distance()}\spxextra{in module pysewer.helper}, \hyperpage{11}
+  \item \spxentry{get\_path\_gdf()}\spxextra{in module pysewer.helper}, \hyperpage{11}
+  \item \spxentry{get\_profile()}\spxextra{pysewer.preprocessing.DEM method}, \hyperpage{19, 20}
+  \item \spxentry{get\_sewer\_info()}\spxextra{in module pysewer.helper}, \hyperpage{12}
+  \item \spxentry{get\_sinks()}\spxextra{pysewer.preprocessing.ModelDomain method}, \hyperpage{23}
+  \item \spxentry{get\_upstream\_nodes()}\spxextra{in module pysewer.helper}, \hyperpage{12}
+
+  \indexspace
+  \bigletter H
+  \item \spxentry{hillshade}\spxextra{pysewer.config.settings.Plotting attribute}, \hyperpage{6}
+
+  \indexspace
+  \bigletter I
+  \item \spxentry{inflow\_trench\_depth}\spxextra{pysewer.config.settings.Optimization attribute}, 
+		\hyperpage{5}
+  \item \spxentry{info\_table}\spxextra{pysewer.config.settings.Plotting attribute}, \hyperpage{6}
+  \item \spxentry{inhabitants\_dwelling}\spxextra{pysewer.config.settings.Optimization attribute}, 
+		\hyperpage{5}
+  \item \spxentry{is\_list\_of\_tuples()}\spxextra{in module pysewer.export}, \hyperpage{8}
+
+  \indexspace
+  \bigletter L
+  \item \spxentry{load\_config()}\spxextra{in module pysewer.config.settings}, \hyperpage{7}
+  \item \spxentry{load\_settings()}\spxextra{in module pysewer.config.settings}, \hyperpage{7}
+
+  \indexspace
+  \bigletter M
+  \item \spxentry{mannings\_equation()}\spxextra{in module pysewer.optimization}, \hyperpage{14}
+  \item \spxentry{map\_dtype\_to\_fiona()}\spxextra{in module pysewer.export}, \hyperpage{8}
+  \item \spxentry{max\_connection\_length}\spxextra{pysewer.config.settings.Preporocessing attribute}, 
+		\hyperpage{6}
+  \item \spxentry{min\_slope}\spxextra{pysewer.config.settings.Optimization attribute}, 
+		\hyperpage{5}
+  \item \spxentry{min\_trench\_depth}\spxextra{pysewer.config.settings.Optimization attribute}, 
+		\hyperpage{5}
+  \item \spxentry{ModelDomain}\spxextra{class in pysewer.preprocessing}, \hyperpage{20}
+  \item \spxentry{module}
+    \subitem \spxentry{pysewer.config.settings}, \hyperpage{5}
+    \subitem \spxentry{pysewer.export}, \hyperpage{7}
+    \subitem \spxentry{pysewer.helper}, \hyperpage{8}
+    \subitem \spxentry{pysewer.optimization}, \hyperpage{13}
+    \subitem \spxentry{pysewer.plotting}, \hyperpage{17}
+    \subitem \spxentry{pysewer.preprocessing}, \hyperpage{18}
+    \subitem \spxentry{pysewer.routing}, \hyperpage{25}
+    \subitem \spxentry{pysewer.simplify}, \hyperpage{26}
+
+  \indexspace
+  \bigletter N
+  \item \spxentry{needs\_pump()}\spxextra{in module pysewer.optimization}, \hyperpage{15}
+  \item \spxentry{no\_dem}\spxextra{pysewer.preprocessing.DEM attribute}, \hyperpage{19, 20}
+
+  \indexspace
+  \bigletter O
+  \item \spxentry{Optimization}\spxextra{class in pysewer.config.settings}, \hyperpage{5}
+  \item \spxentry{optimization}\spxextra{pysewer.config.settings.Config attribute}, \hyperpage{5}
+  \item \spxentry{override\_setting\_to\_config()}\spxextra{in module pysewer.config.settings}, 
+		\hyperpage{7}
+  \item \spxentry{override\_settings()}\spxextra{in module pysewer.config.settings}, \hyperpage{7}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{peak\_factor}\spxextra{pysewer.config.settings.Optimization attribute}, 
+		\hyperpage{5}
+  \item \spxentry{place\_lifting\_station()}\spxextra{in module pysewer.optimization}, 
+		\hyperpage{15}
+  \item \spxentry{place\_pump()}\spxextra{in module pysewer.optimization}, \hyperpage{15}
+  \item \spxentry{plot\_connection\_graph}\spxextra{pysewer.config.settings.Plotting attribute}, 
+		\hyperpage{6}
+  \item \spxentry{plot\_junction\_graph}\spxextra{pysewer.config.settings.Plotting attribute}, 
+		\hyperpage{6}
+  \item \spxentry{plot\_model\_domain()}\spxextra{in module pysewer.plotting}, \hyperpage{17}
+  \item \spxentry{plot\_sewer}\spxextra{pysewer.config.settings.Plotting attribute}, \hyperpage{6}
+  \item \spxentry{plot\_sewer\_attributes()}\spxextra{in module pysewer.plotting}, \hyperpage{17}
+  \item \spxentry{plot\_sink}\spxextra{pysewer.config.settings.Plotting attribute}, \hyperpage{6}
+  \item \spxentry{Plotting}\spxextra{class in pysewer.config.settings}, \hyperpage{6}
+  \item \spxentry{plotting}\spxextra{pysewer.config.settings.Config attribute}, \hyperpage{5}
+  \item \spxentry{Preporocessing}\spxextra{class in pysewer.config.settings}, \hyperpage{6}
+  \item \spxentry{preprocessing}\spxextra{pysewer.config.settings.Config attribute}, \hyperpage{5}
+  \item \spxentry{pressurized\_diameter}\spxextra{pysewer.config.settings.Optimization attribute}, 
+		\hyperpage{5}
+  \item \spxentry{Properties()}\spxextra{pysewer.preprocessing.DEM method}, \hyperpage{19}
+  \item \spxentry{pump\_penalty}\spxextra{pysewer.config.settings.Preporocessing attribute}, 
+		\hyperpage{6}
+  \item \spxentry{pump\_penalty}\spxextra{pysewer.preprocessing.ModelDomain attribute}, 
+		\hyperpage{21}
+  \item \spxentry{pysewer.config.settings}
+    \subitem \spxentry{module}, \hyperpage{5}
+  \item \spxentry{pysewer.export}
+    \subitem \spxentry{module}, \hyperpage{7}
+  \item \spxentry{pysewer.helper}
+    \subitem \spxentry{module}, \hyperpage{8}
+  \item \spxentry{pysewer.optimization}
+    \subitem \spxentry{module}, \hyperpage{13}
+  \item \spxentry{pysewer.plotting}
+    \subitem \spxentry{module}, \hyperpage{17}
+  \item \spxentry{pysewer.preprocessing}
+    \subitem \spxentry{module}, \hyperpage{18}
+  \item \spxentry{pysewer.routing}
+    \subitem \spxentry{module}, \hyperpage{25}
+  \item \spxentry{pysewer.simplify}
+    \subitem \spxentry{module}, \hyperpage{26}
+
+  \indexspace
+  \bigletter R
+  \item \spxentry{raster}\spxextra{pysewer.preprocessing.DEM attribute}, \hyperpage{19, 20}
+  \item \spxentry{remove\_third\_dimension()}\spxextra{in module pysewer.helper}, \hyperpage{12}
+  \item \spxentry{reproject\_dem()}\spxextra{pysewer.preprocessing.DEM method}, \hyperpage{19, 20}
+  \item \spxentry{reset\_sinks()}\spxextra{pysewer.preprocessing.ModelDomain method}, 
+		\hyperpage{23}
+  \item \spxentry{reverse\_bfs()}\spxextra{in module pysewer.optimization}, \hyperpage{16}
+  \item \spxentry{Roads}\spxextra{class in pysewer.preprocessing}, \hyperpage{24}
+  \item \spxentry{roads}\spxextra{pysewer.preprocessing.ModelDomain attribute}, \hyperpage{21}
+  \item \spxentry{roads\_input\_data}\spxextra{pysewer.config.settings.Preporocessing attribute}, 
+		\hyperpage{6}
+  \item \spxentry{roads\_obj}\spxextra{pysewer.preprocessing.Buildings attribute}, \hyperpage{18}
+  \item \spxentry{roughness}\spxextra{pysewer.config.settings.Optimization attribute}, 
+		\hyperpage{5}
+  \item \spxentry{rsph\_tree()}\spxextra{in module pysewer.routing}, \hyperpage{25}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{select\_diameter()}\spxextra{in module pysewer.optimization}, \hyperpage{16}
+  \item \spxentry{set\_diameter()}\spxextra{in module pysewer.optimization}, \hyperpage{16}
+  \item \spxentry{set\_pump\_penalty()}\spxextra{pysewer.preprocessing.ModelDomain method}, 
+		\hyperpage{23}
+  \item \spxentry{set\_sink\_lowest()}\spxextra{pysewer.preprocessing.ModelDomain method}, 
+		\hyperpage{23}
+  \item \spxentry{sewer\_graph}\spxextra{pysewer.config.settings.Plotting attribute}, \hyperpage{6}
+  \item \spxentry{simplify\_graph()}\spxextra{in module pysewer.simplify}, \hyperpage{26}
+
+  \indexspace
+  \bigletter T
+  \item \spxentry{tmax}\spxextra{pysewer.config.settings.Optimization attribute}, \hyperpage{6}
+  \item \spxentry{tmin}\spxextra{pysewer.config.settings.Optimization attribute}, \hyperpage{6}
+  \item \spxentry{tuple\_list\_to\_json()}\spxextra{in module pysewer.export}, \hyperpage{8}
+
+  \indexspace
+  \bigletter V
+  \item \spxentry{value\_get\_buildings}\spxextra{pysewer.config.settings.Preporocessing attribute}, 
+		\hyperpage{7}
+  \item \spxentry{value\_get\_sinks}\spxextra{pysewer.config.settings.Preporocessing attribute}, 
+		\hyperpage{7}
+  \item \spxentry{view\_default\_settings()}\spxextra{in module pysewer.config.settings}, 
+		\hyperpage{7}
+
+  \indexspace
+  \bigletter W
+  \item \spxentry{write\_gdf\_to\_gpkg()}\spxextra{in module pysewer.export}, \hyperpage{8}
+  \item \spxentry{write\_gdf\_to\_shp()}\spxextra{in module pysewer.export}, \hyperpage{8}
+
+\end{sphinxtheindex}
