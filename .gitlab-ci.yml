@@ -18,7 +18,7 @@ pages:
   script:
     - mkdir public
     - cd docs
-    - mv build/html/ ../public
+    - cp -r build/html/* ../public
     # - cp build/latex/pysewer.pdf ../public
   artifacts:
     paths:
