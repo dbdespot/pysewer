@@ -1,6 +1,6 @@
-# stages:
+stages:
 #   - install
-#   - deploy  
+  - deploy  
 
 # install_dependencies:
 #   stage: install
@@ -14,6 +14,7 @@
 #     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 pages:
+  stage: deploy
   script:
     - mkdir public
     - cd docs
