@@ -19,6 +19,7 @@ class TestOptimization:
         self.model_domain.add_sink(self.sink_coordinates)
         self.connection_graph = self.model_domain.generate_connection_graph()
         self.layout = pysewer.rsph_tree(self.connection_graph, [self.sink_coordinates])
+        self.layout_fast_rsph = pysewer.rsph_tree_fast(self.connection_graph, [self.sink_coordinates])
         self.sewer_graph = pysewer.estimate_peakflow(
             self.layout, inhabitants_dwelling=6, daily_wastewater_person=250
         )
@@ -32,6 +33,16 @@ class TestOptimization:
     def test_diameter(self):
         G = self.sewer_graph = pysewer.calculate_hydraulic_parameters(
             self.layout,
+            sinks=[self.sink_coordinates],
+            pressurized_diameter=0.2,
+            diameters=[0.2, 0.3, 0.4, 0.5, 1, 2],
+            roughness=0.012,
+        )
+
+    # test diameter using fast rsph
+    def test_diameter_fast_rsph(self):
+        G = self.sewer_graph = pysewer.calculate_hydraulic_parameters(
+            self.layout_fast_rsph,
             sinks=[self.sink_coordinates],
             pressurized_diameter=0.2,
             diameters=[0.2, 0.3, 0.4, 0.5, 1, 2],
