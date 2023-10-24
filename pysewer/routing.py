@@ -9,12 +9,66 @@ from .helper import get_node_keys
 
 NodeType = Union[int, str, Hashable]
 
+from typing import List, Tuple
+
+import networkx as nx
+
+NodeType = Tuple[float, float]
+
+
+def rsph_tree_fast(
+    connection_graph: nx.Graph,
+    sink: List[NodeType],
+    from_type: str = "building",
+) -> nx.DiGraph:
+    """
+    Returns the directed routed steiner tree that connects all terminal nodes to the sink using the repeated shortest path heuristic.
+
+    Parameters:
+    -----------
+    connection_graph : nx.Graph
+        The graph representing the sewer network.
+    sink : List[Tuple[float, float]]
+        The coordinates of the sink node.
+    from_type : str, optional
+        The type of the source nodes, by default "building".
+    to_type : str, optional
+        The type of the destination nodes, by default "wwtp".
+
+    Returns:
+    --------
+    nx.DiGraph
+        A directed graph representing the routed steiner tree that connects all terminal nodes to the sink.
+    """
+    sewer_graph = nx.DiGraph(nx.create_empty_copy(connection_graph))
+    terminals = get_node_keys(connection_graph, field="node_type", value=from_type)
+    subgraph_nodes = sink
+    while len(terminals) > 0:
+        try:
+            path = nx.dijkstra_path(
+                connection_graph, terminals[0], sink, weight="weight"
+            )
+            # add edges of path to sewer graph while keeping edge attributes
+            nx.add_path(sewer_graph, path)
+
+            edgesinpath = zip(path[0:], path[1:])
+            for e in edgesinpath:
+                nx.set_edge_attributes(
+                    sewer_graph,
+                    {(e[0], e[1]): connection_graph.get_edge_data(e[0], e[1])[0]},
+                )
+            subgraph_nodes = subgraph_nodes + path[1:-1]
+        except:
+            print("WARNING: no Path from Building " + str(terminals[0]) + "to sink")
+
+        terminals.remove(terminals[0])
+    return sewer_graph
+
 
 def rsph_tree(
     connection_graph: nx.Graph,
     sinks: List[NodeType],
     from_type: str = "building",
-    to_type: str = "wwtp",
     skip_nodes: List[NodeType] = [],
 ) -> nx.DiGraph:
     """
