@@ -1,7 +1,4 @@
-<!-- SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
-SPDX-License-Identifier: GPL-3.0-only -->
-
-# Contributing to [Your Project Name]
+# Contributing to pysewer
 
 👍🎉 First off, thanks for taking the time to contribute! 🎉👍
 
@@ -9,7 +6,7 @@ The following is a set of guidelines for contributing to pysewer and its reposit
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [Your Project Name Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [your email].
+This project and everyone participating in it is governed by the [pysewer Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [your email].
 
 ## How Can I Contribute?
 
@@ -21,7 +18,7 @@ This project and everyone participating in it is governed by the [Your Project N
 
 ### Suggesting Enhancements
 
-- **Determine [which repository the enhancement should be suggested in](https://github.com/your/your-project/)**.
+- **Determine [which repository the enhancement should be suggested in](https://git.ufz.de/despot/pysewer_dev/)**.
   
 - **Perform a cursory search** to see if the enhancement has already been suggested. If it has, add to the discussion.
 
