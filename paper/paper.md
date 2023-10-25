@@ -15,7 +15,7 @@ authors:
     orcid: 0000-0002-2430-1612
     affiliation: 1
   - name: Daneish Despot
-    corresponding: ptrue
+    corresponding: true
     orcid: 0000-0002-8980-5651
     affiliation: 1
   - name: Manfred van Afferden
