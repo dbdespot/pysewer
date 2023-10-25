@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Publishing DTD v1.2 20190208//EN"
+                  "JATS-publishing1.dtd">
+<article xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink" dtd-version="1.2" article-type="other">
+<front>
+<journal-meta>
+<journal-id></journal-id>
+<journal-title-group>
+<journal-title>Journal of Open Source Software</journal-title>
+<abbrev-journal-title>JOSS</abbrev-journal-title>
+</journal-title-group>
+<issn publication-format="electronic">2475-9066</issn>
+<publisher>
+<publisher-name>Open Journals</publisher-name>
+</publisher>
+</journal-meta>
+<article-meta>
+<article-id pub-id-type="publisher-id">0</article-id>
+<article-id pub-id-type="doi">N/A</article-id>
+<title-group>
+<article-title>Pysewer: A Python Library for Sewer Network Generation in
+Data Scarce Regions</article-title>
+</title-group>
+<contrib-group>
+<contrib contrib-type="author">
+<name>
+<surname>Sanne</surname>
+<given-names>Moritz</given-names>
+</name>
+<xref ref-type="aff" rid="aff-1"/>
+<xref ref-type="aff" rid="aff-2"/>
+</contrib>
+<contrib contrib-type="author">
+<contrib-id contrib-id-type="orcid">https://orcid.org/0000-0002-2430-1612</contrib-id>
+<name>
+<surname>Khurelbaatar</surname>
+<given-names>Ganbaatar</given-names>
+</name>
+<xref ref-type="aff" rid="aff-1"/>
+</contrib>
+<contrib contrib-type="author" corresp="yes">
+<contrib-id contrib-id-type="orcid">https://orcid.org/0000-0002-8980-5651</contrib-id>
+<name>
+<surname>Despot</surname>
+<given-names>Daneish</given-names>
+</name>
+<xref ref-type="aff" rid="aff-1"/>
+<xref ref-type="corresp" rid="cor-1"><sup>*</sup></xref>
+</contrib>
+<contrib contrib-type="author">
+<name>
+<surname>van Afferden</surname>
+<given-names>Manfred</given-names>
+</name>
+<xref ref-type="aff" rid="aff-1"/>
+</contrib>
+<contrib contrib-type="author">
+<contrib-id contrib-id-type="orcid">https://orcid.org/0000-0003-0454-0437</contrib-id>
+<name>
+<surname>Friesen</surname>
+<given-names>Jan</given-names>
+</name>
+<xref ref-type="aff" rid="aff-1"/>
+</contrib>
+<aff id="aff-1">
+<institution-wrap>
+<institution>Centre for Environmental Biotechnology, Helmholtz Centre
+for Environmental Research GmbH – UFZ, Permoserstraße 15 | 04318
+Leipzig, Germany</institution>
+</institution-wrap>
+</aff>
+<aff id="aff-2">
+<institution-wrap>
+<institution>Europace AG, Berlin, Germany</institution>
+</institution-wrap>
+</aff>
+</contrib-group>
+<author-notes>
+<corresp id="cor-1">* E-mail: <email></email></corresp>
+</author-notes>
+<pub-date date-type="pub" publication-format="electronic" iso-8601-date="2023-10-22">
+<day>22</day>
+<month>10</month>
+<year>2023</year>
+</pub-date>
+<volume>¿VOL?</volume>
+<issue>¿ISSUE?</issue>
+<fpage>¿PAGE?</fpage>
+<permissions>
+<copyright-statement>Authors of papers retain copyright and release the
+work under a Creative Commons Attribution 4.0 International License (CC
+BY 4.0)</copyright-statement>
+<copyright-year>2022</copyright-year>
+<copyright-holder>The article authors</copyright-holder>
+<license license-type="open-access" xlink:href="https://creativecommons.org/licenses/by/4.0/">
+<license-p>Authors of papers retain copyright and release the work under
+a Creative Commons Attribution 4.0 International License (CC BY
+4.0)</license-p>
+</license>
+</permissions>
+<kwd-group kwd-group-type="author">
+<kwd>Python</kwd>
+<kwd>sewer network</kwd>
+<kwd>wastewater</kwd>
+<kwd>infrastructure</kwd>
+<kwd>planning</kwd>
+<kwd>design</kwd>
+<kwd>graph theory</kwd>
+</kwd-group>
+</article-meta>
+</front>
+<body>
+<sec id="summary">
+  <title>Summary</title>
+  <p>Pysewer is a network generator for sewer networks originally
+  designed for rural settlements in emerging countries with little or no
+  wastewater infrastructure. The network generation prioritises gravity
+  flow in order to avoid pumping – which can be a source of failure and
+  high maintenance – where possible. The network dimensioning is based
+  on dry-weather flow.</p>
+  <p>Based on a few data sources, pysewer generates a complete network
+  based on roads, building locations, and elevation data. Global water
+  consumption and population assumptions are included to dimension the
+  sewer diameter. Results are fully-connected sewer networks that
+  connect all buildings to one or several predefined wastewater
+  treatment plant (WWTP) locations. By default, the lowest point in the
+  elevation data is set as the WWTP. The resulting network contains
+  sewer diameters, building connections, as well as lifting stations or
+  pumping stations with pressurised pipes where necessary.</p>
+</sec>
+<sec id="statement-of-need">
+  <title>Statement of Need</title>
+  <p>The sustainable management of water and sanitation has been defined
+  as one of the UN’s sustainable development goals: SDG #6
+  (<xref alt="Water, 2018" rid="ref-unwaterSustainableDevelopment2018" ref-type="bibr">Water,
+  2018</xref>). As of 2019, SDG 6 might not be reached in 2030 despite
+  the progress made, which means that more than half of the population
+  still lacks safely managed sanitation
+  (<xref alt="Water, 2018" rid="ref-unwaterSustainableDevelopment2018" ref-type="bibr">Water,
+  2018</xref>).
+  In order to identify optimal wastewater management at the settlement
+  level, it is necessary to compare different central or decentral
+  solutions. To achieve this, a baseline is required against which other
+  scenarios can be compared
+  (<xref alt="Khurelbaatar et al., 2021" rid="ref-khurelbaatarDataReduced2021" ref-type="bibr">Khurelbaatar
+  et al., 2021</xref>;
+  <xref alt="van Afferden et al., 2015" rid="ref-vanafferdenNewapproach2015" ref-type="bibr">van
+  Afferden et al., 2015</xref>). To this end, we developed pysewer – a
+  tool that generates settlement-wide sewer networks, which connect all
+  the buildings within the settlement boundary or the region of interest
+  to one or more wastewater treatment plant locations.</p>
+  <p>Pysewer is a tool for data-scare environments using only few data
+  and global assumptions – thus enabling a transferability to a wide
+  range of different regions. At the same time, a priori data sources
+  can be substituted with high-resolution data and site-specific
+  information such as local water consumption and population data. The
+  generated networks can then be exported (i.e., as a geopackage or
+  shapefile) in order to utilise the results in preliminary planning
+  stages, initial cost estimations, scenario development processes or
+  for further comparison to decentral solutions where the network can be
+  modified. The option to include several treatment locations also
+  enables users to already plan decentralised networks or favour
+  treatment locations (i.e., due to local demands or restrictions).</p>
+</sec>
+<sec id="functionality-and-key-features">
+  <title>Functionality and key features</title>
+  <p>Pysewer’s concept is built upon network science, where we combine
+  algorithmic optimisation using graph theory with sewer network
+  engineering design to generate a sewer network layout. In the desired
+  layout, all buildings are connected to a wastewater treatment plant
+  (WWTP) through a sewer network, which utilises the terrain to
+  prioritise gravity flow in order to minimise the use of pressure
+  sewers. Addressing the intricate challenge of generating sewer network
+  layouts, particularly in data-scarce environments, is at the forefront
+  of our objectives. Our approach, therefore, leans heavily towards
+  utilising data that can be easily acquired for a specific area of
+  interest. Thus, we deploy the following data as input to autonomously
+  generate a sewer network, with a distinct prioritisation towards
+  gravity flow.</p>
+  <list list-type="order">
+    <list-item>
+      <p>Digital Elevation Model (DEM) – to derive the elevation profile
+      and understand topographic details such as the lowest point
+      (sinks) within the area of interest.</p>
+    </list-item>
+    <list-item>
+      <p>Existing road network data – Preferred vector data format in
+      the form of <monospace>LineString</monospace> to map and utilise
+      current infrastructure pathways.</p>
+    </list-item>
+    <list-item>
+      <p>Building locations – defined by x, y coordinate points, these
+      points represent service requirement locations and identify the
+      connection to the network.</p>
+    </list-item>
+    <list-item>
+      <p>Site-specific water consumption and population data – to
+      plan/size hydraulic elements of the sewer network and estimate the
+      sewage flow.
+      The core functionalities of pysewer include transforming the
+      minimal inputs into an initial network graph—the foundation for
+      the ensuing design and optimisation process; the generation of a
+      gravity flow-prioritised sewer network—identifying the most
+      efficient network paths and positions of the pump and lift
+      stations where required; and the visualisation and exporting of
+      the generated network—allowing visual inspection of the sewer
+      network attributes and export of the generated sewer network.
+      <xref alt="[fig:fig1]" rid="figU003Afig1">[fig:fig1]</xref>
+      provides a visual guide of the distinct yet interconnected modules
+      within pysewer.</p>
+    </list-item>
+  </list>
+  <fig>
+    <caption><p>Pysewer’s modular
+    workflow<styled-content id="figU003Afig1"></styled-content></p></caption>
+    <graphic mimetype="image" mime-subtype="png" xlink:href="media/media/figures/pysewer_module_new.png" />
+  </fig>
+  <sec id="preprocessing-and-initial-network-generation">
+    <title>Preprocessing and initial network generation</title>
+    <p>In the preprocessing module, the roads, buildings and the DEM
+    must all be projected in the same projection (CRS) and must be in
+    the form of a geopandas
+    (<xref alt="Jordahl et al., 2020" rid="ref-kelsey_jordahl_2020_3946761" ref-type="bibr">Jordahl
+    et al., 2020</xref>) data frame or a shapefile.
+    <monospace>Roads</monospace>, <monospace>Buildings</monospace> and
+    <monospace>DEM</monospace> classes are used to transform the raw
+    data formats into the required format (i.e., geopandas data frame)
+    to create the initial graph network (networkx,
+    (<xref alt="Hagberg et al., 2008" rid="ref-SciPyProceedings_11" ref-type="bibr">Hagberg
+    et al., 2008</xref>)), where nodes represent crucial points such as
+    junctions or buildings and edges to simulate potential sewer lines.
+    The following measures ensure that the initial layout aligns with
+    the road network and that there is serviceability to all buildings
+    within the area of interest:</p>
+    <list list-type="bullet">
+      <list-item>
+        <p>“connecting” buildings to the street network using the
+        connect buildings method. This method adds nodes to the graph to
+        connect the buildings in the network using the building
+        points.</p>
+      </list-item>
+      <list-item>
+        <p>Creation of “virtual roads”. Buildings which are not directly
+        connected to the road network are connected by finding the
+        closest edge to the building, which is then marked as the
+        closest edge. The nodes are then disconnected from the edges and
+        are added to the initial connection graph network.</p>
+      </list-item>
+      <list-item>
+        <p>Contracting the street network for more efficient graph
+        traversal.</p>
+      </list-item>
+      <list-item>
+        <p>Setting of the collection point or Wastewater Treatment Plant
+        (WWTP).By default, the lowest elevation point in the region of
+        interest is set as the location of the WWTP. Users can manually
+        define the location of the WWTP by using the
+        <monospace>add_sink</monospace> method.</p>
+      </list-item>
+    </list>
+    <p>After preprocessing, all relevant data is stored as a
+    <monospace>MultiDiGraph</monospace> to allow for asymmetric edge
+    values (e.g., elevation profile and subsequently costs).
+    <xref alt="[fig:fig2]" rid="figU003Afig2">[fig:fig2]</xref>
+    demonstrates the required data, its preprocessing and the generation
+    of the initial graph network.</p>
+    <fig>
+      <caption><p>Pysewer preprocessing. Topographic map with the
+      connection graph resulting from the instantiation of the
+      <monospace>ModelDomain</monospace> class (A). Sewer network layout
+      requirements: existing building, roads, and collection point
+      (WWTP)
+      (B).<styled-content id="figU003Afig2"></styled-content></p></caption>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="media/media/figures/figure2.png" />
+    </fig>
+  </sec>
+  <sec id="generating-a-gravity-flow-prioritise-sewer-network">
+    <title>Generating a gravity flow-prioritise sewer network</title>
+    <p>Within the computational framework of pysewer, the routing and
+    optimisation modules function as the principal mechanisms for
+    synthesising the sewer network. The objective of the routing module
+    is to identify the paths through the network, starting from the
+    sink. The algorithm approximates the directed Steiner tree (the
+    Steiner arborescence) between all sources and the sink by using a
+    repeated shortest path heuristic (RSPH). The routing module has two
+    solvers to find estimates for the underlying minimum Steiner
+    arborescence tree problem; these are:</p>
+    <list list-type="order">
+      <list-item>
+        <p>The RSPH solver iteratively connects the nearest unconnected
+        node (regarding distance and pump penalty) to the closest
+        connected network node. The solver can account for multiple
+        sinks and is well-suited to generate decentralised network
+        scenarios.</p>
+      </list-item>
+      <list-item>
+        <p>The RSPH Fast solver derives the network by combining all
+        shortest paths to a single sink. It is faster but only allows
+        for a single sink.</p>
+      </list-item>
+    </list>
+    <p>In a nutshell, these solvers work by navigating through the
+    connection graph (created using the
+    <monospace>generate_connection_graph</monospace> method of the
+    preprocessing module). This method simplifies the connection graph,
+    removes any self-loops, sets trench depth node attributes to 0, and
+    calculates the geometry, distance, profile, whether a pump is needed
+    weight, and elevation attributes for each edge and node. The
+    shortest path between the subgraph and terminal nodes in the
+    connection graph is found using Dijkstra’s Shortest Path Algorithm.
+    The RSPH solver repeatedly finds the shortest path between the
+    subgraph nodes and the closest terminal node, adding the path to the
+    sewer graph and updating the subgraph nodes and terminal nodes.
+    Terminal nodes refer to the nodes in the connection graph that need
+    to be connected to the sink. On the other hand, subgraph nodes are
+    the nodes in the directed routed Steiner tree. These are initially
+    set to the sink nodes and are updated as the RSPH solver is applied
+    to find the shortest path between the subgraph and the terminal
+    nodes. This way, all terminal nodes are eventually connected to the
+    sink.</p>
+    <p>Subsequently, the optimisation module takes the preliminary
+    network generated by the routing module and refines it by assessing
+    and incorporating the hydraulic elements of the sewer network. Here,
+    the hydraulic parameters of the sewer network are calculated. The
+    calculation focuses on the placement of pump or lifting stations on
+    linear sections between road junctions. It considers the following
+    three cases:</p>
+    <list list-type="order">
+      <list-item>
+        <p>Terrain does not allow for gravity flow to the downstream
+        node (this check uses the <monospace>needs_pump</monospace>
+        attribute from the preprocessing to reduce computational
+        load)—placement of a pump station is required.</p>
+      </list-item>
+      <list-item>
+        <p>Terrain does not require a pump, but the lowest inflow trench
+        depth is too low for gravitational flow—placement of a lift
+        station is required.</p>
+      </list-item>
+    </list>
+    <p>Gravity flow is possible within given constraints—the minimum
+    slope is achieved, no pump or lifting station is required. As our
+    tool strongly focuses on prioritising gravity flow, a high pump
+    penalty is applied to minimise the length of the pressure sewers.
+    The pumping penalty expressed as the edge weight is relative to the
+    trench depth required to achieve minimum slope to achieve
+    self-cleaning velocities in a gravity sewer. The maximum trench
+    depth <inline-formula><alternatives>
+    <tex-math><![CDATA[t_{\text{max}}]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>t</mml:mi><mml:mtext mathvariant="normal">max</mml:mtext></mml:msub></mml:math></alternatives></inline-formula>
+    required to achieve the minimum slope is set at
+    <inline-formula><alternatives>
+    <tex-math><![CDATA[t_{\text{max}} = 8]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>t</mml:mi><mml:mtext mathvariant="normal">max</mml:mtext></mml:msub><mml:mo>=</mml:mo><mml:mn>8</mml:mn></mml:mrow></mml:math></alternatives></inline-formula>
+    in the default settings of pysewer. When there is a need to dig
+    deeper than this predefined value, then a pump is required.</p>
+    <p>The optimisation module also facilitates the selection of the
+    diameters to be used in the network and peak flow estimation, as
+    well as the key sewer attributes such as the number of pump or
+    lifting stations, the length of pressure and gravity sewers, which
+    can be visualised and exported for further analysis.
+    <xref alt="[fig:fig3]" rid="figU003Afig3">[fig:fig3]</xref> shows an
+    example of a final sewer network layout generated after running the
+    calculation of the hydraulics parameters.</p>
+    <fig>
+      <caption><p>Pysewer optimisation. Final layout of the sewer
+      network.<styled-content id="figU003Afig3"></styled-content></p></caption>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="media/media/figures/figure3_sewer_network_layout.png" />
+    </fig>
+  </sec>
+  <sec id="visualising-and-exporting-the-generated-sewer-network">
+    <title>Visualising and exporting the generated sewer network</title>
+    <p>The plotting and exporting module generates visual and geodata
+    outputs. It renders the optimised network design onto a visual map,
+    offering users an intuitive insight into the proposed
+    infrastructure. Sewer network attributes such as the estimated peak
+    flow, the selected pipe diameter (exemplified in
+    <xref alt="[fig:fig4]" rid="figU003Afig4">[fig:fig4]</xref>) and the
+    trench profile are provided in the final geodataframe. They can be
+    exported as geopackage, shapefile or geoparquet, facilitating
+    further analysis and detailed reporting in other geospatial
+    platforms.</p>
+    <fig>
+      <caption><p>Pysewer visualisation. Attributes of the sewer network
+      layout. Peak flow estimation (A), Pipe diameters selected
+      (B)<styled-content id="figU003Afig4"></styled-content></p></caption>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="media/media/figures/figure4_peakflow_diameter.png" />
+    </fig>
+  </sec>
+</sec>
+<sec id="acknowledgement">
+  <title>Acknowledgement</title>
+  <p>M.S. and J.F. were supported by the MULTISOURCE project, which
+  received funding from the European Union’s Horizon 2020 program under
+  grant agreement 101003527. G.K. and D.D. were supported by the WATERUN
+  project, which was funded from the European Union’s Horizon 2020
+  program under grant agreement 101060922. We thank Ronny Gey from the
+  UFZ Research Data Management (RDM) group for reviewing the git
+  repository.</p>
+</sec>
+<sec id="software-citations">
+  <title>Software citations</title>
+  <p>Pysewer was written Python 3.10.6 and used a suite of open-source
+  software packages that aided the development process:</p>
+  <list list-type="bullet">
+    <list-item>
+      <p>Geopandas 0.9.0
+      (<xref alt="Jordahl et al., 2020" rid="ref-kelsey_jordahl_2020_3946761" ref-type="bibr">Jordahl
+      et al., 2020</xref>)</p>
+    </list-item>
+    <list-item>
+      <p>Networkx 3.1
+      (<xref alt="Hagberg et al., 2008" rid="ref-SciPyProceedings_11" ref-type="bibr">Hagberg
+      et al., 2008</xref>)</p>
+    </list-item>
+    <list-item>
+      <p>Numpy 1.25.2
+      (<xref alt="Harris et al., 2020" rid="ref-harris2020array" ref-type="bibr">Harris
+      et al., 2020</xref>)</p>
+    </list-item>
+    <list-item>
+      <p>Matplotlib 3.7.1
+      (<xref alt="Hunter, 2007" rid="ref-HunterU003A2007" ref-type="bibr">Hunter,
+      2007</xref>)</p>
+    </list-item>
+    <list-item>
+      <p>Sklearn 1.0.2
+      (<xref alt="Pedregosa et al., 2011" rid="ref-scikit-learn" ref-type="bibr">Pedregosa
+      et al., 2011</xref>)</p>
+    </list-item>
+    <list-item>
+      <p>GDAL 3.0.2
+      (<xref alt="GDAL/OGR contributors, 2023" rid="ref-gdal" ref-type="bibr">GDAL/OGR
+      contributors, 2023</xref>)</p>
+    </list-item>
+  </list>
+</sec>
+</body>
+<back>
+<ref-list>
+  <ref id="ref-scikit-learn">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Pedregosa</surname><given-names>F.</given-names></name>
+        <name><surname>Varoquaux</surname><given-names>G.</given-names></name>
+        <name><surname>Gramfort</surname><given-names>A.</given-names></name>
+        <name><surname>Michel</surname><given-names>V.</given-names></name>
+        <name><surname>Thirion</surname><given-names>B.</given-names></name>
+        <name><surname>Grisel</surname><given-names>O.</given-names></name>
+        <name><surname>Blondel</surname><given-names>M.</given-names></name>
+        <name><surname>Prettenhofer</surname><given-names>P.</given-names></name>
+        <name><surname>Weiss</surname><given-names>R.</given-names></name>
+        <name><surname>Dubourg</surname><given-names>V.</given-names></name>
+        <name><surname>Vanderplas</surname><given-names>J.</given-names></name>
+        <name><surname>Passos</surname><given-names>A.</given-names></name>
+        <name><surname>Cournapeau</surname><given-names>D.</given-names></name>
+        <name><surname>Brucher</surname><given-names>M.</given-names></name>
+        <name><surname>Perrot</surname><given-names>M.</given-names></name>
+        <name><surname>Duchesnay</surname><given-names>E.</given-names></name>
+      </person-group>
+      <article-title>Scikit-learn: Machine learning in Python</article-title>
+      <source>Journal of Machine Learning Research</source>
+      <year iso-8601-date="2011">2011</year>
+      <volume>12</volume>
+      <fpage>2825</fpage>
+      <lpage>2830</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-kelsey_jordahl_2020_3946761">
+    <element-citation publication-type="software">
+      <person-group person-group-type="author">
+        <name><surname>Jordahl</surname><given-names>Kelsey</given-names></name>
+        <name><surname>Bossche</surname><given-names>Joris Van den</given-names></name>
+        <name><surname>Fleischmann</surname><given-names>Martin</given-names></name>
+        <name><surname>Wasserman</surname><given-names>Jacob</given-names></name>
+        <name><surname>McBride</surname><given-names>James</given-names></name>
+        <name><surname>Gerard</surname><given-names>Jeffrey</given-names></name>
+        <name><surname>Tratner</surname><given-names>Jeff</given-names></name>
+        <name><surname>Perry</surname><given-names>Matthew</given-names></name>
+        <name><surname>Badaracco</surname><given-names>Adrian Garcia</given-names></name>
+        <name><surname>Farmer</surname><given-names>Carson</given-names></name>
+        <name><surname>Hjelle</surname><given-names>Geir Arne</given-names></name>
+        <name><surname>Snow</surname><given-names>Alan D.</given-names></name>
+        <name><surname>Cochran</surname><given-names>Micah</given-names></name>
+        <name><surname>Gillies</surname><given-names>Sean</given-names></name>
+        <name><surname>Culbertson</surname><given-names>Lucas</given-names></name>
+        <name><surname>Bartos</surname><given-names>Matt</given-names></name>
+        <name><surname>Eubank</surname><given-names>Nick</given-names></name>
+        <name><surname>maxalbert</surname></name>
+        <name><surname>Bilogur</surname><given-names>Aleksey</given-names></name>
+        <name><surname>Rey</surname><given-names>Sergio</given-names></name>
+        <name><surname>Ren</surname><given-names>Christopher</given-names></name>
+        <name><surname>Arribas-Bel</surname><given-names>Dani</given-names></name>
+        <name><surname>Wasser</surname><given-names>Leah</given-names></name>
+        <name><surname>Wolf</surname><given-names>Levi John</given-names></name>
+        <name><surname>Journois</surname><given-names>Martin</given-names></name>
+        <name><surname>Wilson</surname><given-names>Joshua</given-names></name>
+        <name><surname>Greenhall</surname><given-names>Adam</given-names></name>
+        <name><surname>Holdgraf</surname><given-names>Chris</given-names></name>
+        <name><surname>Filipe</surname></name>
+        <name><surname>Leblanc</surname><given-names>François</given-names></name>
+      </person-group>
+      <article-title>Geopandas/geopandas: v0.8.1</article-title>
+      <publisher-name>Zenodo</publisher-name>
+      <year iso-8601-date="2020-07">2020</year><month>07</month>
+      <uri>https://doi.org/10.5281/zenodo.3946761</uri>
+      <pub-id pub-id-type="doi">10.5281/zenodo.3946761</pub-id>
+    </element-citation>
+  </ref>
+  <ref id="ref-harris2020array">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Harris</surname><given-names>Charles R.</given-names></name>
+        <name><surname>Millman</surname><given-names>K. Jarrod</given-names></name>
+        <name><surname>Walt</surname><given-names>Stéfan J. van der</given-names></name>
+        <name><surname>Gommers</surname><given-names>Ralf</given-names></name>
+        <name><surname>Virtanen</surname><given-names>Pauli</given-names></name>
+        <name><surname>Cournapeau</surname><given-names>David</given-names></name>
+        <name><surname>Wieser</surname><given-names>Eric</given-names></name>
+        <name><surname>Taylor</surname><given-names>Julian</given-names></name>
+        <name><surname>Berg</surname><given-names>Sebastian</given-names></name>
+        <name><surname>Smith</surname><given-names>Nathaniel J.</given-names></name>
+        <name><surname>Kern</surname><given-names>Robert</given-names></name>
+        <name><surname>Picus</surname><given-names>Matti</given-names></name>
+        <name><surname>Hoyer</surname><given-names>Stephan</given-names></name>
+        <name><surname>Kerkwijk</surname><given-names>Marten H. van</given-names></name>
+        <name><surname>Brett</surname><given-names>Matthew</given-names></name>
+        <name><surname>Haldane</surname><given-names>Allan</given-names></name>
+        <name><surname>Río</surname><given-names>Jaime Fernández del</given-names></name>
+        <name><surname>Wiebe</surname><given-names>Mark</given-names></name>
+        <name><surname>Peterson</surname><given-names>Pearu</given-names></name>
+        <name><surname>Gérard-Marchant</surname><given-names>Pierre</given-names></name>
+        <name><surname>Sheppard</surname><given-names>Kevin</given-names></name>
+        <name><surname>Reddy</surname><given-names>Tyler</given-names></name>
+        <name><surname>Weckesser</surname><given-names>Warren</given-names></name>
+        <name><surname>Abbasi</surname><given-names>Hameer</given-names></name>
+        <name><surname>Gohlke</surname><given-names>Christoph</given-names></name>
+        <name><surname>Oliphant</surname><given-names>Travis E.</given-names></name>
+      </person-group>
+      <article-title>Array programming with NumPy</article-title>
+      <source>Nature</source>
+      <publisher-name>Springer Science; Business Media LLC</publisher-name>
+      <year iso-8601-date="2020-09">2020</year><month>09</month>
+      <volume>585</volume>
+      <issue>7825</issue>
+      <uri>https://doi.org/10.1038/s41586-020-2649-2</uri>
+      <pub-id pub-id-type="doi">10.1038/s41586-020-2649-2</pub-id>
+      <fpage>357</fpage>
+      <lpage>362</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-HunterU003A2007">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Hunter</surname><given-names>J. D.</given-names></name>
+      </person-group>
+      <article-title>Matplotlib: A 2D graphics environment</article-title>
+      <source>Computing in Science &amp; Engineering</source>
+      <publisher-name>IEEE COMPUTER SOC</publisher-name>
+      <year iso-8601-date="2007">2007</year>
+      <volume>9</volume>
+      <issue>3</issue>
+      <pub-id pub-id-type="doi">10.1109/MCSE.2007.55</pub-id>
+      <fpage>90</fpage>
+      <lpage>95</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-SciPyProceedings_11">
+    <element-citation publication-type="paper-conference">
+      <person-group person-group-type="author">
+        <name><surname>Hagberg</surname><given-names>Aric A.</given-names></name>
+        <name><surname>Schult</surname><given-names>Daniel A.</given-names></name>
+        <name><surname>Swart</surname><given-names>Pieter J.</given-names></name>
+      </person-group>
+      <article-title>Exploring network structure, dynamics, and function using NetworkX</article-title>
+      <source>Proceedings of the 7th python in science conference</source>
+      <person-group person-group-type="editor">
+        <name><surname>Varoquaux</surname><given-names>Gaël</given-names></name>
+        <name><surname>Vaught</surname><given-names>Travis</given-names></name>
+        <name><surname>Millman</surname><given-names>Jarrod</given-names></name>
+      </person-group>
+      <publisher-loc>Pasadena, CA USA</publisher-loc>
+      <year iso-8601-date="2008">2008</year>
+      <fpage>11</fpage>
+      <lpage>15</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-gdal">
+    <element-citation publication-type="book">
+      <person-group person-group-type="author">
+        <string-name>GDAL/OGR contributors</string-name>
+      </person-group>
+      <source>GDAL/OGR geospatial data abstraction software library</source>
+      <publisher-name>Open Source Geospatial Foundation</publisher-name>
+      <year iso-8601-date="2023">2023</year>
+      <uri>https://gdal.org</uri>
+      <pub-id pub-id-type="doi">10.5281/zenodo.5884351</pub-id>
+    </element-citation>
+  </ref>
+  <ref id="ref-khurelbaatarDataReduced2021">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Khurelbaatar</surname><given-names>Ganbaatar</given-names></name>
+        <name><surname>Al Marzuqi</surname><given-names>Bishara</given-names></name>
+        <name><surname>Van Afferden</surname><given-names>Manfred</given-names></name>
+        <name><surname>Müller</surname><given-names>Roland A.</given-names></name>
+        <name><surname>Friesen</surname><given-names>Jan</given-names></name>
+      </person-group>
+      <article-title>Data Reduced Method for Cost Comparison of Wastewater Management Scenarios for Two Settlements in Jordan and Oman</article-title>
+      <source>Frontiers in Environmental Science</source>
+      <year iso-8601-date="2021">2021</year>
+      <date-in-citation content-type="access-date"><year iso-8601-date="2023-04-09">2023</year><month>04</month><day>09</day></date-in-citation>
+      <volume>9</volume>
+      <issn>2296-665X</issn>
+      <pub-id pub-id-type="doi">10.3389/fenvs.2021.626634</pub-id>
+    </element-citation>
+  </ref>
+  <ref id="ref-vanafferdenNewapproach2015">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>van Afferden</surname><given-names>Manfred</given-names></name>
+        <name><surname>Cardona</surname><given-names>Jaime A.</given-names></name>
+        <name><surname>Lee</surname><given-names>Mi-Yong</given-names></name>
+        <name><surname>Subah</surname><given-names>Ali</given-names></name>
+        <name><surname>Müller</surname><given-names>Roland A.</given-names></name>
+      </person-group>
+      <article-title>A new approach to implementing decentralized wastewater treatment concepts</article-title>
+      <source>Water Science and Technology</source>
+      <year iso-8601-date="2015-08">2015</year><month>08</month>
+      <date-in-citation content-type="access-date"><year iso-8601-date="2023-05-08">2023</year><month>05</month><day>08</day></date-in-citation>
+      <volume>72</volume>
+      <issue>11</issue>
+      <issn>0273-1223</issn>
+      <pub-id pub-id-type="doi">10.2166/wst.2015.393</pub-id>
+      <fpage>1923</fpage>
+      <lpage>1930</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-unwaterSustainableDevelopment2018">
+    <element-citation publication-type="report">
+      <person-group person-group-type="author">
+        <name><surname>Water</surname><given-names>UN</given-names></name>
+      </person-group>
+      <article-title>Sustainable Development Goal 6: Synthesis report 2018 on water and sanitation</article-title>
+      <publisher-name>United Nations</publisher-name>
+      <publisher-loc>New York, New York, United States of America</publisher-loc>
+      <year iso-8601-date="2018">2018</year>
+      <isbn>978-92-1-101370-2</isbn>
+      <uri>https://d306pr3pise04h.cloudfront.net/docs/publications%2FSDG6_SR2018.pdf</uri>
+    </element-citation>
+  </ref>
+</ref-list>
+</back>
+</article>
