@@ -2,35 +2,20 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import logging
-from typing import Hashable, List, Tuple, Union
-
-import yaml
-
-logger = logging.getLogger(__name__)
-
 import math
-import os
-import random
-from operator import itemgetter
+from typing import Hashable, List, Union
 
-import geopandas as gpd
-import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
-import shapely
-from shapely.geometry import LineString, MultiLineString, Point, Polygon
-from shapely.ops import linemerge, nearest_points
 
-from .config.settings import load_config
-from .helper import get_mean_slope, get_node_keys, get_upstream_nodes
+from pysewer.config.settings import load_config
+from pysewer.helper import get_mean_slope, get_node_keys, get_upstream_nodes
 
 # load default settings
 DEFAULT_CONFIG = load_config()
+logger = logging.getLogger(__name__)
 
 NodeType = Union[str, int, Hashable, None]
-
-
-import networkx as nx
 
 
 def place_lifting_station(G, node):

@@ -2,11 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import itertools
-import json
 from operator import itemgetter
-from typing import Any, List
+from typing import List
 
-import fiona
 import geopandas as gpd
 import networkx as nx
 import numpy as np
@@ -316,6 +314,7 @@ def ckdnearest(
     )
     B = np.concatenate(B)
     ckd_tree = cKDTree(B)
+
     dist, idx = ckd_tree.query(A, k=1)
     idx = itemgetter(*idx)(B_ix)
     gdf = pd.concat(
@@ -410,10 +409,12 @@ def get_sewer_info(G):
     dict
         A dictionary containing the following information:
         - Total Buildings: Total number of buildings in the network.
-        - Pressurized Sewer Length [m]: Total length of pressurized sewers in meters.
+        - Pressurized Sewer Length [m]: Total length of pressurized sewers in
+          meters.
         - Gravity Sewer Length [m]: Total length of gravity sewers in meters.
         - Lifting Stations: Total number of lifting stations in the network.
-        - Pumping Stations: Total number of pumping stations in the network (excluding those located in buildings).
+        - Pumping Stations: Total number of pumping stations in the network
+          (excluding those located in buildings).
         - Private Pumps: Total number of pumps located in buildings.
 
     """
