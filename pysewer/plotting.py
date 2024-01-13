@@ -1,24 +1,19 @@
 # SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
 # SPDX-License-Identifier: GPL-3.0-only
 
-import os
 from typing import Optional
 
-# import earthpy.plot as ep
-# import earthpy.spatial as es
-import geopandas as gpd
+
+import earthpy.plot as ep                # this throws an error in the IDE, but works fine on Jupyter, uncomment when debugging 
+import earthpy.spatial as es         # this throws an error in the IDE, but works fine on Jupyter, uncomment when debugging
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
-import rasterio as rio
 import rasterio.plot
-import shapely
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from rasterio.plot import plotting_extent
-from shapely.geometry import LineString, MultiLineString, Point, Polygon
-from shapely.ops import linemerge, nearest_points
 
-from .config.settings import load_config
+from pysewer.config.settings import load_config
 from .helper import get_edge_gdf, get_node_gdf
 
 DEFAULT_CONFIG = load_config()

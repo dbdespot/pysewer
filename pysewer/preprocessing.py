@@ -14,7 +14,7 @@ from shapely.geometry import LineString, Point, Polygon
 from shapely.ops import linemerge, nearest_points
 from sklearn.cluster import AgglomerativeClustering
 
-from .config.settings import load_config
+from pysewer.config.settings import load_config
 from .helper import (
     ckdnearest,
     get_closest_edge,

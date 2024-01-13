@@ -9,7 +9,7 @@ import networkx as nx
 import numpy as np
 
 from pysewer.config.settings import load_config
-from pysewer.helper import get_mean_slope, get_node_keys, get_upstream_nodes
+from .helper import get_mean_slope, get_node_keys, get_upstream_nodes
 
 # load default settings
 DEFAULT_CONFIG = load_config()

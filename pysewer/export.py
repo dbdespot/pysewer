@@ -16,7 +16,7 @@ from typing import List, Tuple
 import fiona
 import geopandas as gpd
 
-from .config.settings import load_config
+from pysewer.config.settings import load_config
 
 DEFAULT_CONFIG = load_config()
 

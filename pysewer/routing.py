@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
 # SPDX-License-Identifier: GPL-3.0-only
 
-from typing import Hashable, List, Union
+from typing import Hashable, List, Tuple, Union
 
 import networkx as nx
 
@@ -9,16 +9,12 @@ from .helper import get_node_keys
 
 NodeType = Union[int, str, Hashable]
 
-from typing import List, Tuple
-
-import networkx as nx
-
-NodeType = Tuple[float, float]
+NodeType_t = Tuple[float, float]
 
 
 def rsph_tree_fast(
     connection_graph: nx.Graph,
-    sink: List[NodeType],
+    sink: List[NodeType_t],
     from_type: str = "building",
 ) -> nx.DiGraph:
     """
