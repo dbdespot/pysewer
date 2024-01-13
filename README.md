@@ -38,13 +38,13 @@ Currently the installation is easiest managed via Anaconda. Anaconda 3 can be do
 
 First, we want to create a new environment in Anaconda. Therefor, we open Anaconda prompt and create a new Python 3.10.6 Environment and name it pysewer by running the following command:
 
-```
+```shell
 conda create -n pysewer python=3.10.6
 ```
 
 We can then install GDAL, rasterio and fiona :
 
-```
+```shell
 conda activate pysewer
 conda install -c conda-forge gdal rasterio fiona
 ```
@@ -62,6 +62,8 @@ pip install .
 # for the development version
 python -m pip install -e .
 ```
+
+Please see the [documentation](https://despot.pages.ufz.de/pysewer) for more details.
 
 ## Input Data and data representation
 
@@ -85,7 +87,7 @@ After preprocessing, all relevant data is and stored as a MultiDiGraph to allow 
 
 ### Graph Attributes
 
-```
+```yaml
 Node Attributes:
     "node_type": "building","wwtp"
     "elevation"
@@ -176,3 +178,5 @@ Please check out how [Contributing](CONTRIBUTING.md) for on how to contribute to
 Please check out our [Code of Conduct](CODE_OF_CONDUCT.md) for details.
 
 ## How to cite?
+
+Currently, pysewer is under review in the Journal of Open Source Software (JOSS). Please check back later.
