@@ -33,7 +33,9 @@ It is build around an algorithm for generation of viable sewer-network layouts. 
 
 ## Installation
 
-Currently the installation is easiest managed via Anaconda. Anaconda 3 can be downloaded [here.](https://www.anaconda.com/products/individual). The package is tested with Python 3.10.6. We recommend using a conda environment to manage the installation of GDAL and other dependencies given the difficulty of installing GDAL using pip.
+Currently the installation is easiest managed via Anaconda. Anaconda 3 can be downloaded [here.](https://www.anaconda.com/products/individual). The package is tested with Python 3.10.6. We recommend using a conda environment to manage the installation of GDAL and other dependencies given the difficulty of installing GDAL using pip. Therefore we urge to first create a new conda environment and install the required packages. 
+
+**Please use conda to install GDAL, it is the easiest way to install GDAL**
 
 ### Quick-start installation
 
