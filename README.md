@@ -6,7 +6,8 @@ SPDX-License-Identifier: GPL-3.0-only -->
 - [pysewer](#pysewer)
   - [Summary](#summary)
   - [Installation](#installation)
-    - [Create a new conda environment and install GDAL](#create-a-new-conda-environment-and-install-gdal)
+    - [Quick-start installation](#quick-start-installation)
+    - [Manual installation](#manual-installation)
     - [Install pysewer via pip](#install-pysewer-via-pip)
   - [Input Data and data representation](#input-data-and-data-representation)
     - [Preprocessing](#preprocessing)
@@ -32,17 +33,34 @@ It is build around an algorithm for generation of viable sewer-network layouts. 
 
 ## Installation
 
-Currently the installation is easiest managed via Anaconda. Anaconda 3 can be downloaded [here.](https://www.anaconda.com/products/individual)
+Currently the installation is easiest managed via Anaconda. Anaconda 3 can be downloaded [here.](https://www.anaconda.com/products/individual). The package is tested with Python 3.10.6. We recommend using a conda environment to manage the installation of GDAL and other dependencies given the difficulty of installing GDAL using pip.
 
-### Create a new conda environment and install GDAL
+### Quick-start installation
 
-First, we want to create a new environment in Anaconda. Therefor, we open Anaconda prompt and create a new Python 3.10.6 Environment and name it pysewer by running the following command:
+For a quick start installation, clone the repository and navigate to the root directory of the repository. Then, create a new conda environment using the provided environment.yml file:
+
+```shell
+conda env create -f environment.yml
+```
+
+Alternatively you use the `pysewer.txt` file to install the required packages:
+
+```shell
+conda create --name pysewer --file pysewer.txt
+```
+
+
+### Manual installation
+
+For a careful installation to ensure all packages are properly installed, please follow the steps below.
+
+1. Create a new environment (pysewer) in Anaconda.  
 
 ```shell
 conda create -n pysewer python=3.10.6
 ```
 
-We can then install GDAL, rasterio and fiona :
+2. Activate the environment and install the packages as listed in the [environment.yml] file.  Here we show the installation of GDAL, Rasterio and Fiona.  
 
 ```shell
 conda activate pysewer
@@ -56,7 +74,7 @@ Note that the exact package version can be found in the [environment.yml](enviro
 You can either get pysewer and install it using git and pip with:
 
 ```shell
-git clone https://git.ufz.de/despot/pysewer_dev.git
+git clone https://git.ufz.de/despot/pysewer.git
 cd pysewer
 pip install .
 # for the development version
