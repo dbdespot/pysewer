@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
 # SPDX-License-Identifier: GPL-3.0-only
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
-with open("README.md", "r") as f:
+with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
@@ -11,7 +11,7 @@ setup(
     version="0.1.13",
     description="A Python Package for automated routing and optimization of sewer networks",
     license="GNU GPLv3",
-    packages=["pysewer"],  # same as name
+    packages=find_packages(),
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
@@ -36,6 +36,7 @@ setup(
         "networkx",
         "pyarrow",
         "earthpy",
+        "pytest",
     ],
     python_requires=">=3.10",
 )
