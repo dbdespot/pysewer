@@ -6,8 +6,9 @@ SPDX-License-Identifier: GPL-3.0-only -->
 - [pysewer](#pysewer)
   - [Summary](#summary)
   - [Installation](#installation)
-    - [Quick-start installation](#quick-start-installation)
-    - [Manual installation](#manual-installation)
+    - [Step 1: Create the conda environment](#step-1-create-the-conda-environment)
+      - [Fast-track conda environment setup](#fast-track-conda-environment-setup)
+      - [Manual setup of conda environment](#manual-setup-of-conda-environment)
     - [Install pysewer via pip](#install-pysewer-via-pip)
   - [Input Data and data representation](#input-data-and-data-representation)
     - [Preprocessing](#preprocessing)
@@ -33,13 +34,15 @@ It is build around an algorithm for generation of viable sewer-network layouts. 
 
 ## Installation
 
-Currently the installation is easiest managed via Anaconda. Anaconda 3 can be downloaded [here.](https://www.anaconda.com/products/individual). The package is tested with Python 3.10.6. We recommend using a conda environment to manage the installation of GDAL and other dependencies given the difficulty of installing GDAL using pip. Therefore we urge to first create a new conda environment and install the required packages. 
+Currently the installation is easiest managed via Anaconda. Anaconda 3 can be downloaded [here.](https://www.anaconda.com/products/individual). The package is tested with **Python 3.10.6**. We recommend using a conda environment to manage the installation of GDAL and other dependencies given the difficulty of installing GDAL using pip. Therefore we urge to first create a new conda environment and install the required packages.  
 
 **Please use conda to install GDAL, it is the easiest way to install GDAL**
 
-### Quick-start installation
+### Step 1: Create the conda environment
 
-For a quick start installation, clone the repository and navigate to the root directory of the repository. Then, create a new conda environment using the provided environment.yml file:
+#### Fast-track conda environment setup
+
+For a quick start to setting up the conda environment, clone the repository and navigate to the root directory of the repository. Then, create a new conda environment using the provided environment.yml file:
 
 ```shell
 conda env create -f environment.yml
@@ -52,7 +55,7 @@ conda create --name pysewer --file pysewer.txt
 ```
 
 
-### Manual installation
+#### Manual setup of conda environment
 
 For a careful installation to ensure all packages are properly installed, please follow the steps below.
 
@@ -69,7 +72,7 @@ conda activate pysewer
 conda install -c conda-forge gdal rasterio fiona
 ```
 
-Note that the exact package version can be found in the [environment.yml](environment.yml) file.
+Note that the exact versions of the packages used can be found in the [environment.yml](environment.yml) file.
 
 ### Install pysewer via pip
 
