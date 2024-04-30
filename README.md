@@ -71,10 +71,10 @@ Note that the exact package version can be found in the [environment.yml](enviro
 
 ### Install pysewer via pip
 
-You can either get pysewer and install it using git and pip with:
+Now that you have conda environment uo and running, lets install pysewer. To do this you first need to clone pysewer repository hosted [here.](https://github.com/dbdespot/pysewer) and install it using git and pip with:
 
 ```shell
-git clone https://git.ufz.de/despot/pysewer.git
+git clone https://github.com/dbdespot/pysewer.git
 cd pysewer
 pip install .
 # for the development version
@@ -189,7 +189,7 @@ GNU GPLv3-modified-UFZ. See [LICENSE](LICENSE) for details.
 
 # How to contribute to pysewer?
 
-Please check out how [Contributing](CONTRIBUTING.md) for on how to contribute to pysewer.
+Please check out how [Contributing](CONTRIBUTING.md) for on how to contribute to pysewer. Please that we have created a mirror repository on [Github](https://github.com/dbdespot/pysewer) to allow for easier contribution. The original repository is hosted on [Gitlab](https://git.ufz.de/despot/pysewer).
 
 ## Code of conduct
 
