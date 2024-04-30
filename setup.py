@@ -36,7 +36,6 @@ setup(
         "networkx",
         "pyarrow",
         "earthpy",
-        "gdal",
     ],
     python_requires=">=3.10",
 )
