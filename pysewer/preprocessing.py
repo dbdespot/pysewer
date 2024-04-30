@@ -14,7 +14,9 @@ from shapely.geometry import LineString, Point, Polygon
 from shapely.ops import linemerge, nearest_points
 from sklearn.cluster import AgglomerativeClustering
 
-from pysewer.config.settings import load_config
+from .config.settings import load_config
+
+
 from .helper import (
     ckdnearest,
     get_closest_edge,
@@ -303,12 +305,18 @@ class Buildings:
         self.gdf["geometry"] = [remove_third_dimension(g) for g in self.gdf["geometry"]]
         # Convert to Point if Shapefile has MultiPoint Data
         if "MultiPoint" in self.gdf.geometry.type.unique():
-            convert = (
-                lambda MultiP: Point(MultiP.geoms[0].x, MultiP.geoms[0].y)
+            convert = lambda MultiP: (
+                Point(MultiP.geoms[0].x, MultiP.geoms[0].y)
                 if MultiP.geom_type == "MultiPoint"
                 else MultiP
             )
             self.gdf["geometry"] = self.gdf["geometry"].apply(convert)
+        # check the geometry type and convert to Point if necessary, if line, dropit, if polygon, convert to centroid
+        # self.gdf["geometry"] = [
+        #     g.centroid if g.geom_type == "Polygon" else g for g in self.gdf["geometry"]
+        # ]
+        # # drop linestring geometries
+        # self.gdf = self.gdf[self.gdf.geometry.geom_type != "LineString"]
         self.roads_obj = roads_obj
 
     def get_gdf(self):
@@ -375,9 +383,9 @@ class Buildings:
             ).fit(c_buildings_coords)
         except:
             return gpd.GeoDataFrame(geometry=[])
-        self.gdf.loc[
-            self.gdf["distance"] >= max_connection_length, "cluster"
-        ] = clustering.labels_  # Find Centroid of Clusters
+        self.gdf.loc[self.gdf["distance"] >= max_connection_length, "cluster"] = (
+            clustering.labels_
+        )  # Find Centroid of Clusters
         cluster_centers = []
         for cluster_id in clustering.labels_:
             building_points = self.gdf.loc[
@@ -735,7 +743,7 @@ class ModelDomain:
         return connection_digraph
         # add additional attributes and estimate connection costs
 
-    def add_sink(self, sink_location: tuple):
+    def add_sink(self, sink_location: tuple, label: str = "wwtp"):
         """
         Adds a sink node to the graph at the specified location.
 
@@ -748,7 +756,7 @@ class ModelDomain:
         -------
         None
         """
-        self.add_node(Point(sink_location), "wwtp")
+        self.add_node(Point(sink_location), label)
 
     def reset_sinks(self):
         """

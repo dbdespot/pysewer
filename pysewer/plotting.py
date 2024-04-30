@@ -13,7 +13,7 @@ import rasterio.plot
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from rasterio.plot import plotting_extent
 
-from pysewer.config.settings import load_config
+from .config.settings import load_config
 from .helper import get_edge_gdf, get_node_gdf
 
 DEFAULT_CONFIG = load_config()
