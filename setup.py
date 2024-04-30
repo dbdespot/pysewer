@@ -12,10 +12,13 @@ setup(
     description="A Python Package for automated routing and optimization of sewer networks",
     license="GNU GPLv3",
     packages=find_packages(),
+    package_data={
+        'pysewer.config': ['*.yaml'],  # Include all YAML files in the pysewer/config directory
+    },
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: GNU GPLv3",
         "Programming Language :: Python :: 3.10",
         "Operating System :: OS Independent",
     ],
