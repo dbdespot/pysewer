@@ -206,6 +206,7 @@ data/
 /data/
 ss/
 test_scripts/
+test_notebooks/
 logs/
 debugging_scripts/
 pysewer.txt
