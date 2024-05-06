@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
 # SPDX-License-Identifier: GPL-3.0-only
 
+import warnings
 from dataclasses import dataclass, field
 from typing import Hashable, List, Optional, Union
 
@@ -15,8 +16,6 @@ from shapely.ops import linemerge, nearest_points
 from sklearn.cluster import AgglomerativeClustering
 
 from .config.settings import load_config
-
-
 from .helper import (
     ckdnearest,
     get_closest_edge,
@@ -25,6 +24,7 @@ from .helper import (
     get_node_gdf,
     get_node_keys,
     get_path_distance,
+    is_valid_geometry,
     remove_third_dimension,
 )
 from .optimization import needs_pump
@@ -32,7 +32,8 @@ from .simplify import simplify_graph
 
 DEFAULT_CONFIG = load_config()
 
-NodeType = Union[int, str, Hashable]
+# Ignore the specific RuntimeWarning
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 @dataclass
@@ -134,7 +135,7 @@ class DEM:
         """Returns the coordinate system of the DEM Object"""
         if self.no_dem:
             return None
-        return CRS(self.raster.crs)
+        return self.raster.crs
 
     # add method to reproject the raster to a given crs in case there is a mismatch between the crs of the raster and the crs of the other input data
     def reproject_dem(self, crs: CRS):
@@ -251,6 +252,10 @@ class Roads:
         """
         return self.gdf.crs
 
+    # set the crs using epsd code of the dem
+    def set_crs(self, epsg: int):
+        self.gdf.crs = CRS.from_epsg(epsg)
+
     def get_merged_roads(self):
         """
         Merge the road network as a shapely MultiLineString.
@@ -342,6 +347,10 @@ class Buildings:
 
         """
         return self.gdf.crs
+
+    # set the crs using epsd code of the dem to buildng
+    def set_crs(self, epsg: int):
+        self.gdf.crs = CRS.from_epsg(epsg)
 
     def cluster_centers(self, max_connection_length: float):
         """
@@ -455,18 +464,34 @@ class ModelDomain:
         self.roads = Roads(roads)
         self.buildings = Buildings(buildings, roads_obj=self.roads)
         self.dem = DEM(dem)
+
+        # improve handling of the crs of the input data.
+        # assume that the dem is provided, then use the crs of the dem to reproject the other input data
+        # get crs of dem (rasterio.DatasetReader object)
+        dem_epsg = self.dem.get_crs.to_epsg()
+        # set the roads and buildings to the crs of the dem
+        if self.roads.get_crs().to_epsg() is None:
+            self.roads.set_crs(dem_epsg)
+
+        if self.buildings.get_crs().to_epsg() is None:
+            self.buildings.set_crs(dem_epsg)
+
         # print(self.roads.get_crs())
         # print(self.buildings.get_crs())
-        # print(self.dem.get_crs())
+        # print(self.dem.get_crs)
 
         # Check for coordinate system
-        # assert self.roads.get_crs() == self.buildings.get_crs() and self.dem.get_crs() == self.roads.get_crs(), "CRS of input Data does not match"
+        assert (
+            self.roads.get_crs().to_epsg() == self.buildings.get_crs().to_epsg()
+            and self.dem.get_crs == self.roads.get_crs().to_epsg()
+        ), "CRS of input Data does not match"
         assert self.roads.get_crs().is_projected
 
         # create unsilplified graph
         self.connection_graph = self.create_unsimplified_graph(self.roads.get_gdf())
 
         self.connection_graph = nx.Graph(self.connection_graph)
+
         # connecting subgraphs if there are any
         sub_graphs = list(
             (
@@ -477,14 +502,18 @@ class ModelDomain:
         if len(sub_graphs) > 1:
             print("connecting subgraphs")
             self.connect_subgraphs()
+
         # set pump penalty
         self.pump_penalty = pump_penalty
+
         # set node attributes
         nx.set_node_attributes(self.connection_graph, True, "road_network")
         nx.set_node_attributes(self.connection_graph, "", "node_type")
 
         # check connectivity of G
-        self.sewer_graph = nx.DiGraph()  # what is the purpouse of this line?
+        self.sewer_graph = nx.DiGraph()
+
+        # connect buildings
         if connect_buildings:
             self.connect_buildings(clustering=clustering)
 
@@ -556,22 +585,38 @@ class ModelDomain:
         """
         # get building points:
         building_gdf = self.buildings.get_gdf()
-        building_points = building_gdf.geometry.to_list()
+        building_points = [
+            geom for geom in building_gdf.geometry if is_valid_geometry(geom)
+        ]
+
         if clustering == "centers":
             cluster_centers_gdf = self.buildings.cluster_centers(max_connection_length)
-            cluster_centers = cluster_centers_gdf.geometry.to_list()
+            cluster_centers = [
+                geom for geom in cluster_centers_gdf.geometry if is_valid_geometry(geom)
+            ]
+
             if len(cluster_centers) > 0:
-                # cloest edges to cluster centers
+                # check if cluster centers or conected graph is empty or contains invalid values
+                if (
+                    not cluster_centers
+                    or not self.connection_graph
+                    or any(np.isnan(x.x) or np.isnan(x.y) for x in cluster_centers)
+                ):
+                    warnings.warn(
+                        "No cluster centers found or invalid values in cluster centers"
+                    )
+
+                # closest edges to cluster centers
                 closest_edges_cc = get_closest_edge_multiple(
                     self.connection_graph, cluster_centers
                 )
-                for k in range(len(cluster_centers)):
+                for k, center in enumerate(cluster_centers):
                     try:
-                        self.add_node(
-                            cluster_centers[k], "cluster_center", closest_edges_cc[k]
-                        )
-                    except:
-                        self.add_node(cluster_centers[k], "cluster_center")
+                        self.add_node(center, "cluster_center", closest_edges_cc[k])
+                    except Exception as e:
+                        print(f"Error adding cluster center {center}: {e}")
+                        self.add_node(center, "cluster_center")
+
             # closest edges to buildings
             closest_edges_b = get_closest_edge_multiple(
                 self.connection_graph, building_points
@@ -583,9 +628,14 @@ class ModelDomain:
                     )
                 except:
                     self.add_node(i.geometry, "building", node_attributes=i.to_dict())
+
         else:
+            # directly add each building to the graph
             for _, i in building_gdf.iterrows():
-                self.add_node(i.geometry, "building", node_attributes=i.to_dict())
+                if is_valid_geometry(i.geometry):
+                    self.add_node(i.geometry, "building", node_attributes=i.to_dict())
+                else:
+                    print(f"Invalid geometry for building {i}")
 
     def add_node(self, point, node_type, closest_edge=None, node_attributes=None):
         """
@@ -855,6 +905,18 @@ class ModelDomain:
             # get shortest edge between sg and G_withouto_sg:
             sg_gdf = get_node_gdf(sg).unary_union
             G_without_sg_gdf = get_node_gdf(G_without_sg).unary_union
+
+            # check if either gdf is empty or contains invalid values
+            if (
+                sg_gdf.is_empty
+                or G_without_sg_gdf.is_empty
+                or sg_gdf.isna().any()
+                or G_without_sg_gdf.isna().any()
+            ):
+                warnings.warn(
+                    "Skipped an iteration: Empty or invalid subgraph detected...Skipping this connection."
+                )
+                continue
             connection_points = nearest_points(sg_gdf, G_without_sg_gdf)
 
             # add edge

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import itertools
+import warnings
 from operator import itemgetter
 from typing import List
 
@@ -117,6 +118,16 @@ def get_closest_edge_multiple(G: nx.Graph, list_of_points: list) -> list:
     """
     edge_gdf = get_edge_gdf(G)
     edge_gdf["closest_edge"] = edge_gdf.geometry.tolist()
+
+    # check if list of points or edge is empty or contains invalids values
+    if (
+        not list_of_points
+        or edge_gdf.empty
+        or any(np.isnan(x.x) or np.isnan(x.y) for x in list_of_points)
+    ):
+        warnings.warn("Skippind due to empty or invalid list of points or edges.")
+        return []
+
     cc = ckdnearest(
         gpd.GeoDataFrame(geometry=list_of_points), edge_gdf, ["closest_edge"]
     )["closest_edge"].to_list()
@@ -315,6 +326,11 @@ def ckdnearest(
     B = np.concatenate(B)
     ckd_tree = cKDTree(B)
 
+    # check if A or B is empty or contains invalids values
+    if len(A) == 0 or len(B) == 0 or np.isnan(A).any() or np.isnan(B).any():
+        warnings.warn("Skippind due to empty or invalid list of points or edges.")
+        return gdfA
+
     dist, idx = ckd_tree.query(A, k=1)
     idx = itemgetter(*idx)(B_ix)
     gdf = pd.concat(
@@ -393,6 +409,13 @@ def remove_third_dimension(geom):
         raise RuntimeError(
             "Currently this type of geometry is not supported: {}".format(type(geom))
         )
+
+
+def is_valid_geometry(geometry):
+    """
+    Check if a geometry is valid.
+    """
+    return geometry.is_valid and not geometry.is_empty
 
 
 def get_sewer_info(G):
