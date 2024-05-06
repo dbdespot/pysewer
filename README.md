@@ -63,7 +63,7 @@ conda activate pysewer
 Install the required packages:
 
 ```shell
-conda install -c conda-forge gdal rasterio
+conda install -c conda-forge gdal 
 ```
 
 All other packages are installed via pip during the installation of pysewer.
@@ -188,7 +188,7 @@ GNU GPLv3-modified-UFZ. See [LICENSE](LICENSE) for details.
 
 # How to contribute to pysewer?
 
-Please check out how [Contributing](CONTRIBUTING.md) for on how to contribute to pysewer. Please that we have created a mirror repository on [Github](https://github.com/dbdespot/pysewer) to allow for easier contribution. The original repository is hosted on [Gitlab](https://git.ufz.de/despot/pysewer).
+Please check out how [Contributing](CONTRIBUTING.md) for on how to contribute to pysewer. Please note that we have created a mirror repository on [Github](https://github.com/dbdespot/pysewer) to allow for easier contribution. The original repository is hosted on [Gitlab](https://git.ufz.de/despot/pysewer).
 
 ## Code of conduct
 
