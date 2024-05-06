@@ -3,9 +3,8 @@
 
 from typing import Optional
 
-
-import earthpy.plot as ep                # this throws an error in the IDE, but works fine on Jupyter, uncomment when debugging 
-import earthpy.spatial as es         # this throws an error in the IDE, but works fine on Jupyter, uncomment when debugging
+import earthpy.plot as ep  # this throws an error in the IDE, but works fine on Jupyter, uncomment when debugging
+import earthpy.spatial as es  # this throws an error in the IDE, but works fine on Jupyter, uncomment when debugging
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -191,6 +190,7 @@ def plot_sewer_attributes(
     colormap="jet",
     title="Sewer Network Plot",
     hillshade=False,
+    plot_sink=True,
     fig_size=(20, 20),
 ):
     """
@@ -210,6 +210,10 @@ def plot_sewer_attributes(
         The title of the plot. Default is "Sewer Network Plot".
     hillshade : bool, optional
         Whether to include a hillshade in the plot. Default is False.
+    plot_sink : bool, optional
+        Whether to plot the sinks (WWTP) in the sewer network. Default is True.
+    fig_size : tuple, optional
+        The size of the figure in inches. Default is (20, 20).
 
     Returns
     -------
@@ -262,6 +266,11 @@ def plot_sewer_attributes(
             cmap="Greys_r",
             alpha=0.8,
         )
+    
+    if plot_sink:
+        get_node_gdf(
+            modelDomain.connection_graph, field="node_type", value="wwtp"
+        ).plot(ax=ax, marker="o", color="g", markersize=50, label="WWTP")
 
     get_edge_gdf(sewer_graph, detailed=True).plot(
         ax=ax, column=attribute, cmap=colormap, cax=cax, legend=True
