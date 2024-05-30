@@ -40,7 +40,7 @@ setup(
         "pyarrow",
         "earthpy",
         "pytest",
-        "jypterlab",
+        "jupyterlab",
     ],
     python_requires=">=3.10",
 )
