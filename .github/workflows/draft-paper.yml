@@ -1,0 +1,31 @@
+name: Draft PDF
+on:
+  push:
+    paths:
+      - paper/**
+      - .github/workflows/draft-pdf.yml
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    name: Paper Draft
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: List files for debugging
+        run: ls -R
+
+      - name: Build draft PDF
+        uses: openjournals/openjournals-draft-action@master
+        with:
+          journal: joss
+          # Update this path based on the actual location of paper.md
+          paper-path: paper/paper.md
+
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: paper
+          # This should match the output path where Pandoc writes the compiled PDF
+          path: paper/paper.pdf
