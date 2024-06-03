@@ -117,8 +117,6 @@ Pysewer was written Python 3.10.6 and used a suite of open-source software packa
 
 # Author contributions
 
-Conceptualisation: J.F., G.K., and M.v.A.; methodology: J.F., M.S., and D.D.; software development: M.S. and D.D.; writing – original draft, D.D.; writing – review & editing: D.D, J.F., M.S., G.K., and M.v.A.
-
-This line is to be removed
+Conceptualisation: J.F., G.K., and M.v.A.; methodology: J.F., M.S., and D.D.; software development: M.S. and D.D.; writing – original draft: D.D.; writing – review & editing: D.D, J.F., M.S., G.K., and M.v.A.
 
 # References
