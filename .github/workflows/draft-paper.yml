@@ -23,9 +23,21 @@ jobs:
           # Update this path based on the actual location of paper.md
           paper-path: paper/paper.md
 
+      - name: Move PDF to paper directory
+        run: mv paper.pdf paper/paper.pdf
+
+      - name: Commit and push PDF
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add paper/paper.pdf
+          git commit -m 'Add compiled PDF'
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: paper
-          # This should match the output path where Pandoc writes the compiled PDF
           path: paper/paper.pdf
