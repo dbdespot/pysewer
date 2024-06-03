@@ -39,7 +39,7 @@ Pysewer is a network generator for sewer networks originally designed for rural 
 
 Based on a few data sources, pysewer generates a complete network based on roads, building locations, and elevation data. Global water consumption and population assumptions are included to dimension the sewer diameter. Results are fully-connected sewer networks that connect all buildings to one or several predefined wastewater treatment plant (WWTP) locations. By default, the lowest point in the elevation data is set as the WWTP. The resulting network contains sewer diameters, building connections, as well as lifting stations or pumping stations with pressurised pipes where necessary.
 
-# Statement of Need
+# Statement of need
 
 The sustainable management of water and sanitation has been defined as one of the UN’s sustainable development goals: SDG #6 [@unwaterSustainableDevelopment2018]. As of 2019, SDG 6 might not be reached in 2030 despite the progress made, which means that more than half of the population still lacks safely managed sanitation [@unwaterSustainableDevelopment2018].  
 In order to identify optimal wastewater management at the settlement level, it is necessary to compare different central or decentral solutions. To achieve this, a baseline is required against which other scenarios can be compared [@vanafferdenNewapproach2015; @khurelbaatarDataReduced2021]. To this end, we developed pysewer – a tool that generates settlement-wide sewer networks, which connect all the buildings within the settlement boundary or the region of interest to one or more wastewater treatment plant locations.
