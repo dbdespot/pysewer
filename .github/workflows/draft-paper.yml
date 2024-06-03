@@ -26,7 +26,7 @@ jobs:
         run: ls -R
 
       - name: Move PDF to paper directory
-        run: mv paper.pdf paper/paper.pdf
+        run: mv ./paper/paper.pdf paper/paper.pdf
 
       - name: Commit and push PDF
         run: |
