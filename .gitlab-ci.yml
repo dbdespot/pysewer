@@ -20,13 +20,13 @@ build-docs:
     - make html
   artifacts:
     paths:
-      - docs/_build/html
+      - docs/build/html
     expire_in: 1 week
 
 pages:
   stage: deploy
   script:
-    - mv docs/_build/html public
+    - mv docs/build/html public
   artifacts:
     paths:
       - public
