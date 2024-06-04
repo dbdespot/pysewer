@@ -23,7 +23,13 @@ build-docs:
   stage: build
   script:
     - source activate pysewer
+    - echo "Current working directory before changing: $(pwd)"
+    - echo "Contents of the current directory before changing:"
+    - ls -la
     - cd docs
+    - echo "Current working directory after changing: $(pwd)"
+    - echo "Contents of the docs directory:"
+    - ls -la
     - sphinx-apidoc -o source ../pysewer # Regenerate API docs on each build
     - make html clean
     - make html
