@@ -34,7 +34,9 @@ It is build around an algorithm for generation of viable sewer-network layouts. 
 
 
 ## Documentation
-The documentation can be found [here](https://despot.pages.ufz.de/pysewer). 
+The documentation can be found [here](https://despot.pages.ufz.de/pysewer).  
+
+An example of how to use pysewer for generating a sewer network layout can be found here: [example_sewer_network_generation](notebooks/example_sewer_network_generation.ipynb).
 
 ## Installation
 
