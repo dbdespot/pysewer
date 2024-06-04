@@ -5,6 +5,7 @@ SPDX-License-Identifier: GPL-3.0-only -->
 
 - [pysewer](#pysewer)
   - [Summary](#summary)
+  - [Documentation](#documentation)
   - [Installation](#installation)
     - [Step 1: Clone the repository and navigate to the root directory](#step-1-clone-the-repository-and-navigate-to-the-root-directory)
     - [Step 2: Create the conda environment](#step-2-create-the-conda-environment)
@@ -30,6 +31,10 @@ SPDX-License-Identifier: GPL-3.0-only -->
 The aim of pysewer is to provide a framework automatically generate cost-efficient sewer network layouts on minimal data requirements.
 
 It is build around an algorithm for generation of viable sewer-network layouts. The approximated sewer network is represented by sources (households/buildings), potential pathways, and one or multiple sinks. The algorithm approximates the directed steinertree (the steiner arborescence) between all sources and the sink by using an repeated shortest path heuristic (RSPH).
+
+
+## Documentation
+The documentation can be found [here](https://despot.pages.ufz.de/pysewer). 
 
 ## Installation
 

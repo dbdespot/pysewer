@@ -14,9 +14,10 @@ Welcome to pysewer's documentation!
    :caption: Contents:
 
 
-   about
+   about/index
    install
-   modules
+   api_reference/index
+   examples/index
 
 
 

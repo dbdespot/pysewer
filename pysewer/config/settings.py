@@ -18,7 +18,7 @@ DEFAULT_SETTINGS_PATH = str(current_directory / "settings.yaml")
 
 
 @dataclass
-class Preporocessing:
+class Preprocessing:
     dem_file_path: Optional[str]
     roads_input_data: Optional[Union[str, gpd.GeoDataFrame]]
     buildings_input_data: Optional[Union[str, gpd.GeoDataFrame]]
@@ -68,7 +68,7 @@ class Export:
 
 @dataclass
 class Config:
-    preprocessing: Preporocessing
+    preprocessing: Preprocessing
     optimization: Optimization
     plotting: Plotting
     export: Export
@@ -121,7 +121,7 @@ def override_setting_to_config(
     )
 
     # convert the dictionary to a Config object
-    processing_config = Preporocessing(**settings_dict["preprocessing"])
+    processing_config = Preprocessing(**settings_dict["preprocessing"])
     optimization_config = Optimization(**settings_dict["optimization"])
     plotting_config = Plotting(**settings_dict["plotting"])
     export_config = Export(**settings_dict["export"])
