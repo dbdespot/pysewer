@@ -33,8 +33,12 @@ build-docs:
     - echo "Contents of the docs directory:"
     - ls -la
     - sphinx-apidoc -o source ../pysewer # Regenerate API docs on each build
+    - echo "Contents of the docs/source directory after sphinx-apidoc:"
+    - ls -la source
     - make html clean
     - make html
+    - echo "Contents of the docs/_build/html directory after make html:"
+    - ls -la build/html
   artifacts:
     paths:
       - docs/build/html
