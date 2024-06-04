@@ -24,22 +24,22 @@ build-docs:
   stage: build
   script:
     - source activate pysewer
-    - echo "Current working directory before changing:"
-    - echo $(pwd)
-    - echo "Contents of the current directory before changing:"
-    - ls -la
+    # - echo "Current working directory before changing:"
+    # - echo $(pwd)
+    # - echo "Contents of the current directory before changing:"
+    # - ls -la
     - cd docs
-    - echo "Current working directory after changing:"
-    - echo $(pwd)
-    - echo "Contents of the docs directory:"
-    - ls -la
-    - sphinx-apidoc -o source ../pysewer # Regenerate API docs on each build
-    - echo "Contents of the docs/source directory after sphinx-apidoc:"
-    - ls -la source
+    # - echo "Current working directory after changing:"
+    # - echo $(pwd)
+    # - echo "Contents of the docs directory:"
+    # - ls -la
+    # - sphinx-apidoc -o source ../pysewer # Regenerate API docs on each build
+    # - echo "Contents of the docs/source directory after sphinx-apidoc:"
+    # - ls -la source
     - make html clean
     - make html
-    - echo "Contents of the docs/_build/html directory after make html:"
-    - ls -la build/html
+    # - echo "Contents of the docs/_build/html directory after make html:"
+    # - ls -la build/html
   artifacts:
     paths:
       - docs/build/html
