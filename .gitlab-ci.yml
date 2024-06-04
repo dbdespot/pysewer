@@ -1,12 +1,18 @@
-image: python:3.10
+image: continuumio/miniconda3
 
 cache:
   paths:
     - .pip_cache/
+    - /opt/conda
 
 before_script:
+  - conda update conda -y
+  - conda create -n pysewer python=3.10.6 -y
+  - source activate pysewer
+  - conda install -c conda-forge gdal -y
   - python -m pip install --upgrade pip
   - pip install sphinx sphinx-autobuild sphinx_rtd_theme pydata-sphinx-theme sphinx-codeautolink sphinx_design sphinx-favicon sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-mermaid ablog myst-parser matplotlib
+  - pip install .
 
 stages:
   - build
@@ -15,6 +21,7 @@ stages:
 build-docs:
   stage: build
   script:
+    - source activate pysewer
     - cd docs
     - sphinx-apidoc -o source ../pysewer # Regenerate API docs on each build
     - make html
