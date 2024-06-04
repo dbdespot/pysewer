@@ -6,7 +6,7 @@ cache:
 
 before_script:
   - python -m pip install --upgrade pip
-  - pip install sphinx sphinx-autobuild sphinx_rtd_theme pydata-sphinx-theme sphinx.ext.autodoc sphinx.ext.napoleon sphinx-codeautolink sphinx_design sphinx-favicon  sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-mermaid ablog
+  - pip install sphinx sphinx-autobuild sphinx_rtd_theme pydata-sphinx-theme sphinx-codeautolink sphinx_design sphinx-favicon sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-mermaid ablog
 
 stages:
   - build
