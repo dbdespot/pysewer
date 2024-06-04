@@ -1,49 +1,49 @@
-image: continuumio/miniconda3
+# image: continuumio/miniconda3
 
-cache:
-  paths:
-    - .pip_cache/
-    - /opt/conda
+# cache:
+#   paths:
+#     - .pip_cache/
+#     - /opt/conda
 
-before_script:
-  - conda update conda -y
-  - conda create -n pysewer python=3.10.6 -y
-  - source activate pysewer
-  - conda install -c conda-forge gdal -y
-  - conda install -c conda-forge fiona shapely -y  # Additional 
-  - conda install -c anaconda make -y
-  - python -m pip install --upgrade pip
-  - pip install sphinx sphinx-autobuild sphinx_rtd_theme pydata-sphinx-theme sphinx-codeautolink sphinx_design sphinx-favicon sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-mermaid ablog myst-parser matplotlib
-  - pip install .
+# before_script:
+#   - conda update conda -y
+#   - conda create -n pysewer python=3.10.6 -y
+#   - source activate pysewer
+#   - conda install -c conda-forge gdal -y
+#   - conda install -c conda-forge fiona shapely -y  # Additional 
+#   - conda install -c anaconda make -y
+#   - python -m pip install --upgrade pip
+#   - pip install sphinx sphinx-autobuild sphinx_rtd_theme pydata-sphinx-theme sphinx-codeautolink sphinx_design sphinx-favicon sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-mermaid ablog myst-parser matplotlib
+#   - pip install .
 
 stages:
-  - build
+  # - build
   - deploy
 
-build-docs:
-  stage: build
-  script:
-    - source activate pysewer
-    # - echo "Current working directory before changing:"
-    # - echo $(pwd)
-    # - echo "Contents of the current directory before changing:"
-    # - ls -la
-    - cd docs
-    # - echo "Current working directory after changing:"
-    # - echo $(pwd)
-    # - echo "Contents of the docs directory:"
-    # - ls -la
-    # - sphinx-apidoc -o source ../pysewer # Regenerate API docs on each build
-    # - echo "Contents of the docs/source directory after sphinx-apidoc:"
-    # - ls -la source
-    - make html clean
-    - make html
-    # - echo "Contents of the docs/_build/html directory after make html:"
-    # - ls -la build/html
-  artifacts:
-    paths:
-      - docs/build/html
-    expire_in: 1 week
+# build-docs:
+#   stage: build
+#   script:
+#     - source activate pysewer
+#     # - echo "Current working directory before changing:"
+#     # - echo $(pwd)
+#     # - echo "Contents of the current directory before changing:"
+#     # - ls -la
+#     - cd docs
+#     # - echo "Current working directory after changing:"
+#     # - echo $(pwd)
+#     # - echo "Contents of the docs directory:"
+#     # - ls -la
+#     # - sphinx-apidoc -o source ../pysewer # Regenerate API docs on each build
+#     # - echo "Contents of the docs/source directory after sphinx-apidoc:"
+#     # - ls -la source
+#     - make html clean
+#     - make html
+#     # - echo "Contents of the docs/_build/html directory after make html:"
+#     # - ls -la build/html
+#   artifacts:
+#     paths:
+#       - docs/build/html
+#     expire_in: 1 week
 
 pages:
   stage: deploy
