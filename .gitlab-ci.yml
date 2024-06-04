@@ -10,6 +10,7 @@ before_script:
   - conda create -n pysewer python=3.10.6 -y
   - source activate pysewer
   - conda install -c conda-forge gdal -y
+  - conda install -c conda-forge fiona shapely -y  # Additional 
   - conda install -c anaconda make -y
   - python -m pip install --upgrade pip
   - pip install sphinx sphinx-autobuild sphinx_rtd_theme pydata-sphinx-theme sphinx-codeautolink sphinx_design sphinx-favicon sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-mermaid ablog myst-parser matplotlib
