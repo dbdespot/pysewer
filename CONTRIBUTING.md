@@ -12,13 +12,13 @@ This project and everyone participating in it is governed by the [pysewer Code o
 
 ### Reporting Bugs
 
-- **Ensure the bug was not already reported** by searching on GitLab under [Issues](https://github.com/your/your-project/issues).
+- **Ensure the bug was not already reported** by searching on GitHub under [Issues](https://github.com/dbdespot/pysewer/issues).
   
-- If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/your/your-project/issues/new). Be sure to include a **title and clear description**, as much relevant information as possible, and a **code sample** or an **executable test case** demonstrating the expected behavior that is not occurring.
+- If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/dbdespot/pysewer/issues/new). Be sure to include a **title and clear description**, as much relevant information as possible, and a **code sample** or an **executable test case** demonstrating the expected behavior that is not occurring.
 
 ### Suggesting Enhancements
 
-- **Determine [which repository the enhancement should be suggested in](https://git.ufz.de/despot/pysewer_dev/)**.
+- **Determine [which repository the enhancement should be suggested in](hhttps://github.com/dbdespot/pysewer/tree/main)**.
   
 - **Perform a cursory search** to see if the enhancement has already been suggested. If it has, add to the discussion.
 
