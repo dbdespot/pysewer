@@ -69,4 +69,3 @@ This section lists the labels we use to help us track and manage issues and pull
 ### Acknowledgements
 
 - Mention if your contributing guidelines have been adapted from another project.
-
