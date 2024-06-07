@@ -44,7 +44,11 @@ Based on a few data sources, pysewer generates a complete network based on roads
 The sustainable management of water and sanitation has been defined as one of the UN’s sustainable development goals: SDG #6 [@unwaterSustainableDevelopment2018]. As of 2019, SDG 6 might not be reached in 2030 despite the progress made, which means that more than half of the population still lacks safely managed sanitation [@unwaterSustainableDevelopment2018].  
 In order to identify optimal wastewater management at the settlement level, it is necessary to compare different central or decentral solutions. To achieve this, a baseline is required against which other scenarios can be compared [@vanafferdenNewapproach2015; @khurelbaatarDataReduced2021]. To this end, we developed pysewer – a tool that generates settlement-wide sewer networks, which connect all the buildings within the settlement boundary or the region of interest to one or more wastewater treatment plant locations.
 
-Pysewer is a tool for data-scare environments using only few data and global assumptions – thus enabling a transferability to a wide range of different regions. At the same time, a priori data sources can be substituted with high-resolution data and site-specific information such as local water consumption and population data.
+The core principle behind pysewer’s development is based on numerical optimization methods. These methods have been used for sewer network design since the 1960s [@holland1966computer; @duque2020sewer; @li1990new; @maurer2013quantifying; @steele2016heuristic ],
+yet most require detailed or inaccessible input data. Additionally, several Python-based tools employ graph theory to optimize water distribution, water reuse, and wastewater master planning [@calle2023optimal; @friesen2023octopus, @thomas2023viswaternet].
+However, to our knowledge, there is currently no well-documented and publicly available (open-source) Python package specifically designed for generating sewer network layouts using graph theory. This gap is what pysewer aims to fill.
+
+Pysewer is designed for data-scarce environments, utilizing only minimal data and global assumptions – thus enabling transferability to a wide range of different regions. At the same time, a priori data sources can be substituted with high-resolution data and site-specific information such as local water consumption and population data o enhance its accuracy and utility in specific contexts..
 The generated networks can then be exported (i.e., as a geopackage or shapefile) in order to utilise the results in preliminary planning stages, initial cost estimations, scenario development processes or for further comparison to decentral solutions where the network can be modified. The option to include several treatment locations also enables users to already plan decentralised networks or favour treatment locations (i.e., due to local demands or restrictions).
 
 # Functionality and key features
@@ -114,10 +118,8 @@ Pysewer was written Python 3.10.6 and used a suite of open-source software packa
 - Sklearn 1.0.2 [@scikit-learn]
 - GDAL 3.0.2 [@gdal]
 
-
 # Author contributions
 
 Conceptualisation: J.F., G.K., and M.v.A.; methodology: J.F., M.S., and D.D.; software development: M.S. and D.D.; writing – original draft: D.D.; writing – review & editing: D.D, J.F., M.S., G.K., and M.v.A.
-
 
 # References
