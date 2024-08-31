@@ -444,14 +444,29 @@ def get_sewer_info(G):
     info = {}
     buildings = get_node_keys(G, field="node_type", value="building")
     info["Total Buildings"] = len(buildings)
+
+    # extract the presure and gravity sewer geodataframes
     p_sewer_gdf = get_edge_gdf(G, field="pressurized", value=True)
     g_sewer_gdf = get_edge_gdf(G, field="pressurized", value=False)
-    info["Pressurized Sewer Length [m]"] = round(p_sewer_gdf.geometry.length.sum())
-    info["Gravity Sewer Length [m]"] = round(g_sewer_gdf.geometry.length.sum())
+    info["Pressurized Sewer Length [m]"] = (
+        round(p_sewer_gdf.geometry.length.sum()) if not p_sewer_gdf.empty else 0
+    )
+    info["Gravity Sewer Length [m]"] = (
+        round(g_sewer_gdf.geometry.length.sum()) if not g_sewer_gdf.empty else 0
+    )
+
+    # extract the number of lifting and pumping stations
     pumps = get_node_keys(G, field="pumping_station", value=True)
     lifting_stations = get_node_keys(G, field="lifting_station", value=True)
-    info["Lifting Stations"] = len(lifting_stations)
-    info["Pumping Stations"] = len([n for n in pumps if n not in buildings])
-    info["Private Pumps"] = len([n for n in buildings if n in pumps])
-    # info["Onsite Treatment"] = len(get_node_gdf(G,field="onsite",value=True))
+
+    info["Pumping Stations"] = (
+        len([n for n in pumps if n not in buildings]) if pumps else 0
+    )
+    info["Lifting Stations"] = len(lifting_stations) if lifting_stations else 0
+    info["Private Pumps"] = (
+        len([n for n in buildings if n in pumps])
+        if [n for n in buildings if n in pumps]
+        else 0
+    )
+
     return info
