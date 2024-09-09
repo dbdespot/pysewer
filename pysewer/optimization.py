@@ -200,6 +200,7 @@ def calculate_hydraulic_parameters(
     diameters: List[float] = DEFAULT_CONFIG.optimization.diameters,
     roughness: float = DEFAULT_CONFIG.optimization.roughness,
     include_private_sewer: bool = DEFAULT_CONFIG.preprocessing.add_private_sewer,
+    combined_sewer_factor: float = 1.0
 ):
     """
     Calculates hydraulic parameters for a sewer network graph.
@@ -307,7 +308,9 @@ def calculate_hydraulic_parameters(
             slope = get_mean_slope(
                 G, upstream, downstream, td_profile[0][1], td_profile[-1][1]
             )
-            peak_flow = G.nodes[upstream]["peak_flow"]
+            # Calculate diameter
+            # adjust peak flow for combined sewer
+            peak_flow = G.nodes[upstream]["peak_flow"] * combined_sewer_factor
             if pressurized:
                 diam = pressurized_diameter
             else:
