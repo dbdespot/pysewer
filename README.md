@@ -83,9 +83,17 @@ Now that you have conda environment uo and running, lets install pysewer. To do 
 ```shell
 cd pysewer
 pip install .
+
 # for the development version
 python -m pip install -e .
+
+# OR just 
+pip install -e .
 ```
+
+> [!TIP] To install without cloning the repository use:
+> ```pip install git+https://github.com/dbdespot/pysewer.git```
+
 
 Please see the [documentation](https://despot.pages.ufz.de/pysewer) for more details.
 
