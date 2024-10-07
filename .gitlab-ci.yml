@@ -45,6 +45,8 @@ stages:
 #       - docs/build/html
 #     expire_in: 1 week
 
+# automate docs creation 
+
 pages:
   stage: deploy
   script:

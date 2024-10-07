@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
-    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css?v=7f9a90b1" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-codeautolink.css?v=125d5c1c" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
   
@@ -411,14 +411,14 @@ The option saving the data as a parquet file is added.</p>
 <dd class="field-even"><p>The schema dictionary.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysewer.export.write_gdf_to_gpkg">
-<span class="sig-prename descclassname"><span class="pre">pysewer.export.</span></span><span class="sig-name descname"><span class="pre">write_gdf_to_gpkg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GeoDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysewer/export.html#write_gdf_to_gpkg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysewer.export.write_gdf_to_gpkg" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pysewer.export.</span></span><span class="sig-name descname"><span class="pre">write_gdf_to_gpkg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GeoDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysewer/export.html#write_gdf_to_gpkg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysewer.export.write_gdf_to_gpkg" title="Link to this definition">#</a></dt>
 <dd><p>Write a GeoDataFrame to a GeoPackage (GPKG) file using Fiona, converting lists of tuples to JSON strings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -439,7 +439,7 @@ The option saving the data as a parquet file is added.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysewer.export.write_gdf_to_shp">
-<span class="sig-prename descclassname"><span class="pre">pysewer.export.</span></span><span class="sig-name descname"><span class="pre">write_gdf_to_shp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GeoDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysewer/export.html#write_gdf_to_shp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysewer.export.write_gdf_to_shp" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pysewer.export.</span></span><span class="sig-name descname"><span class="pre">write_gdf_to_shp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GeoDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysewer/export.html#write_gdf_to_shp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysewer.export.write_gdf_to_shp" title="Link to this definition">#</a></dt>
 <dd><p>Write a GeoDataFrame to an ESRI Shapefile (SHP) file using Fiona, converting lists of tuples to JSON strings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -460,7 +460,7 @@ The option saving the data as a parquet file is added.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysewer.export.export_sewer_network">
-<span class="sig-prename descclassname"><span class="pre">pysewer.export.</span></span><span class="sig-name descname"><span class="pre">export_sewer_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GeoDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpkg'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysewer/export.html#export_sewer_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysewer.export.export_sewer_network" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pysewer.export.</span></span><span class="sig-name descname"><span class="pre">export_sewer_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GeoDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpkg'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysewer/export.html#export_sewer_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysewer.export.export_sewer_network" title="Link to this definition">#</a></dt>
 <dd><p>Export a sewer network GeoDataFrame to a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -472,7 +472,7 @@ Currently supported formats are ‘gpkg’ (GeoPackage), ‘shp’ (ESRI Shapefi
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – If the file format is not supported.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If the file format is not supported.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>

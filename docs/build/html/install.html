@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
-    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css?v=7f9a90b1" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=125d5c1c" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=87e54e7c" />
   
@@ -388,8 +388,12 @@ Note that the exact versions of the packages used can be found in the [environme
 <p>Now that you have conda environment uo and running, lets install pysewer. To do this you first need to clone pysewer repository hosted [here.](<a class="github reference external" href="https://github.com/dbdespot/pysewer">dbdespot/pysewer</a>) and install it using git and pip with:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>pysewer
 pip<span class="w"> </span>install<span class="w"> </span>.
+
 <span class="c1"># for the development version</span>
-python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+
+<span class="c1"># OR just install without cloning the repository</span>
+pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/dbdespot/pysewer.git
 </pre></div>
 </div>
 </section>
