@@ -93,7 +93,8 @@ python -m pip install -e .
 pip install -e .
 ```
 
-> [!TIP] To install without cloning the repository use:
+> [!TIP] 
+> To install without cloning the repository use:
 > ```pip install git+https://github.com/dbdespot/pysewer.git```
 
 
@@ -144,9 +145,9 @@ The buildings data can include Polygon, MultiPolygon, or Point geometries, where
 | MultiPolygon(((x6, y6), (x7, y7), (x8, y8), (x9, y9)), ((x10, y10), (x11, y11), (x12, y12))) | 3           | {'name': 'House C', 'type': 'residential'} |
 
 > [!NOTE]
-> The buildings data is expected to be a Point, Polygon, or MultiPolygon geometry with a valid CRS. Ideally point geometries are preferred, however we added a function convert polygons or multi-polygons to points.
-> The buildings data can include additional attributes that will be preserved during the preprocessing.
-> To avoid issues with preprocessing, we recommend to project the data into a UTM-zone that matches the area of interest.
+> The buildings data is expected to be a Point, Polygon, or MultiPolygon geometry with a valid CRS. Ideally point geometries are preferred, however we added a function convert polygons or multi-polygons to points.  
+> The buildings data can include additional attributes that will be preserved during the preprocessing.  
+> To avoid issues with preprocessing, we recommend to project the data into a UTM-zone that matches the area of interest.  
 
 ### Preprocessing
 
