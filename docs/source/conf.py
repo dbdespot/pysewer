@@ -12,8 +12,9 @@ import datetime
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 import os
-import sys
 import shutil
+import sys
+
 
 
 sys.path.insert(0, os.path.abspath("../../pysewer"))
@@ -48,10 +49,12 @@ extensions = [
     "sphinxcontrib.mermaid",
     "matplotlib.sphinxext.plot_directive",
     "ablog",
-    'sphinx.ext.mathjax',
-    'sphinx.ext.extlinks',
-    'sphinx_favicon',  # to add custom favicons https://pypi.org/project/sphinx-favicon/
-    'sphinx_codeautolink',  # automatic links from code to documentation # https://sphinx-codeautolink.readthedocs.io/en/latest/index.html
+    "sphinx.ext.mathjax",
+    "sphinx.ext.extlinks",
+    "sphinx_favicon",  # to add custom favicons https://pypi.org/project/sphinx-favicon/
+    "sphinx_codeautolink",  # automatic links from code to documentation # https://sphinx-codeautolink.readthedocs.io/en/latest/index.html
+    "sphinx_copybutton",
+    "sphinx_togglebutton",
 ]
 
 # autosummaries from source files
@@ -101,6 +104,14 @@ templates_path = ["_templates"]
 exclude_patterns = []
 
 
+
+# -- Sphinx-copybutton options ---------------------------------------------
+# Exclude copy button from appearing over notebook cell numbers by using :not()
+# The default copybutton selector is `div.highlight pre`
+# https://github.com/executablebooks/sphinx-copybutton/blob/master/sphinx_copybutton/__init__.py#L82
+copybutton_selector = ":not(.prompt) > div.highlight pre"
+
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -114,6 +125,40 @@ html_theme = "pydata_sphinx_theme"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
+html_theme_options = {
+    "external_links": [
+        {
+            "url": "https://pydata.org",
+            "name": "PyData",
+        },
+        {
+            "url": "https://numfocus.org/",
+            "name": "NumFocus",
+        },
+        {
+            "url": "https://numfocus.org/donate",
+            "name": "Donate to NumFocus",
+        },
+    ],
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/dbdespot/pysewer",
+            "icon": "fa-brands fa-github",
+        },
+        # {
+        #     "name": "PyPI",
+        #     "url": "https://pypi.org/project/pydata-sphinx-theme",
+        #     "icon": "fa-custom fa-pypi",
+        # },
+        # {
+        #     "name": "PyData",
+        #     "url": "https://pydata.org",
+        #     "icon": "fa-custom fa-pydata",
+        # },
+    ],
+}
+
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
@@ -123,9 +168,12 @@ intersphinx_mapping = {
     "pytest": ("https://docs.pytest.org/en/7.1.x/", None),
     "pyproj": ("https://pyproj4.github.io/pyproj/stable/", None),
     "dateutil": ("https://dateutil.readthedocs.io/en/stable/", None),
-    'networkx': ('https://networkx.org/documentation/stable/', 'https://networkx.org/documentation/stable/objects.inv'),
-    'matplotlib': ('https://matplotlib.org/stable/', None),
-    'pandas': ('https://pandas.pydata.org/docs/', None),
+    "networkx": (
+        "https://networkx.org/documentation/stable/",
+        "https://networkx.org/documentation/stable/objects.inv",
+    ),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),
 }
 
 # def setup(app):
@@ -142,5 +190,3 @@ intersphinx_mapping = {
 #                 os.path.join(notebooks_src, notebook),
 #                 os.path.join(notebooks_dest, notebook)
 #             )
-
-
