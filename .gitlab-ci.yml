@@ -1,58 +1,35 @@
-image: continuumio/miniconda3
+image: ubuntu:latest
+
+variables:
+  CONDA_PKGS_DIRS: "$CI_PROJECT_DIR/.conda_pkgs_dir"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip_cache"
 
 cache:
   paths:
-    - .pip_cache/
-    - /opt/conda
+    - .conda_pkgs_dir
+    - .pip_cache
 
 before_script:
-  - conda update conda -y
-  - conda create -n pysewer python=3.10.6 -y
+  - apt-get update && apt-get install -y wget
+  - wget -q https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+  - bash Miniforge3-Linux-x86_64.sh -b -p $HOME/miniforge3
+  - export PATH="$HOME/miniforge3/bin:$PATH"
+  - conda config --set always_yes yes --set changeps1 no
+  - conda create -n pysewer python=3.10.6
   - source activate pysewer
-  - conda install -c conda-forge gdal -y
-  - conda install -c conda-forge fiona shapely -y # Additional
-  - conda install -c anaconda make -y
-  - python -m pip install --upgrade pip
+  - conda install -c conda-forge gdal fiona shapely
+  - conda install -c conda-forge make
+  - pip install --upgrade pip
   - pip install sphinx sphinx-autobuild sphinx_rtd_theme pydata-sphinx-theme sphinx-codeautolink sphinx_design sphinx-favicon sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-mermaid ablog myst-parser matplotlib sphinx-copybutton
   - pip install .
 
-stages:
-  - build
-  - deploy
-
-build-docs:
-  stage: build
+pages:
   script:
     - source activate pysewer
-    # - echo "Current working directory before changing:"
-    # - echo $(pwd)
-    # - echo "Contents of the current directory before changing:"
-    # - ls -la
     - cd docs
-    # - echo "Current working directory after changing:"
-    # - echo $(pwd)
-    # - echo "Contents of the docs directory:"
-    # - ls -la
-    # - sphinx-apidoc -o source ../pysewer # Regenerate API docs on each build
-    # - echo "Contents of the docs/source directory after sphinx-apidoc:"
-    # - ls -la source
-    - make html clean
     - make html
-    - echo "Contents of the docs/_build/html directory after make html:"
     - cd ..
-    - cp -r docs/_build/html public
-    # - ls -la build/html
-  artifacts:
-    paths:
-      - public
-    expire_in: 1 week
-
-# automate docs creation
-
-pages:
-  stage: deploy
-  script:
-    - echo "Deployment step - the public directory is already prepared"
+    - mv docs/build/html public
   artifacts:
     paths:
       - public
