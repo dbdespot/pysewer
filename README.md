@@ -11,6 +11,8 @@ SPDX-License-Identifier: GPL-3.0-only -->
     - [Step 2: Create the conda environment](#step-2-create-the-conda-environment)
     - [Step 3: Install pysewer via pip](#step-3-install-pysewer-via-pip)
   - [Input Data and data representation](#input-data-and-data-representation)
+    - [Road Network Data](#road-network-data)
+    - [Building Data](#building-data)
     - [Preprocessing](#preprocessing)
     - [Graph Attributes](#graph-attributes)
   - [Routing Solver](#routing-solver)
@@ -104,6 +106,47 @@ The following input data is required:
 - A Digital Elevation Model (DEM)
 - Point Data on Building locations
 - Road Network Data
+- Local daily water consumption (cubic meter per person)
+
+### Road Network Data
+
+The roads data is expected to be either LineString or MultiLineString geometries with a valid CRS. The GeoDataFrame can contain additional attributes that will be preserved during the preprocessing.
+
+| Column Name      | Data Type                    | Description                                                                         |
+| ---------------- | ---------------------------- | ----------------------------------------------------------------------------------- |
+| geometry         | LineString / MultiLineString | The geometry representing the road network.                                         |
+| road_id          | integer                      | Unique identifier for each road segment (required).                                 |
+| other_attributes | various                      | Any additional attributes related to roads (optional, preserved during processing). |
+
+**Example Roads Geodataframe**
+
+| geometry                                                    | road_id | other_attributes                        |
+| ----------------------------------------------------------- | ------- | --------------------------------------- |
+| LineString((x1, y1), …)                                     | 1       | {'name': 'Main St.', 'type': 'highway'} |
+| MultiLineString(((x2, y2), (x3, y3)), ((x4, y4), (x5, y5))) | 2       | {'name': '2nd Ave.', 'type': 'street'}  |
+
+### Building Data
+
+The buildings data can include Polygon, MultiPolygon, or Point geometries, where polygons will be converted to points (centroids). The GeoDataFrame should also have a valid CRS, which should match the CRS of the roads data.
+
+| Column Name      | Data Type                      | Description                                                                             |
+| ---------------- | ------------------------------ | --------------------------------------------------------------------------------------- |
+| geometry         | Point / Polygon / MultiPolygon | The geometry representing the buildings (which can be converted to points).             |
+| building_id      | integer                        | Unique identifier for each building.                                                    |
+| other_attributes | various                        | Any additional attributes related to buildings (optional, preserved during processing). |
+
+**Example Buildings Geodataframe**
+
+| geometry                                                                                     | building_id | other_attributes                           |
+| -------------------------------------------------------------------------------------------- | ----------- | ------------------------------------------ |
+| Point(x1, y1)                                                                                | 1           | {'name': 'House A', 'type': 'residential'} |
+| Polygon(((x2, y2), (x3, y3), (x4, y4), (x5, y5)))                                            | 2           | {'name': 'House B', 'type': 'residential'} |
+| MultiPolygon(((x6, y6), (x7, y7), (x8, y8), (x9, y9)), ((x10, y10), (x11, y11), (x12, y12))) | 3           | {'name': 'House C', 'type': 'residential'} |
+
+> [!NOTE]
+> The buildings data is expected to be a Point, Polygon, or MultiPolygon geometry with a valid CRS. Ideally point geometries are preferred, however we added a function convert polygons or multi-polygons to points.
+> The buildings data can include additional attributes that will be preserved during the preprocessing.
+> To avoid issues with preprocessing, we recommend to project the data into a UTM-zone that matches the area of interest.
 
 ### Preprocessing
 
