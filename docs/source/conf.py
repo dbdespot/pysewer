@@ -54,7 +54,6 @@ extensions = [
     "sphinx_favicon",  # to add custom favicons https://pypi.org/project/sphinx-favicon/
     "sphinx_codeautolink",  # automatic links from code to documentation # https://sphinx-codeautolink.readthedocs.io/en/latest/index.html
     "sphinx_copybutton",
-    "sphinx_togglebutton",
 ]
 
 # autosummaries from source files
@@ -157,11 +156,6 @@ html_theme_options = {
         #     "icon": "fa-custom fa-pydata",
         # },
     ],
-    "search_bar_position": "sidebar",  # or "navbar" if you prefer
-}
-
-html_sidebars = {
-    "**": ["search-field.html", "sidebar-nav-bs.html"]
 }
 
 
