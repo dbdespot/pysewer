@@ -253,15 +253,23 @@ class Roads:
             self.gdf = gpd.read_file(input_data)
         else:
             self.gdf = input_data
-
-        # drop any rows with missing geometry data 
-        self.gdf = self.gdf.dropna(subset=["geometry"])
-
-        # drop any rows with geometry being None
-        self.gdf = self.gdf[self.gdf["geometry"].notnull()]
-
-        # remove the third dimension from the geometry if present
-        self.gdf["geometry"] = [remove_third_dimension(g) for g in self.gdf["geometry"]]
+        
+        # Remove rows with None geometries
+        self.gdf = self.gdf.dropna(subset=['geometry'])
+        
+        # Remove third dimension and handle potential errors
+        def safe_remove_third_dimension(geom):
+            try:
+                return remove_third_dimension(geom)
+            except Exception as e:
+                print(f"Error processing geometry: {e}")
+                return None
+        
+        self.gdf["geometry"] = self.gdf["geometry"].apply(safe_remove_third_dimension)
+        
+        # Remove any rows where geometry became None after processing
+        self.gdf = self.gdf.dropna(subset=['geometry'])
+        
         self.merged_roads = self.gdf.unary_union
 
     def get_nearest_point(self, point):
