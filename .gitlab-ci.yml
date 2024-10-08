@@ -10,24 +10,22 @@ cache:
     - .pip_cache
 
 stages:
-  - setup
   - build
   - deploy
 
-setup:
-  stage: setup
-  script:
-    - apt-get update && apt-get install -y wget
-    - wget -q https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
-    - bash Miniforge3-Linux-x86_64.sh -b -p $HOME/miniforge3
-    - export PATH="$HOME/miniforge3/bin:$PATH"
-    - conda config --set always_yes yes --set changeps1 no
-    - conda create -n pysewer python=3.10.6
-    - source activate pysewer
-    - conda install -c conda-forge gdal fiona shapely make
-    - pip install --upgrade pip
-    - pip install sphinx sphinx-autobuild sphinx_rtd_theme pydata-sphinx-theme sphinx-codeautolink sphinx_design sphinx-favicon sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-mermaid ablog myst-parser matplotlib sphinx-copybutton
-    - pip install .
+before_script:
+  - apt-get update && apt-get install -y wget
+  - wget -q https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+  - bash Miniforge3-Linux-x86_64.sh -b -p $HOME/miniforge3
+  - export PATH="$HOME/miniforge3/bin:$PATH"
+  - conda config --set always_yes yes --set changeps1 no
+  - conda create -n pysewer python=3.10.6
+  - source activate pysewer
+  - conda install -c conda-forge gdal fiona shapely
+  - conda install -c conda-forge make
+  - pip install --upgrade pip
+  - pip install sphinx sphinx-autobuild sphinx_rtd_theme pydata-sphinx-theme sphinx-codeautolink sphinx_design sphinx-favicon sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-mermaid ablog myst-parser matplotlib sphinx-copybutton
+  - pip install .
 
 build:
   stage: build
@@ -37,14 +35,17 @@ build:
     - make clean html
     - make html
     - cd ..
+    - mv docs/build/html public
   artifacts:
     paths:
-      - docs/build/html
+      - public
 
 pages:
   stage: deploy
+  dependencies:
+    - build
   script:
-    - mv docs/build/html public
+    - echo "Deploying to GitLab Pages..."
   artifacts:
     paths:
       - public
