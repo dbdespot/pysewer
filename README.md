@@ -93,10 +93,9 @@ python -m pip install -e .
 pip install -e .
 ```
 
-> [!TIP] 
-> To install without cloning the repository use:
-> ```pip install git+https://github.com/dbdespot/pysewer.git```
-
+> [!TIP]  
+> To install without cloning the repository use:  
+> ```pip install git+https://github.com/dbdespot/pysewer.git```  
 
 Please see the [documentation](https://despot.pages.ufz.de/pysewer) for more details.
 
