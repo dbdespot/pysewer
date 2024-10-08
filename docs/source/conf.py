@@ -128,17 +128,17 @@ html_static_path = ["_static"]
 html_theme_options = {
     "external_links": [
         {
-            "url": "https://pydata.org",
-            "name": "PyData",
+            "url": "https://www.ufz.de/index.php?en=51198",
+            "name": "UFZ WASP",
         },
-        {
-            "url": "https://numfocus.org/",
-            "name": "NumFocus",
-        },
-        {
-            "url": "https://numfocus.org/donate",
-            "name": "Donate to NumFocus",
-        },
+        # {
+        #     "url": "https://numfocus.org/",
+        #     "name": "NumFocus",
+        # },
+        # {
+        #     "url": "https://numfocus.org/donate",
+        #     "name": "Donate to NumFocus",
+        # },
     ],
     "icon_links": [
         {
@@ -157,6 +157,11 @@ html_theme_options = {
         #     "icon": "fa-custom fa-pydata",
         # },
     ],
+    "search_bar_position": "sidebar",  # or "navbar" if you prefer
+}
+
+html_sidebars = {
+    "**": ["search-field.html", "sidebar-nav-bs.html"]
 }
 
 
