@@ -143,7 +143,7 @@ The buildings data can include Polygon, MultiPolygon, or Point geometries, where
 | Polygon(((x2, y2), (x3, y3), (x4, y4), (x5, y5)))                                            | 2           | {'name': 'House B', 'type': 'residential'} |
 | MultiPolygon(((x6, y6), (x7, y7), (x8, y8), (x9, y9)), ((x10, y10), (x11, y11), (x12, y12))) | 3           | {'name': 'House C', 'type': 'residential'} |
 
-> [!NOTE]
+> [!NOTE]  
 > The buildings data is expected to be a Point, Polygon, or MultiPolygon geometry with a valid CRS. Ideally point geometries are preferred, however we added a function convert polygons or multi-polygons to points.  
 > The buildings data can include additional attributes that will be preserved during the preprocessing.  
 > To avoid issues with preprocessing, we recommend to project the data into a UTM-zone that matches the area of interest.  
