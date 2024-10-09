@@ -1,0 +1,38 @@
+.test_template: &test_template
+  stage: test
+  script:
+    - source activate pysewer
+    - pip install pytest
+    - pytest tests/
+  artifacts:
+    reports:
+      junit: test-results/test-report.xml
+
+test:ubuntu:
+  <<: *test_template
+  image: ubuntu:latest
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ['3.9', '3.10', '3.11']
+  variables:
+    PYTHON_VERSION: $PYTHON_VERSION
+
+test:windows:
+  <<: *test_template
+  tags:
+    - windows
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ['3.9', '3.10', '3.11']
+  variables:
+    PYTHON_VERSION: $PYTHON_VERSION
+
+test:macos:
+  <<: *test_template
+  tags:
+    - macos
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ['3.9', '3.10', '3.11']
+  variables:
+    PYTHON_VERSION: $PYTHON_VERSION

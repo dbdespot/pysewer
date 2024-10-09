@@ -10,44 +10,31 @@ cache:
     - .pip_cache
 
 stages:
+  - setup
+  - test
   - build
   - deploy
 
-before_script:
-  - apt-get update && apt-get install -y wget
-  - wget -q https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
-  - bash Miniforge3-Linux-x86_64.sh -b -p $HOME/miniforge3
-  - export PATH="$HOME/miniforge3/bin:$PATH"
-  - conda config --set always_yes yes --set changeps1 no
-  - conda create -n pysewer python=3.10.6
-  - source activate pysewer
-  - conda install -c conda-forge gdal fiona shapely
-  - conda install -c conda-forge make
-  - pip install --upgrade pip
-  - pip install sphinx sphinx-autobuild sphinx_rtd_theme pydata-sphinx-theme sphinx-codeautolink sphinx_design sphinx-favicon sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-mermaid ablog myst-parser matplotlib sphinx-copybutton
-  - pip install .
+include:
+  - local: 'ci/setup.yml'
+  - local: 'ci/test.yml'
+  - local: 'ci/build.yml'
+  - local: 'ci/deploy.yml'
 
-build:
-  stage: build
-  script:
-    - source activate pysewer
-    - cd docs
-    - make clean html
-    - make html
-    - cd ..
-    - mv docs/build/html public
-  artifacts:
-    paths:
-      - public
+# possible global configurations or jobs that can be added, see hifis course and gitlab ci documentation. 
 
-pages:
-  stage: deploy
-  dependencies:
-    - build
-  script:
-    - echo "Deploying to GitLab Pages..."
-  artifacts:
-    paths:
-      - public
-  only:
-    - main
+# For example, add a lint job:
+# lint:
+#   stage: test
+#   image: python:3.10
+#   script:
+#     - pip install flake8
+#     - flake8 .
+
+# Or a security scan job:
+# security_scan:
+#   stage: test
+#   image: python:3.10
+#   script:
+#     - pip install bandit
+#     - bandit -r .
