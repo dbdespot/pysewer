@@ -23,16 +23,27 @@ How Can I Contribute?
 
 ## Forking and Pull Requests
 
-- Fork the Repository: Only maintainers can commit directly to the main branch. All contributions must be made through pull requests from your own fork. Follow these steps to contribute:
+### Fork the Repository
+
+Only maintainers can commit directly to the main branch. All contributions must be made through pull requests from your own fork. Follow these steps to contribute:
+
   1. Fork the repository on GitHub.
   2. Create a new branch in your fork to isolate the changes.
   3. Submit a pull request (PR) from your fork’s branch to the main repository’s develop branch (or another designated branch). Please bear in mind that a PR should be submitted when feature or bug is fixed, the code is tested, documented etc and ready to be merged.
   4. Ensure your branch is up-to-date with the latest version of the develop branch before submitting.
-- Permissions and Main Branch: Only maintainers and trusted collaborators have direct commit rights to the main branch to ensure its stability.
-- Code Review: All PRs will undergo a code review process by the maintainers before being merged into the main repository.
-- Unit Tests: Add unit tests for any new or changed functionality to ensure that your code works as expected. (pytest is preferred)
-- No Breaking Changes: Please avoid introducing breaking changes unless absolutely necessary and discussed with the maintainers in advance.
-- Automated Testing: Ensure your contribution passes all existing automated tests before submitting a PR.
+
+> [!NOTE]  
+>
+> - Permissions and Main Branch: Only maintainers and trusted collaborators have direct commit rights to the main branch to ensure its stability.  
+> - Code Review: All PRs will undergo a code review process by the maintainers before being merged into the main repository.
+> - Unit Tests: Add unit tests for any new or changed functionality to ensure that your code works as expected. (pytest is preferred)
+> - No Breaking Changes: Please avoid introducing breaking changes unless absolutely necessary and discussed with the maintainers in advance.
+> - Automated Testing: Ensure your contribution passes all existing automated tests before submitting a PR.
+
+### Maintainers and Trusted Collaborators
+
+The main branch is protected to ensure the stability of pysewer. Only maintainers and trusted collaborators have direct write access. To become a trusted collaborator or maintainer, individuals must demonstrate a significant and consistent contribution to the project. Please note that adding maintainers/ collaborators is still under discussion as it extends to the organization admin and the legal framework that we need to follow.
+
 
 ## Styleguides
 
