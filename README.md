@@ -103,9 +103,9 @@ Please see the [documentation](https://despot.pages.ufz.de/pysewer) for more det
 
 The following input data is required:
 
-- A Digital Elevation Model (DEM)
-- Point Data on Building locations
-- Road Network Data
+- A Digital Elevation Model (DEM) (peferred file format: GeoTiff (.tif))
+- Point Data on Building locations (peferred file format: Shapefile, GeoPackage or GeoJSON (.shp/.gpkg/.geojson)). Geopandas GeoDataFrame objects is also supported.
+- Road Network Data (peferred file format: Shapefile, GeoPackage or GeoJSON (.shp/.gpkg/.geojson)). Geopandas GeoDataFrame objects is also supported.
 - Local daily water consumption (cubic meter per person)
 
 ### Road Network Data
@@ -127,7 +127,7 @@ The roads data is expected to be either LineString or MultiLineString geometries
 
 ### Building Data
 
-The buildings data can include Polygon, MultiPolygon, or Point geometries, where polygons will be converted to points (centroids). The GeoDataFrame should also have a valid CRS, which should match the CRS of the roads data.
+The buildings data can include Polygon, MultiPolygon, or Point geometries, where polygons will be converted to points (centroids). Ideally point geometries are preferred, however we added a function that converts polygons or multi-polygons to points. The GeoDataFrame should also have a valid CRS, which should match the CRS of the roads data.
 
 | Column Name      | Data Type                      | Description                                                                             |
 | ---------------- | ------------------------------ | --------------------------------------------------------------------------------------- |
@@ -144,9 +144,12 @@ The buildings data can include Polygon, MultiPolygon, or Point geometries, where
 | MultiPolygon(((x6, y6), (x7, y7), (x8, y8), (x9, y9)), ((x10, y10), (x11, y11), (x12, y12))) | 3           | {'name': 'House C', 'type': 'residential'} |
 
 > [!NOTE]  
-> The buildings data is expected to be a Point, Polygon, or MultiPolygon geometry with a valid CRS. Ideally point geometries are preferred, however we added a function convert polygons or multi-polygons to points.  
+> 
 > The buildings data can include additional attributes that will be preserved during the preprocessing.  
+> 
 > To avoid issues with preprocessing, we recommend to project the data into a UTM-zone that matches the area of interest.  
+> 
+> We also recommend removing all buildings and roads that are not within the area of interest. In addition it must be ensured that all geometries are valid and object_ids that are empty or have no geometry be removed.
 
 ### Preprocessing
 
