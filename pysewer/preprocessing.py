@@ -246,7 +246,7 @@ class Roads:
         Initializes a Roads object with road data from either a shapefile or a geopandas dataframe.
         Parameters
         ----------
-        input_data : str or geopandas.GeoDataFrame
+        input_data : str (path to shapefile) or geopandas.GeoDataFrame
             Path to shapefile or geopandas dataframe containing road data.
         """
         if isinstance(input_data, str):
