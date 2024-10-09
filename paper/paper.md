@@ -55,17 +55,22 @@ The generated networks can then be exported (i.e., as a geopackage or shapefile)
 
 Pysewer’s concept is built upon network science, where we combine algorithmic optimisation using graph theory with sewer network engineering design to generate a sewer network layout. In the desired layout, all buildings are connected to a wastewater treatment plant (WWTP) through a sewer network, which utilises the terrain to prioritise gravity flow in order to minimise the use of pressure sewers. Addressing the intricate challenge of generating sewer network layouts, particularly in data-scarce environments, is at the forefront of our objectives. Our approach, therefore, leans heavily towards utilising data that can be easily acquired for a specific area of interest. Thus, we deploy the following data as input to autonomously generate a sewer network, with a distinct prioritisation towards gravity flow.
 
-1. Digital Elevation Model (DEM) – to derive the elevation profile and understand topographic details such as the lowest point (sinks) within the area of interest.
-2. Existing road network data – Preferred vector data format in the form of `LineString` to map and utilise current infrastructure pathways.
-3. Building locations – defined by x, y coordinate points, these points represent service requirement locations and identify the connection to the network.
-4. Site-specific water consumption and population data – to plan/size hydraulic elements of the sewer network and estimate the sewage flow.  
-   The core functionalities of pysewer include transforming the minimal inputs into an initial network graph—the foundation for the ensuing design and optimisation process; the generation of a gravity flow-prioritised sewer network—identifying the most efficient network paths and positions of the pump and lift stations where required; and the visualisation and exporting of the generated network—allowing visual inspection of the sewer network attributes and export of the generated sewer network. \autoref{fig:fig1} provides a visual guide of the distinct yet interconnected modules within pysewer.
+1. Digital Elevation Model (DEM) – to derive the elevation profile and understand
+   topographic details such as the lowest point (sinks) within the area of interest.
+2. Existing road network data – Preferred vector data format in the form of
+   `LineString` to map and utilise current infrastructure pathways.
+3. Building locations – defined by x, y coordinate points, these points represent
+   service requirement locations and identify the connection to the network.
+4. Site-specific water consumption and population data – to plan/size hydraulic
+   elements of the sewer network and estimate the sewage flow.
+
+The core functionalities of pysewer include transforming the minimal inputs into an initial network graph—the foundation for the ensuing design and optimisation process; the generation of a gravity flow-prioritised sewer network—identifying the most efficient network paths and positions of the pump and lift stations where required; and the visualisation and exporting of the generated network—allowing visual inspection of the sewer network attributes and export of the generated sewer network. \autoref{fig:fig1} provides a visual guide of the distinct yet interconnected modules within pysewer.
 
 ![Pysewer's modular workflow\label{fig:fig1}](./media/figures/pysewer_module_new.png)
 
 ## Preprocessing and initial network generation
 
-In the preprocessing module, the roads, buildings and the DEM must all be projected in the same projection (CRS) and must be in the form of a geopandas [@kelsey_jordahl_2020_3946761] data frame or a shapefile. `Roads`, `Buildings` and `DEM` classes are used to transform the raw data formats into the required format (i.e., geopandas data frame) to create the initial graph network (networkx, [@SciPyProceedings_11]), where nodes represent crucial points such as junctions or buildings and edges to simulate potential sewer lines. The following measures ensure that the initial layout aligns with the road network and that there is serviceability to all buildings within the area of interest:
+In the preprocessing module, the roads, buildings and the DEM must all be projected in the same projection (CRS). The road and building data input must be in the form of either a geopandas [@kelsey_jordahl_2020_3946761] `GeoDataFrame` or a `str`  which specifies the path to a file with vector formats such shapefile (`.shp`), geojson (`.geojson`) or geopackage (`.gpkg`). As for the `DEM`, the preferred format is a geotiff (`.tif`). `Roads`, `Buildings` and `DEM` classes are used to transform the raw data formats into the required format (i.e., geopandas data frame) to create the initial graph network (networkx, [@SciPyProceedings_11]), where nodes represent crucial points such as junctions or buildings and edges to simulate potential sewer lines. The following measures ensure that the initial layout aligns with the road network and that there is serviceability to all buildings within the area of interest:
 
 - “connecting” buildings to the street network using the connect buildings method. This method adds nodes to the graph to connect the buildings in the network using the building points.
 - Creation of “virtual roads”. Buildings which are not directly connected to the road network are connected by finding the closest edge to the building, which is then marked as the closest edge. The nodes are then disconnected from the edges and are added to the initial connection graph network.
