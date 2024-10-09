@@ -25,7 +25,7 @@ How Can I Contribute?
 
 ### Fork the Repository
 
-Only maintainers can commit directly to the main branch. All contributions must be made through pull requests from your own fork. Follow these steps to contribute:
+Only maintainers can commit directly to the main branch. All contributions must be made through pull requests from your own fork. Please follow these steps to contribute:
 
   1. Fork the repository on GitHub.
   2. Create a new branch in your fork to isolate the changes.
