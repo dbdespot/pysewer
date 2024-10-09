@@ -4,6 +4,7 @@
 import datetime
 import logging
 from logging.handlers import RotatingFileHandler
+import os
 
 import pytest
 
@@ -18,6 +19,9 @@ def configure_logging():
     # get the the current timestamp to create a unique file for this run
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     log_filename = f"logs/test_logs_{timestamp}.log"
+
+    # Create the logs directory if it doesn't exist
+    os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 
     # create a rotating file handler
     log_handler = RotatingFileHandler(
