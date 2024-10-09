@@ -6,50 +6,45 @@ The following is a set of guidelines for contributing to pysewer and its reposit
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [pysewer Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [your email].
+This project and everyone participating in it is governed by the pysewer Code of Conduct. By participating, you are expected to uphold this code. Please report unacceptable behavior to [your email].
 
-## How Can I Contribute?
+How Can I Contribute?
 
-### Reporting Bugs
+## Reporting Bugs
 
-- **Ensure the bug was not already reported** by searching on GitHub under [Issues](https://github.com/dbdespot/pysewer/issues).
-  
-- If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/dbdespot/pysewer/issues/new). Be sure to include a **title and clear description**, as much relevant information as possible, and a **code sample** or an **executable test case** demonstrating the expected behavior that is not occurring.
+- Ensure the bug was not already reported by searching on GitHub under Issues.
+- If you’re unable to find an open issue addressing the problem, open a new one. Be sure to include a title and clear description, as much relevant information as possible, and a code sample or an executable test case demonstrating the expected behavior that is not occurring.
 
-### Suggesting Enhancements
+## Suggesting Enhancements
 
-- **Determine [which repository the enhancement should be suggested in](hhttps://github.com/dbdespot/pysewer/tree/main)**.
-  
-- **Perform a cursory search** to see if the enhancement has already been suggested. If it has, add to the discussion.
+- Determine which repository the enhancement should be suggested in.
+- Perform a cursory search to see if the enhancement has already been suggested. If it has, add to the discussion.
+- When you are creating an enhancement suggestion, please include as many details as possible.
 
-- When you are creating an enhancement suggestion, please **include as many details as possible**.
+## Forking and Pull Requests
 
-### Pull Requests
-
-- Ensure any install or build dependencies are removed before the end of the layer when doing a build.
-
-- Add unit tests for any new or changed functionality.
-
-- Ensure the PR description clearly describes the problem and solution. Include the relevant issue number if applicable.
-
-- **Do not introduce breaking changes** unless they are necessary and discussed with the team.
+- Fork the Repository: Only maintainers can commit directly to the main branch. All contributions must be made through pull requests from your own fork. Follow these steps to contribute:
+  1. Fork the repository on GitHub.
+  2. Create a new branch in your fork to isolate the changes.
+  3. Submit a pull request (PR) from your fork’s branch to the main repository’s develop branch (or another designated branch). Please bear in mind that a PR should be submitted when feature or bug is fixed, the code is tested, documented etc and ready to be merged.
+  4. Ensure your branch is up-to-date with the latest version of the develop branch before submitting.
+- Permissions and Main Branch: Only maintainers and trusted collaborators have direct commit rights to the main branch to ensure its stability.
+- Code Review: All PRs will undergo a code review process by the maintainers before being merged into the main repository.
+- Unit Tests: Add unit tests for any new or changed functionality to ensure that your code works as expected. (pytest is preferred)
+- No Breaking Changes: Please avoid introducing breaking changes unless absolutely necessary and discussed with the maintainers in advance.
+- Automated Testing: Ensure your contribution passes all existing automated tests before submitting a PR.
 
 ## Styleguides
 
 ### Git Commit Messages
 
-- Use the present tense ("Add feature" not "Added feature").
-  
-- Use the imperative mood ("Move cursor to..." not "Moves cursor to...").
-
+- Use the present tense (“Add feature” not “Added feature”).
 - Limit the first line to 72 characters or fewer.
 
 ### GitHub Pull Requests and Issues
 
 - Use a clear and descriptive title for the issue to identify the suggestion.
-
 - Provide a comprehensive description of the suggested enhancement in as much detail as possible.
-
 - Provide specific examples to demonstrate the steps.
 
 ## Additional Notes
@@ -58,14 +53,18 @@ This project and everyone participating in it is governed by the [pysewer Code o
 
 This section lists the labels we use to help us track and manage issues and pull requests.
 
-- **bug** - Issues that are bugs.
+- bug - Issues that are bugs.
+- enhancement - Issues that are feature requests.
+- discussion - Issues that are discussions.
+- help wanted - Issues that require assistance.
 
-- **enhancement** - Issues that are feature requests.
+## Acknowledgements
 
-- **discussion** - Issues that are discussions.
+As this contributing guidelines have been adapted from a couple of open source reposguidelines, we would like to acknowledge the original authors for their contributions.
 
-- **help wanted** - Issues that require assistance.
+### References
 
-### Acknowledgements
-
-- Mention if your contributing guidelines have been adapted from another project.
+- [Open Source Guides](https://opensource.guide/)
+- [Contributing to Open Source](https://opensource.com/article/19/7/how-to-contribute-to-open-source)
+- [GitHub Docs](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/adding-a-code-of-conduct-to-your-project)
+- [scipy contributing](https://github.com/scipy/scipy/blob/a06de4e129fbd45e3367f1f86d84ce7ef580da93/CONTRIBUTING.rst)
