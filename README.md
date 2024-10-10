@@ -11,9 +11,12 @@ SPDX-License-Identifier: GPL-3.0-only -->
     - [Step 2: Create the conda environment](#step-2-create-the-conda-environment)
     - [Step 3: Install pysewer via pip](#step-3-install-pysewer-via-pip)
   - [Input Data and data representation](#input-data-and-data-representation)
+    - [Input data requirements](#input-data-requirements)
     - [Road Network Data](#road-network-data)
     - [Building Data](#building-data)
     - [Preprocessing](#preprocessing)
+    - [Input data preprocessing recommendations](#input-data-preprocessing-recommendations)
+    - [Preprocessing of the initial graph](#preprocessing-of-the-initial-graph)
     - [Graph Attributes](#graph-attributes)
   - [Routing Solver](#routing-solver)
   - [Plotting](#plotting)
@@ -101,6 +104,8 @@ Please see the [documentation](https://despot.pages.ufz.de/pysewer) for more det
 
 ## Input Data and data representation
 
+### Input data requirements
+
 The following input data is required:
 
 - A Digital Elevation Model (DEM) (peferred file format: GeoTiff (.tif))
@@ -152,6 +157,15 @@ The buildings data can include Polygon, MultiPolygon, or Point geometries, where
 > We also recommend removing all buildings and roads that are not within the area of interest. In addition it must be ensured that all geometries are valid and object_ids that are empty or have no geometry be removed.
 
 ### Preprocessing
+
+### Input data preprocessing recommendations
+
+- Ensure that the roads and buildings data are clipped to the area of interest, i.e. the settlement area.
+- Ensure that the DEM covers the area of interest. For example, if the planned WWTP is located outside of the city, then this area must be included in the DEM.
+- The DEM must be free of no-data values, i.e., all the DEM should be inspected and undergo quality check before being used.
+- Ensure that all additional sinks are within the bounds of the DEM
+
+### Preprocessing of the initial graph
 
 The main objective of sewer layout generation is to connect all buildings to a waste water treatment plant (WWTP) while keeping system cost low. The initial graph represents all potential sewer lines in our model domain.
 
