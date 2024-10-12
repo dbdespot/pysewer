@@ -88,23 +88,54 @@ def rsph_tree(
     nx.DiGraph
         The directed routed steiner tree that connects all terminal nodes to the sink using the repeated shortest path heuristic.
     """
+    # Create a new DiGraph with the same nodes and attributes as connection_graph
     sewer_graph = nx.DiGraph(nx.create_empty_copy(connection_graph))
     terminals = get_node_keys(connection_graph, field="node_type", value=from_type)
     terminals = [n for n in terminals if n not in skip_nodes]
-    subgraph_nodes = sinks
+    subgraph_nodes = list(set(sinks))  # Remove duplicates
 
-    # sageguard against sinks not being in the connection graph
+    # Print number of weakly connected components
+    wcc = list(nx.weakly_connected_components(connection_graph))
+    print(f"Number of weakly connected components: {len(wcc)}")
+
+    # TODO: add virtual path, adressing the issue of multiple components in the graph slows down the computation, especially for larger networks. need to be tested
+    # If there are multiple components, try to connect them
+    # if len(wcc) > 1:
+    #     print("Attempting to connect components...")
+    #     for i in range(len(wcc) - 1):
+    #         source = next(iter(wcc[i]))
+    #         target = next(iter(wcc[i+1]))
+    #         try:
+    #             path = nx.shortest_path(connection_graph, source, target)
+    #             nx.add_path(sewer_graph, path)
+    #             print(f"Connected component {i} to {i+1}")
+    #         except nx.NetworkXNoPath:
+    #             print(f"No path found between components {i} and {i+1}.")
+    # print(f"No path found between components {i} and {i+1}. Adding virtual path.")
+    # add_virtual_path(sewer_graph, source, target)
+
+    # Safeguard against sinks not being in the connection graph
     for sink in sinks:
         if sink not in connection_graph.nodes:
             raise ValueError(f"Sink {sink} not found in the connection graph.")
 
     # Handling single sink case
     if len(subgraph_nodes) == 1:
-        subgraph_nodes = sinks + sinks
+        subgraph_nodes = subgraph_nodes * 2
+
+    # Ensure the graph is weakly connected
+    if not nx.is_weakly_connected(connection_graph):
+        largest_wcc = max(nx.weakly_connected_components(connection_graph), key=len)
+        connection_graph = connection_graph.subgraph(largest_wcc).copy()
+        terminals = [t for t in terminals if t in largest_wcc]
+        subgraph_nodes = [s for s in subgraph_nodes if s in largest_wcc]
+
     all_paths = dict(nx.all_pairs_dijkstra_path(connection_graph))
     all_lengths = dict(nx.all_pairs_dijkstra_path_length(connection_graph))
 
-    while len(terminals) > 0:
+    print(f"Number of terminals (buildings) to process: {len(terminals)}")
+
+    while terminals:
         try:
             path = find_rsph_path(
                 connection_graph, subgraph_nodes, terminals, all_paths, all_lengths
@@ -113,7 +144,7 @@ def rsph_tree(
             print(f"Error finding path: {e}")
             break  # exit the loop if no viable terminal is found
 
-        # add edges of path to sewer graph while keeping edge attributes
+        # Add edges of path to sewer graph while keeping edge attributes
         nx.add_path(sewer_graph, path)
 
         edgesinpath = zip(path[:-1], path[1:])
@@ -126,8 +157,12 @@ def rsph_tree(
                     )[0]
                 },
             )
-        subgraph_nodes = subgraph_nodes + path[1:-1]
+        subgraph_nodes.extend(path[1:-1])
+        subgraph_nodes = list(set(subgraph_nodes))  # Remove duplicates
         terminals.remove(path[0])
+
+    print(f"Number of nodes in final sewer graph: {sewer_graph.number_of_nodes()}")
+    print(f"Number of edges in final sewer graph: {sewer_graph.number_of_edges()}")
 
     return sewer_graph
 
@@ -139,52 +174,38 @@ def find_rsph_path(
     all_paths: dict,
     all_lengths: dict,
 ) -> List[NodeType]:
-    """
-    Identifies the closest terminal node to the growing tree and returns the connection path.
-
-    Parameters
-    ----------
-    connection_graph : nx.Graph
-        The graph representing the entire network.
-    subgraph_nodes : List[NodeType]
-        The nodes in the subgraph being grown.
-    terminals : List[NodeType]
-        The terminal nodes in the network.
-    all_paths : dict
-        A dictionary containing all the shortest paths between terminal nodes.
-    all_lengths : dict
-        A dictionary containing the lengths of all the shortest paths between terminal nodes.
-
-    Returns
-    -------
-    List[NodeType]
-        The shortest path between the closest terminal node and the growing subgraph.
-
-    Raises
-    ------
-    ValueError
-        If there is no recorded path from the closest terminal node to the growing subgraph in the all_paths dictionary.
-    """
     terminal_distances = []
     closest_tree_node = []
     for terminal in terminals:
-        # check if there is a recorded distance between the terminal and nodes in the subgraph
         missing_nodes = [
             node for node in subgraph_nodes if node not in all_lengths[terminal]
         ]
         if missing_nodes:
             print(f"Terminal {terminal} missing distances to nodes: {missing_nodes}.")
             continue
-        # if any(node not in all_lengths[terminal] for node in subgraph_nodes):
-        #     continue  # Skip this terminal as it doesn't have distances to all subgraph_nodes
-        # get distances from the terminal node to all nodes in the subgraph
-        distances = [all_lengths[terminal][node] for node in subgraph_nodes]
+
+        distances = [
+            all_lengths[terminal][node]
+            for node in subgraph_nodes
+            if node in all_lengths[terminal]
+        ]
+        if not distances:
+            continue  # Skip this terminal if no valid distances are found
+
         min_dist = min(distances)
-        tree_node = subgraph_nodes[distances.index(min_dist)]
+        tree_node = subgraph_nodes[
+            subgraph_nodes.index(
+                next(
+                    node
+                    for node in subgraph_nodes
+                    if node in all_lengths[terminal]
+                    and all_lengths[terminal][node] == min_dist
+                )
+            )
+        ]
         terminal_distances.append(min_dist)
         closest_tree_node.append(tree_node)
 
-    # safe guard if no terminal distances are found
     if not terminal_distances:
         raise ValueError(
             f"No viable terminal found to connect to the subgraph nodes: {subgraph_nodes}."
@@ -199,3 +220,13 @@ def find_rsph_path(
             f"No recorded path from {closest_terminal} to {tree_node} in the all_paths dictionary."
         )
     return all_paths[closest_terminal][tree_node]
+
+
+# def add_virtual_path(graph: nx.DiGraph, source: Tuple, target: Tuple) -> None:
+#     """
+#     Adds a virtual path between two nodes in the graph.
+#     """
+#     midpoint = ((source[0] + target[0]) / 2, (source[1] + target[1]) / 2)
+#     graph.add_edge(source, midpoint, virtual=True, weight=1000)  # High weight for virtual edges
+#     graph.add_edge(midpoint, target, virtual=True, weight=1000)
+#     print(f"Added virtual path between {source} and {target}")
