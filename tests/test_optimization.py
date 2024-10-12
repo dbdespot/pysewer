@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
 # SPDX-License-Identifier: GPL-3.0-only
 
+from pathlib import Path
+
 import networkx as nx
 import pytest
 from shapely.geometry import LineString, Point
@@ -10,16 +12,18 @@ import pysewer
 
 class TestOptimization:
     @pytest.fixture(autouse=True)
-    def setUp(self):
+    def setup(self):
         self.sink_coordinates = (691350, 2553250)
-        dem = "./tests/test_data/dem.tif"
-        buildings = "./tests/test_data/buildings_clipped.shp"
-        roads = "./tests/test_data/roads_clipped.shp"
+        dem = Path("tests") / "test_data" / "dem.tif"
+        buildings = Path("tests") / "test_data" / "buildings_clipped.shp"
+        roads = Path("tests") / "test_data" / "roads_clipped.shp"
         self.model_domain = pysewer.ModelDomain(dem, roads, buildings)
         self.model_domain.add_sink(self.sink_coordinates)
         self.connection_graph = self.model_domain.generate_connection_graph()
         self.layout = pysewer.rsph_tree(self.connection_graph, [self.sink_coordinates])
-        self.layout_fast_rsph = pysewer.rsph_tree_fast(self.connection_graph, [self.sink_coordinates])
+        self.layout_fast_rsph = pysewer.rsph_tree_fast(
+            self.connection_graph, [self.sink_coordinates]
+        )
         self.sewer_graph = pysewer.estimate_peakflow(
             self.layout, inhabitants_dwelling=6, daily_wastewater_person=250
         )

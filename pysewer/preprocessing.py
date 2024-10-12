@@ -4,6 +4,7 @@
 import warnings
 from dataclasses import dataclass, field
 from typing import Hashable, List, Optional, Union
+from pathlib import Path
 
 import geopandas as gpd
 import networkx as nx
@@ -11,7 +12,7 @@ import numpy as np
 import rasterio as rio
 import shapely
 from pyproj.crs import CRS
-from shapely.geometry import LineString, MultiLineString, Point, Polygon, MultiPolygon
+from shapely.geometry import LineString, MultiLineString, MultiPolygon, Point, Polygon
 from shapely.ops import linemerge, nearest_points
 from sklearn.cluster import AgglomerativeClustering
 
@@ -73,16 +74,28 @@ class DEM:
         if self.file_path:
             self.raster = rio.open(self.file_path)
             self.no_dem = False
-            self.remove_nodata(fill_value=0)  # Call remove_nodata with a default fill_value
+            # check and remove nodata values in the dem if present
+            nodata_removed = self.remove_nodata(fill_value=0)
+            if nodata_removed:
+                print(
+                    "Warning: The DEM has been filled to remove nodata values. This alters the original DEM."
+                )
+            else:
+                print("No nodata values found in the DEM.")
 
     def remove_nodata(self, fill_value: float = 0):
         """
-        Removes or replaces nodata values in the DEM raster.
+        Removes or replaces nodata values in the DEM raster if present.
 
         Parameters
         ----------
         fill_value : float, optional
             The value to replace nodata values with. Default is 0.
+
+        Returns
+        -------
+        bool
+            True if nodata values were removed, False otherwise.
 
         Raises
         ------
@@ -96,7 +109,7 @@ class DEM:
             data = src.read(1)
             nodata = src.nodata
 
-            if nodata is not None:
+            if nodata is not None and np.any(data == nodata):
                 data[data == nodata] = fill_value
 
                 kwargs = src.meta.copy()
@@ -109,8 +122,11 @@ class DEM:
                 with rio.open(self.file_path, "w", **kwargs) as dst:
                     dst.write(data, 1)
 
-        # Reload the raster
-        self.raster = rio.open(self.file_path)
+                # Reload the raster
+                self.raster = rio.open(self.file_path)
+                return True
+
+        return False
 
     def get_elevation(self, point: shapely.geometry.Point):
         """
@@ -133,7 +149,7 @@ class DEM:
         """
         if self.no_dem:
             return 0
-        
+
         elevation = list(self.raster.sample([(point.x, point.y)]))[0][0]
         elevation = round(float(elevation), 2)
         if elevation == self.raster.nodata:
@@ -241,22 +257,24 @@ class Roads:
         Initializes a Roads object with road data from either a shapefile or a geopandas dataframe.
     """
 
-    def __init__(self, input_data: Union[str, gpd.GeoDataFrame]):
+    def __init__(self, input_data: Union[str, Path, gpd.GeoDataFrame]):
         """
         Initializes a Roads object with road data from either a shapefile or a geopandas dataframe.
         Parameters
         ----------
-        input_data : str (path to shapefile) or geopandas.GeoDataFrame
+        input_data : str, Path, or geopandas.GeoDataFrame
             Path to shapefile or geopandas dataframe containing road data.
         """
-        if isinstance(input_data, str):
+        if isinstance(input_data, (str, Path)):
             self.gdf = gpd.read_file(input_data)
-        else:
+        elif isinstance(input_data, gpd.GeoDataFrame):
             self.gdf = input_data
-        
+        else:
+            raise TypeError("input_data must be a string, Path, or GeoDataFrame")
+
         # Remove rows with None geometries
-        self.gdf = self.gdf.dropna(subset=['geometry'])
-        
+        self.gdf = self.gdf.dropna(subset=["geometry"])
+
         # Remove third dimension and handle potential errors
         def safe_remove_third_dimension(geom):
             try:
@@ -264,12 +282,12 @@ class Roads:
             except Exception as e:
                 print(f"Error processing geometry: {e}")
                 return None
-        
+
         self.gdf["geometry"] = self.gdf["geometry"].apply(safe_remove_third_dimension)
-        
+
         # Remove any rows where geometry became None after processing
-        self.gdf = self.gdf.dropna(subset=['geometry'])
-        
+        self.gdf = self.gdf.dropna(subset=["geometry"])
+
         self.merged_roads = self.gdf.unary_union
 
     def get_nearest_point(self, point):
@@ -352,16 +370,18 @@ class Buildings:
 
     """
 
-    def __init__(self, input_data: Union[str, gpd.GeoDataFrame], roads_obj: Roads):
+    def __init__(self, input_data: Union[str, Path, gpd.GeoDataFrame], roads_obj: Roads):
         """
         Initialize a Buildings object with building data from either a shapefile or a geopandas dataframe.
         """
         # Digest and clean input Data
-        # Allow input to be either path to shp file or gdf
-        if type(input_data) == str:
+        # Allow input to be either path to shp file, Path object, or gdf
+        if isinstance(input_data, (str, Path)):
             self.gdf = gpd.read_file(input_data)
-        else:
+        elif isinstance(input_data, gpd.GeoDataFrame):
             self.gdf = input_data
+        else:
+            raise TypeError("input_data must be a string, Path, or GeoDataFrame")
 
         # drop any rows with missing geometry data
         self.gdf = self.gdf.dropna(subset=["geometry"])
@@ -374,7 +394,7 @@ class Buildings:
 
         # remove the third dimension from the geometry if present
         self.gdf["geometry"] = [remove_third_dimension(g) for g in self.gdf["geometry"]]
-        
+
         # Convert to Point if Shapefile has MultiPoint Data
         if "MultiPoint" in self.gdf.geometry.type.unique():
             convert = lambda MultiP: (
@@ -389,7 +409,7 @@ class Buildings:
 
         # flatten the list of points into individual rows
         self.gdf = self.gdf.explode("geometry").reset_index(drop=True)
-        
+
         # Ensure that the GeoDataFrame is valid, the geometry column is set and reassign the crs
         if "geometry" in self.gdf.columns and not self.gdf.empty:
             self.gdf = gpd.GeoDataFrame(self.gdf, geometry="geometry", crs=original_crs)
@@ -430,7 +450,6 @@ class Buildings:
     def set_crs(self, epsg: int):
         self.gdf.crs = CRS.from_epsg(epsg)
 
-
     # add method to convert the polygons or multipolygons to points
     @staticmethod
     def convert_to_points(geometry):
@@ -438,9 +457,17 @@ class Buildings:
         Converts the building polygons or multipolygons to points.
         """
         if isinstance(geometry, MultiPolygon):
-            points = [polygon.centroid for polygon in geometry.geoms if polygon.is_valid and not polygon.is_empty]
+            points = [
+                polygon.centroid
+                for polygon in geometry.geoms
+                if polygon.is_valid and not polygon.is_empty
+            ]
         elif isinstance(geometry, Polygon):
-            points = [geometry.centroid] if geometry.is_valid and not geometry.is_empty else []
+            points = (
+                [geometry.centroid]
+                if geometry.is_valid and not geometry.is_empty
+                else []
+            )
         elif isinstance(geometry, Point):
             points = [geometry]
         else:
@@ -606,8 +633,8 @@ class ModelDomain:
         nx.set_node_attributes(self.connection_graph, True, "road_network")
         nx.set_node_attributes(self.connection_graph, "", "node_type")
 
-        # check connectivity of G
-        self.sewer_graph = nx.DiGraph()
+        # initialize the sewer graph
+        self.sewer_graph = nx.DiGraph(self.connection_graph)
 
         # connect buildings
         if connect_buildings:
@@ -629,9 +656,15 @@ class ModelDomain:
         G_unsimplified = nx.Graph()
 
         # validate the the geometry column, so that it contains only Linestring or MultiLineString geometries
-        if not roads_gdf["geometry"].apply(lambda geom: isinstance(geom, (LineString, MultiLineString))).all():
-            raise ValueError("Invalid geometry type. Only LineString or MultiLineString geometries are allowed.")
-    
+        if (
+            not roads_gdf["geometry"]
+            .apply(lambda geom: isinstance(geom, (LineString, MultiLineString)))
+            .all()
+        ):
+            raise ValueError(
+                "Invalid geometry type. Only LineString or MultiLineString geometries are allowed."
+            )
+
         # iterate over each row in the GeoDataFrame
         for index, row in roads_gdf.iterrows():
             geometry = row["geometry"]
@@ -641,7 +674,7 @@ class ModelDomain:
 
             # Handle MultiLineString geometries
             if isinstance(geometry, MultiLineString):
-                # iterate over each LineString in the lines list 
+                # iterate over each LineString in the lines list
                 for line in geometry.geoms:
                     for i in range(len(line.coords) - 1):
                         start_point = line.coords[i]
@@ -652,7 +685,10 @@ class ModelDomain:
 
                         # Add edge to the graph, include the segment geometry
                         G_unsimplified.add_edge(
-                            start_point, end_point, geometry=segment_geometry, **road_attrs
+                            start_point,
+                            end_point,
+                            geometry=segment_geometry,
+                            **road_attrs,
                         )
             else:  # Single LineString geometry
                 for i in range(len(geometry.coords) - 1):
@@ -703,9 +739,15 @@ class ModelDomain:
         building_gdf = self.buildings.get_gdf()
 
         # validate the the geometry column, so that it contains only Point geometries
-        if not building_gdf["geometry"].apply(lambda geom: isinstance(geom, Point)).all():
-            raise ValueError("Invalid geometry type. Only Point geometries are allowed.")
-        
+        if (
+            not building_gdf["geometry"]
+            .apply(lambda geom: isinstance(geom, Point))
+            .all()
+        ):
+            raise ValueError(
+                "Invalid geometry type. Only Point geometries are allowed."
+            )
+
         building_points = [
             geom for geom in building_gdf.geometry if is_valid_geometry(geom)
         ]
@@ -1034,10 +1076,13 @@ class ModelDomain:
             # check if either gdf is empty or contains invalid values
             # check if either gdf is empty or contains invalid values
             if (
-                sg_gdf.is_empty
-                or G_without_sg_gdf.is_empty
-                or sg_gdf.isna().any() if hasattr(sg_gdf, 'isna') else False
-                or G_without_sg_gdf.isna().any() if hasattr(G_without_sg_gdf, 'isna') else False
+                sg_gdf.is_empty or G_without_sg_gdf.is_empty or sg_gdf.isna().any()
+                if hasattr(sg_gdf, "isna")
+                else (
+                    False or G_without_sg_gdf.isna().any()
+                    if hasattr(G_without_sg_gdf, "isna")
+                    else False
+                )
             ):
                 warnings.warn(
                     "Skipped an iteration: Empty or invalid subgraph detected...Skipping this connection."

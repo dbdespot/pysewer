@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
 # SPDX-License-Identifier: GPL-3.0-only
+from pathlib import Path
 
 import networkx as nx
 
@@ -12,7 +13,7 @@ import pysewer
 
 @pytest.fixture
 def dem_data():
-    dem = pysewer.DEM("tests/test_data/dem.tif")
+    dem = pysewer.DEM(Path("tests") / "test_data" / "dem.tif")
     point1 = Point(691410, 2553010)
     profile1 = LineString([(691510, 2552770), (691510, 2552780), (691510, 2552785)])
     profileOOB = LineString([(691410, 2553010), (1091410, 2553010)])
@@ -53,28 +54,30 @@ def test_get_profile(dem_data):
 
 
 def test_get_crs_dem():
-    dem = pysewer.DEM("tests/test_data/dem.tif")
+    dem = pysewer.DEM(Path("tests") / "test_data" / "dem.tif")
     assert dem.get_crs.to_authority() == ("EPSG", "32640")
 
 
 @pytest.fixture
 def buildings():
-    roads = pysewer.Roads("./tests/test_data/roads_clipped.shp")
-    return pysewer.Buildings("./tests/test_data/buildings_clipped.shp", roads_obj=roads)
+    roads = pysewer.Roads(Path("tests") / "test_data" / "roads_clipped.shp")
+    return pysewer.Buildings(
+        Path("tests") / "test_data" / "buildings_clipped.shp", roads_obj=roads
+    )
 
 
 @pytest.fixture
 def roads():
-    return pysewer.Roads("./tests/test_data/roads_clipped.shp")
+    return pysewer.Roads(Path("tests") / "test_data" / "roads_clipped.shp")
 
 
 # for testing the connection graph
 @pytest.fixture
 def connection_graph():
     sink_coordinates = [(691350, 2553250)]
-    dem = "./tests/test_data/dem.tif"
-    buildings = "./tests/test_data/buildings_clipped.shp"
-    roads = "./tests/test_data/roads_clipped.shp"
+    dem = Path("tests") / "test_data" / "dem.tif"
+    buildings = Path("tests") / "test_data" / "buildings_clipped.shp"
+    roads = Path("tests") / "test_data" / "roads_clipped.shp"
     model_domain = pysewer.ModelDomain(dem, roads, buildings)
     model_domain.add_sink(sink_coordinates)
     connection_graph = model_domain.generate_connection_graph()
@@ -165,9 +168,9 @@ def test_pump_penalty(connection_graph):
 
     # set pump penalty to 1
     model_domain = pysewer.ModelDomain(
-        "./tests/test_data/dem.tif",
-        "./tests/test_data/roads_clipped.shp",
-        "./tests/test_data/buildings_clipped.shp",
+        Path("tests") / "test_data" / "dem.tif",
+        Path("tests") / "test_data" / "roads_clipped.shp",
+        Path("tests") / "test_data" / "buildings_clipped.shp",
     )
     model_domain.add_sink([(691350, 2553250)])
     model_domain.set_pump_penalty(1)
