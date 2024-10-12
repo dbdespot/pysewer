@@ -3,8 +3,8 @@
 
 import warnings
 from dataclasses import dataclass, field
-from typing import Hashable, List, Optional, Union
 from pathlib import Path
+from typing import Hashable, List, Optional, Union
 
 import geopandas as gpd
 import networkx as nx
@@ -370,7 +370,9 @@ class Buildings:
 
     """
 
-    def __init__(self, input_data: Union[str, Path, gpd.GeoDataFrame], roads_obj: Roads):
+    def __init__(
+        self, input_data: Union[str, Path, gpd.GeoDataFrame], roads_obj: Roads
+    ):
         """
         Initialize a Buildings object with building data from either a shapefile or a geopandas dataframe.
         """
@@ -1025,7 +1027,22 @@ class ModelDomain:
             pass
 
     def get_sinks(self):
-        """Returns a list of node keys for all wastewater treatment plants (wwtp) in the connection graph."""
+        """
+        Get a list of node keys for all wastewater treatment plants (wwtp) in the connection graph.
+
+        Returns
+        -------
+        list
+            A list of node keys representing wastewater treatment plants in the connection graph.
+
+        Notes
+        -----
+        This method uses the `get_node_keys` function to retrieve nodes that are
+        identified as wastewater treatment plants based on the configuration settings.
+
+        The field and value used for identifying sinks are obtained from
+        the DEFAULT_CONFIG.preprocessing settings.
+        """
         return get_node_keys(
             self.connection_graph,
             field=DEFAULT_CONFIG.preprocessing.field_get_sinks,
@@ -1046,7 +1063,22 @@ class ModelDomain:
         self.pump_penalty = pp
 
     def get_buildings(self):
-        """Returns a list of node keys for all buildings in the connection graph."""
+        """
+        Get a list of node keys for all buildings in the connection graph.
+
+        Returns
+        -------
+        list
+            A list of node keys representing buildings in the connection graph.
+
+        Notes
+        -----
+        This method uses the `get_node_keys` function to retrieve nodes that are
+        identified as buildings based on the configuration settings.
+
+        The field and value used for identifying buildings are obtained from
+        the DEFAULT_CONFIG.preprocessing settings.
+        """
         return get_node_keys(
             self.connection_graph,
             field=DEFAULT_CONFIG.preprocessing.field_get_buildings,
@@ -1054,49 +1086,57 @@ class ModelDomain:
         )
 
     def connect_subgraphs(self):
-        """Identifies unconnected street subnetworks and connects them based on shortest distance"""
-        G = self.connection_graph
-        sub_graphs = list((G.subgraph(c).copy() for c in nx.connected_components(G)))
+        """
+        Identifies unconnected street subnetworks and connects them based on shortest distance.
+
+        This method iteratively connects disconnected components of the street network
+        by finding the closest pair of nodes between subgraphs and adding an edge between them.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This method modifies the `connection_graph` attribute of the class instance.
+        It prints progress messages and the final number of connected components.
+
+        Raises
+        ------
+        ValueError
+            If there's an error while connecting subgraphs, the error is printed
+            and the method continues with the next iteration.
+        """
+        sub_graphs = list(nx.connected_components(self.connection_graph))
         while len(sub_graphs) > 1:
             # select one subgraph
             sg = sub_graphs.pop()
-            G_without_sg = sub_graphs.pop()
+            G_without_sg = set()
 
             while len(sub_graphs) > 0:
-                G_without_sg = nx.compose(G_without_sg, sub_graphs.pop())
+                G_without_sg.update(sub_graphs.pop())
 
-            # get shortest edge between sg and G_withouto_sg:
-            sg_gdf = get_node_gdf(sg).unary_union
-            G_without_sg_gdf = get_node_gdf(G_without_sg).unary_union
-
-            # # validate the sd_gdf and G_without_sg_gdf are geodataframes
-            # if not isinstance(sg_gdf, gpd.GeoDataFrame) or not isinstance(G_without_sg_gdf, gpd.GeoDataFrame):
-            #     raise ValueError("Invalid data type. Expected GeoDataFrame.")
-
-            # check if either gdf is empty or contains invalid values
-            # check if either gdf is empty or contains invalid values
-            if (
-                sg_gdf.is_empty or G_without_sg_gdf.is_empty or sg_gdf.isna().any()
-                if hasattr(sg_gdf, "isna")
-                else (
-                    False or G_without_sg_gdf.isna().any()
-                    if hasattr(G_without_sg_gdf, "isna")
-                    else False
+            try:
+                # Find the closest pair of nodes between sg and G_without_sg
+                closest_pair = min(
+                    ((n1, n2) for n1 in sg for n2 in G_without_sg),
+                    key=lambda pair: Point(pair[0]).distance(Point(pair[1])),
                 )
-            ):
-                warnings.warn(
-                    "Skipped an iteration: Empty or invalid subgraph detected...Skipping this connection."
-                )
+
+                # Add edge between the closest nodes
+                self.connection_graph.add_edge(*closest_pair, road_network=True)
+
+            except ValueError as e:
+                print(f"Error connecting subgraphs: {str(e)}")
                 continue
-            connection_points = nearest_points(sg_gdf, G_without_sg_gdf)
 
-            # add edge
-            G.add_edge(
-                (connection_points[0].x, connection_points[0].y),
-                (connection_points[1].x, connection_points[1].y),
-                road_network=True,
-            )
             # get updated subgraph list
-            sub_graphs = list(
-                (G.subgraph(c).copy() for c in nx.connected_components(G))
-            )
+            sub_graphs = list(nx.connected_components(self.connection_graph))
+
+        print(
+            f"Number of connected components after connecting subgraphs: {nx.number_connected_components(self.connection_graph)}"
+        )

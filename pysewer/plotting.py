@@ -62,6 +62,8 @@ def plot_model_domain(
         The azimuth of the hillshade, by default 0.
     hillshade : bool, optional
         Whether to plot the hillshade, by default False.
+    plot_problematic_points : bool, optional
+        Whether to plot the problematic points, by default False.
 
     Returns
     -------
@@ -138,15 +140,6 @@ def plot_model_domain(
                 label="Pumping Station",
             )
 
-            # get_node_gdf(sewer_graph, field="pumping_station", value=True).plot(
-            #     ax=ax,
-            #     marker="^",
-            #     color="red",
-            #     markersize=50,
-            #     zorder=6,
-            #     label="Pumping Station",
-            # )
-
             get_node_gdf(sewer_graph, field="lifting_station", value=True).plot(
                 ax=ax,
                 marker="^",
@@ -178,6 +171,8 @@ def plot_model_domain(
         )
 
     ax.set_title("Sewer Network Plot")
+    ax.set_xlabel("Easting")
+    ax.set_ylabel("Northing")
     plt.legend(loc="upper right")
 
     return fig, ax
@@ -266,7 +261,7 @@ def plot_sewer_attributes(
             cmap="Greys_r",
             alpha=0.8,
         )
-    
+
     if plot_sink:
         get_node_gdf(
             modelDomain.connection_graph, field="node_type", value="wwtp"
@@ -277,6 +272,7 @@ def plot_sewer_attributes(
     )
     ax.set_title(title)
     return fig, ax
+
 
 def plot_connection_graph(model_domain, fig_size=(10, 10)):
     """
@@ -297,7 +293,7 @@ def plot_connection_graph(model_domain, fig_size=(10, 10)):
         The axes object.
     """
     # Generate the connection graph if it hasn't been generated yet
-    if not hasattr(model_domain, 'connection_graph'):
+    if not hasattr(model_domain, "connection_graph"):
         model_domain.connection_graph = model_domain.generate_connection_graph()
 
     # Create a base plot using the existing plot_model_domain function
@@ -308,22 +304,28 @@ def plot_connection_graph(model_domain, fig_size=(10, 10)):
         plot_sink=True,
         plot_sewer=False,
         hillshade=True,
-        fig_size=fig_size
+        fig_size=fig_size,
     )
 
     # Plot the edges of the connection graph
     edge_gdf = get_edge_gdf(model_domain.connection_graph)
-    edge_gdf.plot(ax=ax, color='blue', linewidth=1, zorder=3, label='Connections')
+    edge_gdf.plot(ax=ax, color="blue", linewidth=1, zorder=3, label="Connections")
 
     # Plot the nodes of the connection graph
     node_gdf = get_node_gdf(model_domain.connection_graph)
-    node_gdf.plot(ax=ax, color='red', markersize=20, zorder=4, label='Nodes')
+    node_gdf.plot(ax=ax, color="red", markersize=20, zorder=4, label="Nodes")
 
     # Highlight nodes that need pumps
-    pump_nodes = [node for node, data in model_domain.connection_graph.nodes(data=True) if data.get('needs_pump', False)]
+    pump_nodes = [
+        node
+        for node, data in model_domain.connection_graph.nodes(data=True)
+        if data.get("needs_pump", False)
+    ]
     if pump_nodes:
         pump_gdf = get_node_gdf(model_domain.connection_graph, value=pump_nodes)
-        pump_gdf.plot(ax=ax, color='yellow', markersize=30, zorder=5, label='Pump Needed')
+        pump_gdf.plot(
+            ax=ax, color="yellow", markersize=30, zorder=5, label="Pump Needed"
+        )
 
     # Add labels for elevation to each node
     # for node, data in model_domain.connection_graph.nodes(data=True):
@@ -332,7 +334,7 @@ def plot_connection_graph(model_domain, fig_size=(10, 10)):
     #         elevation_text = f"{elevation:.1f}m"
     #     else:
     #         elevation_text = str(elevation)
-    #     ax.annotate(elevation_text, (node[0], node[1]), xytext=(3, 3), 
+    #     ax.annotate(elevation_text, (node[0], node[1]), xytext=(3, 3),
     #                 textcoords="offset points", fontsize=8, color='black')
 
     ax.set_title("Connection Graph")
