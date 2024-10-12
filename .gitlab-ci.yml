@@ -24,7 +24,7 @@ before_script:
   - conda install -c conda-forge gdal fiona shapely
   - conda install -c conda-forge make
   - pip install --upgrade pip
-  - pip install sphinx sphinx-autobuild sphinx_rtd_theme pydata-sphinx-theme sphinx-codeautolink sphinx_design sphinx-favicon sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-mermaid ablog myst-parser matplotlib sphinx-copybutton
+  - pip install sphinx sphinx-autobuild sphinx_rtd_theme pydata-sphinx-theme sphinx-codeautolink sphinx_design sphinx-favicon sphinxcontrib-applehelp sphinxcontrib-devhelp ablog myst-parser matplotlib sphinx-copybutton
   - pip install .
 
 build:

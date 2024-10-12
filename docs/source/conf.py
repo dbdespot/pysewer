@@ -46,7 +46,6 @@ extensions = [
     "sphinx.ext.doctest",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "sphinxcontrib.mermaid",
     "matplotlib.sphinxext.plot_directive",
     "ablog",
     "sphinx.ext.mathjax",
