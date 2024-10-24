@@ -108,6 +108,7 @@ The plotting and exporting module generates visual and geodata outputs. It rende
 
 ![Pysewer visualisation. Attributes of the sewer network layout. Peak flow estimation (A), Pipe diameters selected (B)\label{fig:fig4}](./media/figures/figure4_peakflow_diameter.png)
 
+
 # Acknowledgement
 
 M.S. and J.F. were supported by the MULTISOURCE project, which received funding from the European Union’s Horizon 2020 program under grant agreement 101003527. G.K. and D.D. were supported by the WATERUN project, which was funded from the European Union’s Horizon 2020 program under grant agreement 101060922. We thank Ronny Gey from the UFZ Research Data Management (RDM) group for reviewing the git repository.
