@@ -104,7 +104,7 @@ The optimisation module also facilitates the selection of the diameters to be us
 
 ## Visualising and exporting the generated sewer network
 
-The plotting and exporting module generates visual and geodata outputs. It renders the optimised network design onto a visual map, offering users an intuitive insight into the proposed infrastructure. Sewer network attributes such as the estimated peak flow, the selected pipe diameter (exemplified in \autoref{fig:fig4}) and the trench profile are provided in the final geodataframe. They can be exported as a geopackage(`.gpkg`) or shapefile (`.shp`)file, facilitating further analysis and detailed reporting in other geospatial platforms.
+The plotting and exporting module generates visual and geodata outputs. It renders the optimised network design onto a visual map, offering users an intuitive insight into the proposed infrastructure. Sewer network attributes such as the estimated peak flow, the selected pipe diameter (exemplified in \autoref{fig:fig4}) and the trench profile are provided in the final `GeoDataFrame`. They can be exported as a geopackage(`.gpkg`) or shapefile (`.shp`) file, facilitating further analysis and detailed reporting in other geospatial platforms.
 
 ![Pysewer visualisation. Attributes of the sewer network layout. Peak flow estimation (A), Pipe diameters selected (B)\label{fig:fig4}](./media/figures/figure4_peakflow_diameter.png)
 
