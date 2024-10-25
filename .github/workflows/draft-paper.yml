@@ -12,6 +12,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
+
+      - name: Get branch name
+        id: branch-name
+        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
 
       - name: List files for debugging
         run: ls -R
@@ -29,8 +35,9 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           message: '(auto) Paper PDF Draft'
-          # This should be the path to the paper within your repo.
-          add: 'paper/*.pdf' # to commit all PDFs in the paper directory
+          add: 'paper/*.pdf'
+          push: true
+          branch: ${{ steps.branch-name.outputs.branch }}
 
       # - name: Commit and push PDF
       #   run: |
