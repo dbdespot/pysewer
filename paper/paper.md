@@ -75,7 +75,7 @@ In the preprocessing module, the roads, buildings, and the DEM must all be proje
 - “Connecting” buildings to the street network using the connect buildings method. This method adds nodes to the graph to connect the buildings in the network using the building points.
 - Creation of “virtual roads”. Buildings which are not directly connected to the road network are connected by finding the closest edge to the building, which is then marked as the closest edge. The nodes are then disconnected from the edges and are added to the initial connection graph network.
 - Simplifying the street network for more efficient graph traversal.
-- Setting of the collection point or Wastewater Treatment Plant (WWTP).By default, the lowest elevation point in the region of interest is set as the location(s) of the WWTP. Users can manually define the location of the WWTP by using the `add_sink` method.
+- Setting of the collection point or Wastewater Treatment Plant (WWTP). By default, the lowest elevation point in the region of interest is set as the location(s) of the WWTP. Users can manually define the location of the WWTP by using the `add_sink` method.
 
 After preprocessing, all relevant data is stored as a `MultiDiGraph` to allow for asymmetric edge values (e.g., elevation profile and subsequently costs). \autoref{fig:fig2} demonstrates the required data, its preprocessing and the generation of the initial graph network.
 
