@@ -110,14 +110,14 @@ The plotting and exporting module generates visual and geodata outputs. It rende
 
 # Acknowledgement
 
-M.S. and J.F. were supported by the MULTISOURCE project, which received funding from the European Union’s Horizon 2020 program under grant agreement 101003527. G.K. and D.D. were supported by the WATERUN project, which was funded from the European Union’s Horizon 2020 program under grant agreement 101060922. We thank Ronny Gey from the UFZ Research Data Management (RDM) group for reviewing the git repository.
+M.S. and J.F. were supported by the MULTISOURCE project, which received funding from the European Union’s Horizon 2020 program under grant agreement 101003527. G.K. and D.D. were supported by the WATERUN project, which was funded from the European Union’s Horizon 2020 program under grant agreement 101060922. We thank Ronny Gey from the UFZ Research Data Management (RDM) group for reviewing the Git repository.
 
 # Software citations
 
-Pysewer was written Python 3.10.6 and used a suite of open-source software packages that aided the development process:
+Pysewer was written in Python 3.10.6 and used a suite of open-source software packages that aided the development process:
 
 - Geopandas 0.8.1 [@kelsey_jordahl_2020_3946761]
-- Networkx 3.1 [@hagbergExploringNetwork2008]
+- NetworkX 3.1 [@hagbergExploringNetwork2008]
 - Rasterio 1.3.10 [@gillies_2019]
 - Numpy 1.25.2 [@harris2020array]
 - Matplotlib 3.7.1 [@Hunter:2007]
