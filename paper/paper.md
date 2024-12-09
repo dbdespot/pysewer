@@ -117,11 +117,11 @@ M.S. and J.F. were supported by the MULTISOURCE project, which received funding 
 Pysewer was written Python 3.10.6 and used a suite of open-source software packages that aided the development process:
 
 - Geopandas 0.8.1 [@kelsey_jordahl_2020_3946761]
-- Networkx 3.1 [@SciPyProceedings_11]
+- Networkx 3.1 [@hagbergExploringNetwork2008]
 - Rasterio 1.3.10 [@gillies_2019]
 - Numpy 1.25.2 [@harris2020array]
 - Matplotlib 3.7.1 [@Hunter:2007]
-- Scikit-learn 1.0.2 [@MLR:v12:pedregosa11a]
+- Scikit-learn 1.0.2 [@JMLR:v12:pedregosa11a]
 - GDAL 3.0.2 [@gdal]
 
 # Author contributions
