@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name="pysewer",
-    version="0.1.18",
+    version="0.1.20",
     description="A Python Package for automated routing and optimization of sewer networks",
     license="GNU GPLv3",
     packages=find_packages(),
