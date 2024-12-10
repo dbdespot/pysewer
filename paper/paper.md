@@ -118,7 +118,7 @@ Pysewer was written in Python 3.10.6 and used a suite of open-source software pa
 
 - Geopandas 0.8.1 [@kelsey_jordahl_2020_3946761]
 - NetworkX 3.1 [@hagbergExploringNetwork2008]
-- Rasterio 1.3.10 [@gillies_2019]
+- Rasterio 1.2.10 [@gillies_2019]
 - Numpy 1.25.2 [@harris2020array]
 - Matplotlib 3.7.1 [@Hunter:2007]
 - Scikit-learn 1.0.2 [@JMLR:v12:pedregosa11a]
