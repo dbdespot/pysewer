@@ -11,7 +11,6 @@
 Idempotent: existing staged files are kept.
 """
 
-import shutil
 from pathlib import Path
 
 import geopandas as gpd
@@ -81,6 +80,13 @@ def stage_reviewer(dem, suffix, label):
 
 
 def stage_wasweta():
+    """The source DEM leaves its nodata border UNtagged: one line of 0.0
+    cells in ~1,400 m terrain. Sampled silently, those cells fabricate a
+    ~1,387 m elevation cliff (25 m/s design velocities on adjacent pipes).
+    Declare nodata=0.0 on the staged copy (terrain minimum is 1,355 m, so
+    0.0 is unambiguous) and clip features inside the valid-data footprint."""
+    from shapely.geometry import box
+
     out = WORK / "wasweta"
     out.mkdir(parents=True, exist_ok=True)
     if (out / "dem_utm.tif").exists():
@@ -89,9 +95,25 @@ def stage_wasweta():
     if not WASWETA_SRC.exists():
         print(f"wasweta: source not found ({WASWETA_SRC}) — skipped")
         return
-    for pattern in ("dem_utm.tif", "roads_utm.*", "buildings_utm.*"):
-        for f in WASWETA_SRC.glob(pattern):
-            shutil.copy2(f, out / f.name)
+    with rasterio.open(WASWETA_SRC / "dem_utm.tif") as src:
+        data = src.read()
+        meta = src.meta.copy()
+        meta.update(nodata=0.0)
+        with rasterio.open(out / "dem_utm.tif", "w", **meta) as dst:
+            dst.write(data)
+        valid = data[0] != 0
+        rows = valid.any(axis=1).nonzero()[0]
+        cols = valid.any(axis=0).nonzero()[0]
+        # 2-cell inner margin keeps profile sampling off the nodata border
+        left, top = src.xy(rows[0] + 2, cols[0] + 2, offset="ul")
+        right, bottom = src.xy(rows[-1] - 2, cols[-1] - 2, offset="lr")
+    extent = box(left, bottom, right, top)
+    for name in ("roads_utm", "buildings_utm"):
+        gdf = gpd.read_file(WASWETA_SRC / f"{name}.shp")
+        clipped = gpd.clip(gdf, extent).explode(index_parts=False)
+        clipped = clipped[~clipped.geometry.is_empty]
+        clipped.to_file(out / f"{name}.shp")
+        print(f"wasweta: {name} {len(gdf)} -> {len(clipped)} features")
     print("wasweta: staged")
 
 

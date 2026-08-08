@@ -176,7 +176,7 @@ capacity criterion (d/D ≤ 0.75), the Manning roughness correction (0.0015 → 
 deemed-to-satisfy gradient checks at intermittent heads.
 
 Cases.  Repository test networks (small_test, example_case), the JOSS reviewer dataset (reduced extent), the
-Wasweta II test case (Tanzania), the Elan project's French dataset (run with their design settings), and locally
+Wasweta II test case (Kenya), the Elan project's French dataset (run with their design settings), and locally
 staged open-data towns (OSM roads/buildings + Copernicus GLO-30 DEM). Networks span 95 to ~4,700 pipes
 (2 km to 184 km). The full reviewer extent (17,065 buildings) exceeds workstation memory in BOTH versions
 identically and is deferred to an HPC (EVE) run — a shared scalability ceiling, not a regression.
@@ -281,9 +281,11 @@ velocity is expected to be high in these networks: most length is minimum-diamet
 near-zero flow, for which Butler & Davies' deemed-to-satisfy gradient criterion applies instead of a velocity check (the
 design engine already applies exactly that logic to its violation reporting). d/D never exceeds 0.75 — the capacity
 criterion is satisfied everywhere; the margin (median d/D) also shows how much reserve the minimum-diameter grid has.
-Maximum velocities above the ~3 m/s scour guideline (Wasweta II most prominently) occur on individual steep-terrain
-pipes that follow the ground slope; the engine reports these as velocity_max violations, and the engineering response is
-drop structures or energy dissipation on those reaches, not a different network layout."""
+Maximum velocities above the ~3 m/s scour guideline occur on individual steep-terrain pipes that follow the ground
+slope; the engine reports these as velocity_max violations, and the engineering response is drop structures or energy
+dissipation on those reaches, not a different network layout. Diameters never decrease in the flow direction on gravity
+paths (verified junction-by-junction on every network, both versions); apparent mid-trunk drops in the maps are
+pressurized rising mains at their fixed pump-main diameter, now drawn distinctly."""
     fig.text(0.07, 0.24, note, fontsize=8, va="top", linespacing=1.5, color="#333333")
     return fig
 
