@@ -53,6 +53,41 @@ def test_get_profile(dem_data):
     assert y == [181.37, 179.56, 177.41]
 
 
+def test_get_profile_warns_on_implausible_gradient(tmp_path):
+    """A DEM with UNtagged nodata (0.0 border cells in high terrain) must
+    not pass silently: the fabricated cliff gradient triggers a warning
+    (Wasweta II benchmark, 2026-08-08 — 1,387 m drop over 33 m of pipe)."""
+    import warnings
+
+    import numpy as np
+    import rasterio
+    from rasterio.transform import from_origin
+
+    path = tmp_path / "dem_untagged_nodata.tif"
+    data = np.full((10, 10), 1400.0, dtype="float32")
+    data[:, -1] = 0.0  # nodata border, missing from the nodata tag
+    with rasterio.open(
+        path,
+        "w",
+        driver="GTiff",
+        height=10,
+        width=10,
+        count=1,
+        dtype="float32",
+        crs="EPSG:32736",
+        transform=from_origin(0, 100, 10, 10),
+    ) as dst:
+        dst.write(data, 1)
+
+    dem = pysewer.DEM(path)
+    with pytest.warns(UserWarning, match="gradient"):
+        dem.get_profile(LineString([(5, 55), (95, 55)]))
+    # a profile that stays on valid terrain must stay silent
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        dem.get_profile(LineString([(5, 55), (75, 55)]))
+
+
 def test_get_crs_dem():
     dem = pysewer.DEM(Path("tests") / "test_data" / "dem.tif")
     assert dem.get_crs.to_authority() == ("EPSG", "32640")

@@ -75,6 +75,11 @@ include = ["pysewer*"]
 [tool.setuptools.package-data]
 "pysewer.config" = ["*.yaml"]
 
+[tool.pytest.ini_options]
+# keep collection out of work/ scratch (e.g. the benchmark baseline
+# worktree ships its own tests/ tree, which collides with ours)
+testpaths = ["tests"]
+
 [tool.ruff]
 line-length = 88
 target-version = "py310"

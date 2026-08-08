@@ -35,6 +35,7 @@ class Preprocessing:
     value_get_buildings: str = "building"
     add_private_sewer: bool = True
     combined_sewer_factor: float = 1.0
+    max_plausible_gradient: float = 1.0
 
 
 @dataclass
@@ -154,6 +155,11 @@ def validate_config_values(config: "Config") -> None:
     Sanity-check parameter values that would silently produce nonsense
     networks (e.g. negative trench depths — Elan bug report 2026-08-06).
     """
+    if config.preprocessing.max_plausible_gradient <= 0:
+        raise ValueError(
+            "preprocessing.max_plausible_gradient must be > 0, got "
+            f"{config.preprocessing.max_plausible_gradient}"
+        )
     opt = config.optimization
     for name in (
         "tmin",

@@ -18,6 +18,12 @@ preprocessing:
   value_get_sinks: "wwtp" # value for sinks
   field_get_buildings: "node_type" # field name for buildings
   value_get_buildings: "building" # value for buildings
+  # DEM plausibility guard: warn when a sampled profile implies a gradient
+  # steeper than this (m/m). Real terrain rarely exceeds 100%; steeper jumps
+  # almost always mean the DEM has nodata cells missing from its nodata tag
+  # (e.g. an untagged 0.0 border), which silently corrupts slopes, design
+  # velocities and pump placement.
+  max_plausible_gradient: 1.0
 
 optimization:
   inhabitants_dwelling: 2
