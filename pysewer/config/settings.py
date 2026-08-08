@@ -3,6 +3,7 @@
 
 import logging
 import os
+import warnings
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -57,7 +58,11 @@ class Optimization:
     min_pipe_length: float = 2.0
     velocity_min: float = 0.7
     velocity_max: float = 3.0
-    max_depth_ratio: float = 0.75
+    # Design fill target d/D (see settings.yaml for the rationale): 0.70 sits
+    # one notch below the Butler / BS EN 752 hydraulic-capacity limit of 0.75
+    # so trunk sizing carries a practical reserve instead of landing exactly
+    # at the limit on discrete commercial diameters.
+    max_depth_ratio: float = 0.70
     # Peak-flow model (Butler & Davies ch. 9): "constant" uses peak_factor
     # everywhere; "babbitt"/"harman"/"gifft" vary the factor with cumulative
     # upstream population, capped at peak_factor_max (BS EN 752: 6).
@@ -216,6 +221,21 @@ def validate_config_values(config: "Config") -> None:
     if opt.dts_min_gradient <= 0:
         raise ValueError(
             f"optimization.dts_min_gradient ({opt.dts_min_gradient}) must be > 0"
+        )
+    # Design fill target must be a proportional depth in (0, 1]. Above the
+    # Butler / BS EN 752 capacity limit of 0.75 the pipe is designed beyond
+    # its usable gravity capacity, so warn rather than silently oversurcharge.
+    if not 0 < opt.max_depth_ratio <= 1:
+        raise ValueError(
+            f"optimization.max_depth_ratio ({opt.max_depth_ratio}) must be "
+            "in (0, 1] (proportional flow depth d/D)"
+        )
+    if opt.max_depth_ratio > 0.75:
+        warnings.warn(
+            f"optimization.max_depth_ratio ({opt.max_depth_ratio}) exceeds the "
+            "Butler / BS EN 752 capacity limit of 0.75; pipes will be sized "
+            "with no reserve below full-bore flow.",
+            stacklevel=2,
         )
 
 

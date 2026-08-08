@@ -241,6 +241,48 @@ def test_dts_suppresses_velocity_min_at_intermittent_heads():
     assert "gradient_below_dts" not in violations
 
 
+def test_default_depth_target_leaves_reserve_below_butler_limit():
+    """The recommended default design fill target is 0.70 — one notch below
+    the Butler / BS EN 752 capacity limit of 0.75 — so trunks carry reserve
+    instead of landing exactly at the limit (Wasweta II diameter story,
+    2026-08-08)."""
+    reset_config()
+    from pysewer.config.manager import get_config
+
+    assert get_config().optimization.max_depth_ratio == 0.70
+
+
+def test_depth_target_governs_diameter_choice():
+    """The design fill target tips discrete diameter selection. The Wasweta II
+    trunk (29.8 L/s, 1% slope) fills a DN200 to d/D 0.748: at the 0.75 limit
+    it stays DN200, but at the 0.70 target it must size up."""
+    args = dict(
+        target_flow=0.0298,
+        diameters=[0.2, 0.3],  # standard list has no DN250
+        roughness=0.013,
+        slope=-0.01,
+        vmin=0.7,
+        vmax=3.0,
+    )
+    at_limit, _ = select_diameter_with_constraints(max_depth_ratio=0.75, **args)
+    with_reserve, _ = select_diameter_with_constraints(max_depth_ratio=0.70, **args)
+    assert at_limit == 0.2
+    assert with_reserve == 0.3
+
+
+def test_max_depth_ratio_above_butler_limit_warns():
+    """Designing above the 0.75 capacity limit is allowed but must warn."""
+    reset_config()
+    with pytest.warns(UserWarning, match="0.75"):
+        set_config(custom_settings_dict={"optimization": {"max_depth_ratio": 0.9}})
+
+
+def test_max_depth_ratio_out_of_range_raises():
+    reset_config()
+    with pytest.raises(ValueError, match="max_depth_ratio"):
+        set_config(custom_settings_dict={"optimization": {"max_depth_ratio": 1.5}})
+
+
 def test_hydraulic_violations_flagged_when_no_diameter_fits():
     """
     If no diameter meets d/D or velocity bounds, the edge records a violation.

@@ -50,7 +50,17 @@ optimization:
   min_pipe_length: 2.0
   velocity_min: 0.7
   velocity_max: 3.0
-  max_depth_ratio: 0.75
+  # Design fill target: the diameter selector picks the smallest pipe whose
+  # capacity at this proportional depth d/D (exact wetted-angle Manning
+  # geometry) conveys the design peak flow. 0.75 is the Butler & Davies /
+  # BS EN 752 ABSOLUTE hydraulic-capacity limit (d/D 0.75 <=> Q/Q_full 0.912);
+  # designing exactly to it leaves ZERO reserve and, on discrete commercial
+  # sizes, lands trunks right at the limit (e.g. Wasweta II: 29.8 L/s in a
+  # DN200 at 1% => d/D 0.748). The default is set one notch below the limit
+  # to 0.70 so sizing tips to the next available diameter and carries a
+  # practical margin for flow growth, infiltration and peak-factor spread.
+  # Set to 0.75 to design to the bare capacity limit; lower for more reserve.
+  max_depth_ratio: 0.70
   # peak-flow model (Butler & Davies ch. 9): "constant" applies peak_factor
   # everywhere; "babbitt" (5/P^0.2), "harman" (1+14/(4+sqrt(P))) or "gifft"
   # (5/P^(1/6)) vary the factor with cumulative upstream population

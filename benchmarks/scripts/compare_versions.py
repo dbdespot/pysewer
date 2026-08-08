@@ -142,7 +142,7 @@ def run_worker(mode, case, sink, out_path, timeout_s):
     return json.loads(out_path.read_text())
 
 
-def compare_case(case_path, out_dir, timeout_s=DEFAULT_TIMEOUT_S):
+def compare_case(case_path, out_dir, timeout_s=DEFAULT_TIMEOUT_S, current_only=False):
     with open(case_path) as fh:
         case = yaml.safe_load(fh)
     name = case.get("name", Path(case_path).stem)
@@ -157,6 +157,13 @@ def compare_case(case_path, out_dir, timeout_s=DEFAULT_TIMEOUT_S):
     results = {}
     for mode in ("v0120", "current"):
         out_path = out_dir / f"compare_{name}.{mode}.json"
+        # The v0.1.20 baseline is frozen (its own worktree code): when only the
+        # current checkout changed, reuse the cached baseline instead of
+        # recomputing it (Couva alone is ~50 min per mode).
+        if mode == "v0120" and current_only and out_path.exists():
+            results[mode] = json.loads(out_path.read_text())
+            print(f"    {mode}: cached ({results[mode].get('runtime_s', '—')}s)")
+            continue
         results[mode] = run_worker(mode, case, sink, out_path, timeout_s)
         status = results[mode].get("error") or f"ok ({results[mode]['runtime_s']}s)"
         print(f"    {mode}: {status}")
@@ -198,6 +205,11 @@ def main():
     parser.add_argument("cases", nargs="*", help="case YAML paths or names")
     parser.add_argument("--all", action="store_true", help="run all benchmarks/cases/*.yaml")
     parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT_S)
+    parser.add_argument(
+        "--current-only",
+        action="store_true",
+        help="reuse the cached v0.1.20 baseline; recompute only current main",
+    )
     args = parser.parse_args()
 
     if args.all:
@@ -212,7 +224,9 @@ def main():
     out_dir = REPO_ROOT / "work" / "benchmarks" / "results"
     out_dir.mkdir(parents=True, exist_ok=True)
     for case_path in case_paths:
-        comparison = compare_case(case_path, out_dir, args.timeout)
+        comparison = compare_case(
+            case_path, out_dir, args.timeout, current_only=args.current_only
+        )
         append_report(comparison, out_dir)
     print(f"report: {out_dir / 'compare_report.md'}")
 
