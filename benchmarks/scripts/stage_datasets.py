@@ -28,10 +28,6 @@ def stage_reviewer_reduced():
     )
 
 
-def stage_reviewer_full():
-    stage_reviewer(dem="elevation.tif", suffix="full", label="reviewer_full")
-
-
 def stage_dem_nodata_fixed(src_path, out_path):
     """Copy a DEM clearing a bogus nodata tag. The reviewer rasters declare
     nodata=0.0, but the terrain legitimately spans -4..76 m, so sea-level
@@ -101,5 +97,4 @@ def stage_wasweta():
 
 if __name__ == "__main__":
     stage_reviewer_reduced()
-    stage_reviewer_full()
     stage_wasweta()

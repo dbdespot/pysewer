@@ -105,3 +105,9 @@ uv+mamba two-layer env).
       (Q = k·√ΣDU) as head-flow model; Colebrook-White (k_s 0.6/1.5 mm)
       as alternative to Manning; velocity check at 2·DWF per Sewers for
       Adoption
+- [ ] **reviewer_full benchmark → EVE (HPC)** (2026-08-08): dropped from the
+      local suite — at 7,893 roads / 17,065 buildings BOTH versions get
+      OOM-killed on the laptop (SIGKILL after 4.4 h / 6.2 h), so it needs an
+      EVE job via `bin/bootstrap_env.sh` + SLURM (high-mem node). While
+      there, profile connection-graph memory — the ceiling is shared by
+      v0.1.20 and current, so it's a scalability limit, not a regression
