@@ -36,7 +36,14 @@ optimization:
   # still used verbatim under min_slope_model: "uniform".
   min_slope: -0.01
   max_slope: -0.05
-  tmax: 6.0
+  # Maximum trench depth [m]. A gravity pipe is buried down to tmax before a
+  # lifting station is forced, so tmax trades station count against
+  # excavation depth on flat terrain. 8 m (up from 6 m; the historical
+  # Pysewer-1 value) is a practical open-cut limit with standard shoring and
+  # roughly halves lifting stations vs 6 m on flat networks, at the cost of a
+  # deeper tail (~p95 trench ~5.8 m on Wasweta II). Raise to 10 m to cut
+  # stations further if deeper excavation (shoring/groundwater) is acceptable.
+  tmax: 8.0
   tmin: 0.25
   inflow_trench_depth: 0.25
   min_trench_depth: 0.25

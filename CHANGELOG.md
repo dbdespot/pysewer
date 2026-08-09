@@ -84,6 +84,16 @@ bug report (2026-08-06).
   standard specifies minimum *gradients*, not a design-flow velocity).
   `velocity_max` still applies. The legacy `uniform` model keeps its
   `velocity_min` / small-sewer `gradient_below_dts` reporting.
+- Default `tmax` raised 6 m → 8 m (the historical Pysewer-1 value). A gravity
+  pipe is buried down to `tmax` before a lifting station is forced, so a
+  deeper limit converts many shallow lifts into a modest deep-trench tail —
+  the median trench stays ~0.4 m; only the deep p95 grows (~4.5 m → ~5.8 m).
+  On Wasweta II (self-cleansing model, routing rebuilt at each `tmax`) this
+  takes lifting stations 96 → 70 and pumping stations 9 → 5. Combined with the
+  self-cleansing slope, total stations fall from 136 (uniform, `tmax` 6:
+  12 pumps / 124 lifts) to 75 (5 / 70), a 45% reduction. `tmax` remains a
+  per-project knob — 10 m cuts stations further where deeper excavation
+  (shoring / groundwater) is acceptable.
 
 ### Fixed
 
