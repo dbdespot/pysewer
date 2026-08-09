@@ -59,6 +59,32 @@ bug report (2026-08-06).
   checked instead (`dts_min_gradient`, default 1:150; violation
   `gradient_below_dts`).
 
+### Changed (design realism — self-cleansing minimum slope)
+
+- Minimum laying gradient is now **diameter-dependent** by default
+  (`optimization.min_slope_model: "self_cleansing"`). The uniform
+  `min_slope` (1%) was applied to every diameter, which over-buries trunks
+  on flat terrain until burial reaches `tmax` and forces a lifting station
+  roughly every `tmax/min_slope` of flow path — the source of implausibly
+  high lift counts on flat networks. Larger pipes self-cleanse at much
+  flatter grades, so `min_self_cleansing_slope(D)` inverts Manning at full
+  bore (`S = (velocity_min·n / (D/4)**(2/3))**2`, floored at
+  `min_slope_abs`, default 1:2000). Values match the Butler & Davies /
+  BS EN 752 deemed-to-satisfy gradients within ~10% (DN200 1:222, DN300
+  1:382, DN500 1:755). On the Wasweta II benchmark this cuts lifting
+  stations 124 → 96 and pumping stations 12 → 9 with routing/topology
+  unchanged. Set `min_slope_model: "uniform"` to restore the legacy
+  single-gradient behaviour.
+- Under the self-cleansing model the partial-flow `velocity_min` acceptance
+  flag is not recorded: every pipe is laid at its diameter's self-cleansing
+  gradient where terrain permits, so the gradient itself is the
+  deemed-to-satisfy criterion (Butler / BS EN 752). The steady velocity at
+  foul design flow is always below 0.7 m/s in a minimally graded sewer, so it
+  is not a meaningful additional acceptance test (this is exactly why the
+  standard specifies minimum *gradients*, not a design-flow velocity).
+  `velocity_max` still applies. The legacy `uniform` model keeps its
+  `velocity_min` / small-sewer `gradient_below_dts` reporting.
+
 ### Fixed
 
 - Capacity criterion and `d_over_D` now use the true proportional flow

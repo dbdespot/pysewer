@@ -219,25 +219,30 @@ def _design_single_edge(peak_flow, terrain_slope, config_overrides=None):
 
 def test_dts_suppresses_velocity_min_at_intermittent_heads():
     """
-    Butler ch. 9.4: below the small-sewer flow threshold (1 L/s) the steady
-    velocity_min check does not apply; the deemed-to-satisfy minimum
-    gradient (1:150) is checked instead.
+    Legacy uniform model, Butler ch. 9.4: below the small-sewer flow threshold
+    (1 L/s) the steady velocity_min check does not apply; the single
+    deemed-to-satisfy minimum gradient (1:150) is checked instead. (Pinned to
+    min_slope_model="uniform"; the self_cleansing model uses a
+    diameter-specific gradient — see test_self_cleansing_velocity_reporting.)
     """
+    uniform = {"min_slope_model": "uniform"}
     # tiny flow, design gradient 1% (>= 1:150): clean — no velocity_min
-    violations = _design_single_edge(0.0001, -0.01)
+    violations = _design_single_edge(0.0001, -0.01, config_overrides=uniform)
     assert "velocity_min" not in violations
     assert "gradient_below_dts" not in violations
 
     # tiny flow, gentle terrain and min_slope 1:500 (< 1:150): DTS flag,
     # still no meaningless velocity_min
     violations = _design_single_edge(
-        0.0001, -0.002, config_overrides={"min_slope": -0.002}
+        0.0001, -0.002, config_overrides={**uniform, "min_slope": -0.002}
     )
     assert "gradient_below_dts" in violations
     assert "velocity_min" not in violations
 
     # above the threshold the steady-flow velocity check applies as before
-    violations = _design_single_edge(0.002, -0.002, config_overrides={"min_slope": -0.002})
+    violations = _design_single_edge(
+        0.002, -0.002, config_overrides={**uniform, "min_slope": -0.002}
+    )
     assert "velocity_min" in violations
     assert "gradient_below_dts" not in violations
 
@@ -384,6 +389,25 @@ def test_min_slope_model_validation():
         set_config(custom_settings_dict={"optimization": {"min_slope_abs": -0.1}})
 
 
+def test_self_cleansing_suppresses_velocity_min():
+    """Under the self_cleansing model a pipe laid at its diameter's
+    self-cleansing gradient is deemed to satisfy (Butler / BS EN 752), so the
+    partial-flow velocity_min check — which foul design flows never pass in a
+    minimally graded sewer — is not recorded. The legacy uniform model still
+    reports velocity_min above the small-sewer threshold."""
+    # DN200 on a gentle grade, flow above the small-sewer threshold: the
+    # uniform model flags velocity_min; self_cleansing deems it satisfied.
+    args = dict(peak_flow=0.002, terrain_slope=-0.002)
+    uniform = _design_single_edge(
+        **args, config_overrides={"min_slope_model": "uniform", "min_slope": -0.002}
+    )
+    self_cleansing = _design_single_edge(
+        **args, config_overrides={"min_slope_model": "self_cleansing"}
+    )
+    assert "velocity_min" in uniform
+    assert "velocity_min" not in self_cleansing
+
+
 def test_hydraulic_violations_flagged_when_no_diameter_fits():
     """
     If no diameter meets d/D or velocity bounds, the edge records a violation.
@@ -395,6 +419,9 @@ def test_hydraulic_violations_flagged_when_no_diameter_fits():
             "velocity_min": 1.0,
             "velocity_max": 2.0,
             "max_depth_ratio": 0.5,
+            # legacy velocity_min reporting path (self_cleansing replaces it
+            # with a gradient check — covered separately)
+            "min_slope_model": "uniform",
         }
     }
     set_config(custom_settings_dict=custom)

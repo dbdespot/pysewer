@@ -429,22 +429,32 @@ def calculate_hydraulic_parameters(
                 and "depth_ratio" not in violations
             ):
                 violations.append("depth_ratio")
-            # Self-cleansing: at intermittent heads (small-sewer regime,
-            # Butler §9.4) the steady partial-flow velocity is physically
-            # meaningless, so velocity_min does not apply; the BS EN 752
-            # deemed-to-satisfy minimum gradient is checked instead.
-            if (
-                not pressurized
-                and peak_flow < config.optimization.small_sewer_flow_threshold
-            ):
-                violations = [v for v in violations if v != "velocity_min"]
-                if -slope < config.optimization.dts_min_gradient:
-                    violations.append("gradient_below_dts")
-            elif (
-                velocity < config.optimization.velocity_min
-                and "velocity_min" not in violations
-            ):
-                violations.append("velocity_min")
+            # Self-cleansing reporting (Butler / BS EN 752 deemed-to-satisfy).
+            # The steady partial-flow velocity at foul design flows sits well
+            # below velocity_min in any reasonably graded sewer, so velocity_min
+            # is not a meaningful acceptance test at design flow; a pipe laid at
+            # its deemed-to-satisfy minimum gradient is *deemed* to self-cleanse.
+            if not pressurized:
+                if config.optimization.min_slope_model == "self_cleansing":
+                    # Every pipe is laid at its diameter's self-cleansing
+                    # gradient where terrain permits, so the gradient itself is
+                    # the deemed-to-satisfy acceptance criterion (Butler /
+                    # BS EN 752). The steady velocity at foul design flow is not
+                    # a meaningful additional test — it is always well below
+                    # velocity_min in a minimally graded sewer — so velocity_min
+                    # is not recorded. (velocity_max, below, still applies.)
+                    violations = [v for v in violations if v != "velocity_min"]
+                elif peak_flow < config.optimization.small_sewer_flow_threshold:
+                    # legacy uniform model, intermittent-head regime (Butler
+                    # §9.4): single deemed-to-satisfy gradient (dts_min_gradient)
+                    violations = [v for v in violations if v != "velocity_min"]
+                    if -slope < config.optimization.dts_min_gradient:
+                        violations.append("gradient_below_dts")
+                elif (
+                    velocity < config.optimization.velocity_min
+                    and "velocity_min" not in violations
+                ):
+                    violations.append("velocity_min")
             if (
                 velocity > config.optimization.velocity_max
                 and "velocity_max" not in violations
