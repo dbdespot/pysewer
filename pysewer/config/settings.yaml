@@ -30,6 +30,10 @@ optimization:
   inhabitants_dwelling_attribute_name: ""
   daily_wastewater_person: 0.15
   peak_factor: 4.0
+  # min_slope is the legacy uniform minimum laying gradient (drop/length,
+  # negative). Under min_slope_model: "self_cleansing" (default) it is
+  # superseded per-pipe by a diameter-dependent self-cleansing slope; it is
+  # still used verbatim under min_slope_model: "uniform".
   min_slope: -0.01
   max_slope: -0.05
   tmax: 6.0
@@ -75,6 +79,21 @@ optimization:
   # replaced by the deemed-to-satisfy minimum gradient (default 1:150)
   small_sewer_flow_threshold: 0.001
   dts_min_gradient: 0.00667
+  # Minimum-gradient model for laying gravity pipes:
+  #   "self_cleansing" (default) — derive a diameter-dependent minimum slope
+  #     from the self-cleansing velocity by inverting Manning at full bore
+  #     (S = (velocity_min * roughness / (D/4)**(2/3))**2). Larger pipes get
+  #     flatter minimum grades (DN200 ~1:222, DN300 ~1:382, DN500 ~1:755),
+  #     matching Butler & Davies / BS EN 752 deemed-to-satisfy practice. This
+  #     stops trunks being over-buried on flat terrain, which otherwise forces
+  #     a lifting station every ~tmax/min_slope of flow path.
+  #   "uniform" — legacy: apply the single `min_slope` above to all diameters.
+  min_slope_model: "self_cleansing"
+  # Constructability floor magnitude (positive, drop/length): a self-cleansing
+  # laid slope never goes flatter than this. 0.0005 = 1:2000; below this,
+  # survey/laying tolerance dominates. Kept separate from dts_min_gradient
+  # (1:150) so it does not clamp the flatter large-diameter grades.
+  min_slope_abs: 0.0005
 
 plotting:
   plot_connection_graph: false

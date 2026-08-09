@@ -7,6 +7,7 @@ import pytest
 from pysewer.config.manager import reset_config, set_config
 from pysewer.optimization import (
     calculate_hydraulic_parameters,
+    min_self_cleansing_slope,
     select_diameter_with_constraints,
 )
 
@@ -281,6 +282,106 @@ def test_max_depth_ratio_out_of_range_raises():
     reset_config()
     with pytest.raises(ValueError, match="max_depth_ratio"):
         set_config(custom_settings_dict={"optimization": {"max_depth_ratio": 1.5}})
+
+
+def test_min_self_cleansing_slope_values():
+    """Full-bore Manning inversion gives diameter-dependent self-cleansing
+    grades matching Butler deemed-to-satisfy within ~10% (n=0.013, v=0.7),
+    flatter for larger pipes, floored for constructability, always negative."""
+    reset_config()
+    assert min_self_cleansing_slope(0.2) == pytest.approx(-0.00450, abs=1e-4)
+    assert min_self_cleansing_slope(0.3) == pytest.approx(-0.00262, abs=1e-4)
+    assert min_self_cleansing_slope(0.5) == pytest.approx(-0.00132, abs=1e-4)
+    # steeper (more negative) for smaller pipes
+    assert (
+        min_self_cleansing_slope(0.2)
+        < min_self_cleansing_slope(0.3)
+        < min_self_cleansing_slope(0.5)
+        < 0
+    )
+    # small pipes are NOT flattened (stay near the 1:150-1:264 DTS regime)
+    assert min_self_cleansing_slope(0.2) <= -0.004
+    # constructability floor dominates for a very large pipe
+    assert min_self_cleansing_slope(5.0, min_slope_abs=0.001) == pytest.approx(-0.001)
+
+
+def _count_lifts_flat_chain(peak_flow, model, n_edges=8):
+    """Design a flat multi-edge chain and count lifting stations placed."""
+    from shapely.geometry import LineString
+
+    set_config(
+        custom_settings_dict={
+            "optimization": {
+                "diameters": [0.2, 0.3, 0.5],
+                "min_slope_model": model,
+                "min_slope": -0.01,
+            }
+        }
+    )
+    G = nx.DiGraph()
+    nodes = [f"n{i}" for i in range(n_edges + 1)]
+    for n in nodes:
+        G.add_node(n, peak_flow=peak_flow)  # flat terrain, constant flow
+    for i in range(n_edges):
+        G.add_edge(
+            nodes[i],
+            nodes[i + 1],
+            profile=[(0, 10.0), (100.0, 10.0)],
+            needs_pump=False,
+            geometry=LineString([(i * 100, 0), ((i + 1) * 100, 0)]),
+        )
+    calculate_hydraulic_parameters(G, sinks=[nodes[-1]])
+    return sum(1 for n in nodes if G.nodes[n].get("lifting_station"))
+
+
+def test_self_cleansing_reduces_lifts_on_flat_terrain():
+    """On flat terrain a large-diameter run laid at its (flat) self-cleansing
+    grade accumulates burial far slower than the uniform 1%, so it needs fewer
+    lifting stations — the Wasweta II mechanism in miniature."""
+    high_flow = 0.05  # forces a large diameter -> flat self-cleansing slope
+    uniform_lifts = _count_lifts_flat_chain(high_flow, "uniform")
+    self_cleansing_lifts = _count_lifts_flat_chain(high_flow, "self_cleansing")
+    assert uniform_lifts >= 1
+    assert self_cleansing_lifts < uniform_lifts
+
+
+def test_steep_terrain_design_unchanged_by_slope_model():
+    """On steep terrain the pipe follows the ground, so the min-slope model
+    never binds: diameter and violations are identical under both models."""
+    from shapely.geometry import LineString
+
+    def design(model):
+        set_config(
+            custom_settings_dict={
+                "optimization": {
+                    "diameters": [0.2, 0.3, 0.5],
+                    "min_slope_model": model,
+                }
+            }
+        )
+        G = nx.DiGraph()
+        G.add_node("a", peak_flow=0.01)
+        G.add_node("b")
+        G.add_edge(
+            "a",
+            "b",
+            profile=[(0, 20.0), (100.0, 15.0)],  # 5% downhill
+            needs_pump=False,
+            geometry=LineString([(0, 0), (100, 0)]),
+        )
+        calculate_hydraulic_parameters(G, sinks=["b"])
+        e = G.edges[("a", "b")]
+        return e["diameter"], e["hydraulic_violations"]
+
+    assert design("uniform") == design("self_cleansing")
+
+
+def test_min_slope_model_validation():
+    reset_config()
+    with pytest.raises(ValueError, match="min_slope_model"):
+        set_config(custom_settings_dict={"optimization": {"min_slope_model": "bogus"}})
+    with pytest.raises(ValueError, match="min_slope_abs"):
+        set_config(custom_settings_dict={"optimization": {"min_slope_abs": -0.1}})
 
 
 def test_hydraulic_violations_flagged_when_no_diameter_fits():

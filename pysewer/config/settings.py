@@ -76,6 +76,15 @@ class Optimization:
     # deemed-to-satisfy minimum gradient (Butler Table 9.8).
     small_sewer_flow_threshold: float = 0.001
     dts_min_gradient: float = 1 / 150
+    # Minimum-gradient model for laying gravity pipes (see settings.yaml):
+    # "self_cleansing" derives a diameter-dependent minimum slope from the
+    # self-cleansing velocity (flatter for larger pipes), so trunks are not
+    # over-buried on flat terrain (which forces excess lifting stations);
+    # "uniform" keeps the legacy single `min_slope` for all diameters.
+    min_slope_model: str = "self_cleansing"
+    # Constructability floor magnitude (positive) for the self-cleansing model:
+    # a laid slope never goes flatter than this regardless of diameter.
+    min_slope_abs: float = 0.0005
 
 
 @dataclass
@@ -235,6 +244,26 @@ def validate_config_values(config: "Config") -> None:
             f"optimization.max_depth_ratio ({opt.max_depth_ratio}) exceeds the "
             "Butler / BS EN 752 capacity limit of 0.75; pipes will be sized "
             "with no reserve below full-bore flow.",
+            stacklevel=2,
+        )
+    if opt.min_slope_model not in ("uniform", "self_cleansing"):
+        raise ValueError(
+            f"optimization.min_slope_model ({opt.min_slope_model!r}) must be "
+            "'uniform' or 'self_cleansing'"
+        )
+    if opt.min_slope_abs <= 0:
+        raise ValueError(
+            f"optimization.min_slope_abs ({opt.min_slope_abs}) must be > 0 "
+            "(slope magnitude)"
+        )
+    # The constructability floor should not be steeper than the smallest-pipe
+    # deemed-to-satisfy gradient, or it would clamp the flatter large-diameter
+    # self-cleansing grades and defeat the purpose of the model.
+    if opt.min_slope_abs > opt.dts_min_gradient:
+        warnings.warn(
+            f"optimization.min_slope_abs ({opt.min_slope_abs}) is steeper than "
+            f"dts_min_gradient ({opt.dts_min_gradient}); it will clamp the "
+            "diameter-dependent self-cleansing slopes for larger pipes.",
             stacklevel=2,
         )
 
