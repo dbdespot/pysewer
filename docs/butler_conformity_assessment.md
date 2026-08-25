@@ -142,7 +142,94 @@ Worth porting back:
 Not to port: the pysewer-storm "guo"-method machinery (storm/combined
 specific).
 
-## 6. Verdict
+## 6. Diameter selection — worked example and the design fill target
+
+This section answers a recurring question ("why are the pipes so small — the
+older pysewer gave larger, more realistic diameters?") from first principles,
+and records the resulting default choice. It is the reference for the story
+told to the Elan team.
+
+### 6.1 Why the diameters come out where they do
+
+pysewer sizes each gravity pipe as the **smallest available diameter whose
+capacity at a target proportional depth `d/D` conveys the design peak flow**
+(`select_diameter_with_constraints`). Capacity at partial depth is exact
+wetted-angle Manning geometry, so for a circular pipe the flow at depth `d/D`
+relative to full-bore is a fixed function of `d/D` alone (slope and diameter
+cancel):
+
+| `d/D` | `Q/Q_full` |
+|------:|-----------:|
+| 0.25  | 0.137 |
+| 0.50  | 0.500 |
+| 0.646 | 0.750 |
+| 0.70  | 0.837 |
+| 0.75  | 0.912 |
+| 1.00  | 1.000 |
+
+Two consequences fall straight out of this table:
+
+- **`d/D = 0.5` carries exactly half of full-bore** (same hydraulic radius),
+  and the Butler / BS EN 752 capacity limit `d/D ≤ 0.75` corresponds to
+  `Q/Q_full ≤ 0.912` — *not* 0.75.
+- **The published v0.1.20 criterion "flow ratio ≤ 0.75" is identically
+  `d/D = 0.646`** — i.e. it was ~16 % *stricter* on depth than the limit it
+  claimed to enforce. That extra hidden strictness is the entire reason
+  v0.1.20's trunks looked larger: it was quietly reserving capacity that the
+  corrected true-`d/D` criterion (§4.1) does not.
+
+### 6.2 Worked example — the Wasweta II trunk
+
+Design peak flow `Q = 29.8 L/s` at the valley trunk; slope pinned at the
+`min_slope` trench floor `S = 1 %`; `n = 0.013`. Full-bore and partial
+capacities (from the geometry above):
+
+| DN | `Q_full` | `d/D` at `Q` | cap @ 0.75 | cap @ 0.70 | cap @ 0.646 |
+|---:|---------:|-------------:|-----------:|-----------:|------------:|
+| 200 | 32.8 L/s | **0.748** | 29.9 L/s | 27.5 L/s | 24.6 L/s |
+| 250 | 59.5 L/s | 0.501 | 54.2 L/s | 49.8 L/s | 44.6 L/s |
+| 300 | 96.7 L/s | 0.381 | 88.2 L/s | 81.0 L/s | 72.5 L/s |
+
+At the bare `0.75` limit the 29.8 L/s **just fits a DN200** (`d/D = 0.748`,
+capacity 29.9 L/s) — so main sizes it DN200 with essentially **zero reserve**.
+That is hydraulically compliant but not what a prudent engineer specifies: any
+flow growth, infiltration allowance, or peak-factor uncertainty pushes it over.
+Because commercial sizes are discrete (the standard list jumps DN200 → DN300),
+tipping the target down to `0.70` re-sizes the trunk to the next available
+diameter, which then runs comfortably part-full. v0.1.20 reached the same
+larger pipe for the *wrong* stated reason (its mislabeled 0.646 depth); the
+corrected engine reaches it for the *right* one (an explicit reserve policy).
+
+### 6.3 The default: `max_depth_ratio = 0.70`
+
+`max_depth_ratio` is the **design fill target**, and its default is set one
+notch below the `0.75` hydraulic-capacity limit:
+
+- `0.75` — the Butler / BS EN 752 **absolute** capacity limit; designing to it
+  leaves no reserve (the DN200-at-0.748 case above). A validation warning fires
+  if a user sets it above 0.75.
+- **`0.70` (default)** — leaves a practical margin for flow growth, infiltration
+  and peak-factor spread, and on discrete pipe sizes tips borderline trunks up
+  to the next available diameter. This restores realistic trunk diameters
+  without reintroducing v0.1.20's mislabeled criterion.
+- Lower still (e.g. `0.5`, "design half-full") for conservative practice.
+
+The knob is a single settings value (`optimization.max_depth_ratio`); it drives
+only gravity diameter selection and never pump placement (which is trench-depth
+governed). The standalone computation reproducing both tables lives in the
+benchmark notes.
+
+### 6.4 Monotonicity is enforced and verified
+
+Diameters never decrease in the flow direction on gravity paths: `set_diameter`
+takes `max(selected, largest upstream diameter)` at every edge, and this was
+verified junction-by-junction on all eight benchmark networks in both versions
+(**zero** gravity-to-gravity decreases). Apparent mid-trunk drops seen on
+network maps are **pressurized rising mains** drawn at their fixed pump-main
+diameter — a plotting artifact, now drawn as a distinct dashed style, not a
+sizing error.
+
+## 7. Verdict
 
 pysewer's sizing chain is **structurally Butler-conform** (peak flow from
 population → capacity-constrained smallest diameter → monotonic downstream

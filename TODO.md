@@ -101,7 +101,29 @@ uv+mamba two-layer env).
       (constant PF, no infiltration) — **decide whether to switch the
       recommended defaults to babbitt + infiltration 0.1 in the docs/
       example settings** after the next Elan benchmark round
+- [x] **Design fill target set to 0.70** (2026-08-08): `max_depth_ratio`
+      default lowered 0.75 → 0.70. 0.75 is the Butler/BS EN 752 absolute
+      capacity limit (d/D 0.75 ⇔ Q/Q_full 0.912); designing exactly to it
+      left trunks at zero reserve (Wasweta II: 29.8 L/s in a DN200 at 1% ⇒
+      d/D 0.748). 0.70 tips borderline trunks to the next commercial size.
+      Worked calc: benchmarks/scripts/diameter_selection_calc.py; rationale:
+      docs/butler_conformity_assessment.md §6. Still open from the same
+      round: whether to also default babbitt PF + infiltration 0.1 (decide
+      after the next Elan benchmark; note infiltration would push the same
+      Wasweta edges to DN300 for the honest reason — more design flow)
+- [ ] **Benchmark against external synthetic-network datasets** (user to
+      provide): datasets on which other synthetic sewer-generation models
+      were trained/evaluated. Add as benchmark cases (same v0120-vs-current
+      harness) and compare pysewer's topology, diameters and station counts
+      against those references — the acceptance test that our sizing matches
+      independent tools, not just our own older version
 - [ ] Butler conformity, remaining (optional): Discharge Unit method
       (Q = k·√ΣDU) as head-flow model; Colebrook-White (k_s 0.6/1.5 mm)
       as alternative to Manning; velocity check at 2·DWF per Sewers for
       Adoption
+- [ ] **reviewer_full benchmark → EVE (HPC)** (2026-08-08): dropped from the
+      local suite — at 7,893 roads / 17,065 buildings BOTH versions get
+      OOM-killed on the laptop (SIGKILL after 4.4 h / 6.2 h), so it needs an
+      EVE job via `bin/bootstrap_env.sh` + SLURM (high-mem node). While
+      there, profile connection-graph memory — the ceiling is shared by
+      v0.1.20 and current, so it's a scalability limit, not a regression

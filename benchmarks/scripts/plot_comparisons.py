@@ -37,6 +37,7 @@ plt.rcParams.update(
 SINK_COLOR = "#CC3311"
 PUMP_COLOR = "#EE6677"
 LIFT_COLOR = "#228833"
+PRESSURIZED_COLOR = "#EE7733"
 VERSION_LABELS = {"v0120": "published v0.1.20", "current": "current main"}
 
 
@@ -51,12 +52,25 @@ def diameter_colors(diameters):
 
 def plot_map(ax, gpkg_path, color_by, sink, title):
     pipes = gpd.read_file(gpkg_path, layer="pipes")
-    for diam, group in pipes.groupby("diameter"):
+    # gravity pipes colored by diameter; pressurized rising mains drawn
+    # separately — their diameter is the fixed pump-main size, and coloring
+    # them like gravity pipes reads as a spurious diameter drop mid-trunk
+    pressurized = pipes["pressurized"].astype(bool)
+    for diam, group in pipes[~pressurized].groupby("diameter"):
         group.plot(
             ax=ax,
             color=color_by[diam],
             linewidth=max(0.6, diam * 6),
             label=f"D {diam} m ({len(group)})",
+        )
+    if pressurized.any():
+        pipes[pressurized].plot(
+            ax=ax,
+            color=PRESSURIZED_COLOR,
+            linewidth=1.3,
+            linestyle=(0, (3, 1.5)),
+            label=f"pressurized main ({int(pressurized.sum())})",
+            zorder=5,
         )
     try:
         stations = gpd.read_file(gpkg_path, layer="stations")

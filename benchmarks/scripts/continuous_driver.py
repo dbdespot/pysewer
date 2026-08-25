@@ -25,14 +25,15 @@ RESULTS = REPO_ROOT / "work" / "benchmarks" / "results"
 CASE_DIR = SCRIPTS.parent / "cases"
 GENERATED = REPO_ROOT / "work" / "benchmarks" / "cases_generated"
 
-# static cases, fast -> slow; reviewer_full (17k buildings) queued last
+# static cases, fast -> slow
+# (reviewer_full — 17k buildings — exceeds laptop memory in both versions;
+#  it is an HPC job, not part of the local suite: see TODO.md)
 STATIC_ORDER = [
     "small_test",
     "example_case",
     "wasweta_ii",
     "reviewer_reduced",
     "elan_french",
-    "reviewer_full",
 ]
 
 

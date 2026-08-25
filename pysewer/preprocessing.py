@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
 # SPDX-License-Identifier: GPL-3.0-only
 
+import itertools
 import os
 import warnings
 from dataclasses import dataclass, field
@@ -169,7 +170,27 @@ class DEM:
         x = np.append(x, line.length)
         interpolated_points = [line.interpolate(dist) for dist in x]
         elevation = [self.get_elevation(ip) for ip in interpolated_points]
-        return list(zip(x, elevation, strict=False))
+        profile = list(zip(x, elevation, strict=False))
+        # Plausibility guard: a gradient steeper than max_plausible_gradient
+        # between adjacent samples almost always means the DEM contains
+        # nodata cells that are missing from its nodata tag (e.g. an
+        # untagged 0.0 border in high terrain), which would otherwise pass
+        # silently and corrupt slopes, velocities and pump placement.
+        max_gradient = config.preprocessing.max_plausible_gradient
+        for (x0, z0), (x1, z1) in itertools.pairwise(profile):
+            if x1 > x0 and abs(z1 - z0) / (x1 - x0) > max_gradient:
+                pt = line.interpolate(x1)
+                warnings.warn(
+                    f"DEM profile implies a {abs(z1 - z0) / (x1 - x0):.0%} "
+                    f"gradient ({z0:.1f} m -> {z1:.1f} m over {x1 - x0:.1f} m) "
+                    f"near ({pt.x:.1f}, {pt.y:.1f}). This usually means the "
+                    "DEM has nodata cells not declared in its nodata tag; "
+                    "check the raster's nodata value "
+                    "(preprocessing.max_plausible_gradient).",
+                    stacklevel=2,
+                )
+                break
+        return profile
 
     @property
     def get_crs(self) -> CRS | None:
