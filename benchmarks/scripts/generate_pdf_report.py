@@ -172,8 +172,9 @@ def overview_page(cases, page_no, n_pages):
 Scope.  The published pysewer release (v0.1.20, PyPI) and the current main branch are run on {len(cases)} benchmark
 networks under identical inputs and identical explicit design arguments, in isolated worker processes. Current main
 includes the pump-penalty/config corrections and the Butler & Davies conformity work: the true proportional-depth
-capacity criterion (d/D ≤ 0.75), the Manning roughness correction (0.0015 → 0.013), variable peak-factor methods and
-deemed-to-satisfy gradient checks at intermittent heads.
+capacity criterion (d/D ≤ 0.75), the Manning roughness correction (0.0015 → 0.013), the diameter-dependent
+self-cleansing minimum laying gradient, variable peak-factor methods and deemed-to-satisfy gradient checks at
+intermittent heads. Both versions run at the same trench-depth limit (tmax 8 m).
 
 Cases.  Repository test networks (small_test, example_case), the JOSS reviewer dataset (reduced extent), the
 Wasweta II test case (Kenya), the Elan project's French dataset (run with their design settings), and locally
@@ -182,13 +183,19 @@ staged open-data towns (OSM roads/buildings + Copernicus GLO-30 DEM). Networks s
 identically and is deferred to an HPC (EVE) run — a shared scalability ceiling, not a regression.
 
 Key findings.
-  1.  Topology and total length are invariant — pipe counts differ ≤ 0.3 %, total length ≤ 2 % on every case.
-  2.  Current main places more pumping/lifting stations. The corrected feasibility logic detects gravity pipes that
-      violate the trench-depth envelope and inserts a station where v0.1.20 silently accepted the violation.
-  3.  v0.1.20 oversizes trunks. Its capacity check limited the FLOW ratio to 0.75 (equivalent to d/D ≈ 0.65) while
-      claiming to limit filling depth; the corrected true d/D ≤ 0.75 criterion (i.e. Q/Q_full ≤ 0.912) keeps trunks at the
-      smaller, still-compliant diameter. No pipe in any current-main design exceeds d/D = 0.75.
-  4.  Runtimes are equivalent (within ±8 %), so the corrected hydraulics cost nothing.
+  1.  Topology and total length are invariant — pipe counts and total length are identical to the metre on every case;
+      the two versions differ only in station placement and (marginally) diameter, not in the routed tree.
+  2.  Current main places FEWER pumping/lifting stations — 275 vs 452 across the suite, a 39 % reduction, driven almost
+      entirely by lifting stations (e.g. Wasweta II 92 → 70, Couva 105 → 46, Chaguanas 81 → 30). Both versions run at
+      the same trench-depth limit (tmax 8 m); the difference is the diameter-dependent self-cleansing minimum slope,
+      which lays trunks at their true self-cleansing grade (≈ 1:380 for DN300) instead of a uniform 1 % on every pipe.
+      The uniform grade over-buried trunks on flat terrain until burial hit tmax and forced a lift roughly every
+      600 m — the source of the implausibly high counts. Steep cases (Elan French) are essentially unchanged (57 → 57).
+  3.  Diameters are now closely matched between versions — identical on five of eight cases and differing by a handful
+      of pipes on the rest (e.g. Chaguanas DN300 67 → 9). Where they differ, current main is one size SMALLER on a few
+      trunks: its true proportional-depth capacity check (d/D ≤ 0.75, i.e. Q/Q_full ≤ 0.912) lets a trunk stay at the
+      smaller compliant diameter that v0.1.20's stricter flow-ratio check bumped up. No pipe in any design exceeds d/D = 0.75.
+  4.  Runtimes are of the same order; the corrected hydraulics and slope model add no material cost.
 
 Reading the per-case pages.  Each case page shows both networks coloured by diameter (pumping stations red,
 lifting stations green, sink starred) with diameter and station counts, followed by an engineering summary table.
@@ -356,19 +363,24 @@ def case_page(c, page_no, n_pages):
 def interpretation_page(page_no, n_pages):
     fig = page_frame("Interpretation and open items", page_no, n_pages)
     text = """\
-More stations, and why that is correct.  The additional pumping/lifting stations placed by current main are not a bias
-toward pumping: they appear exactly where a gravity pipe cannot stay inside the minimum/maximum trench-depth envelope.
-v0.1.20's routing accepted such pipes silently (its needs_pump flag leaked construction-time state and its penalty logic
-could be bypassed by falsy user settings); current main detects the infeasibility and answers it the only physically
-consistent way. For planning purposes the station count of current main is the honest cost estimate of draining the
-terrain — the v0.1.20 count was an undercount.
+Fewer stations, and why that is correct.  Both versions bury a gravity pipe down to the trench-depth limit (tmax 8 m)
+before forcing a lifting station, so the station count is set by how fast burial accumulates — which is set by the
+minimum laying gradient. v0.1.20 applies a uniform 1 % minimum to every pipe; on flat terrain that over-buries the trunk
+by ~1 m per 100 m until it reaches tmax and a lift is forced, roughly every 600 m. Current main derives a
+diameter-dependent minimum self-cleansing gradient (Butler & Davies / BS EN 752 deemed-to-satisfy: ≈ 1:222 for DN200,
+≈ 1:380 for DN300, ≈ 1:755 for DN500), so trunks are laid three-to-four times flatter, accumulate burial far more slowly
+and need far fewer lifts. Across the suite this removes 177 stations (452 → 275, −39 %), concentrated on the flat
+terrain networks (Couva −68, Wasweta II −24, Chaguanas −51); the steep Elan French case is unchanged. The routed tree
+is identical, so this is purely a laying-gradient correction, not a topology change. These lower counts are the more
+physically plausible estimate of the pumping burden of draining flat terrain.
 
-Smaller trunks, and why that is correct.  v0.1.20 sized diameters by requiring Q ≤ 0.75·Q_full. For a circular section
-that flow ratio corresponds to a filling degree of only d/D ≈ 0.65 — stricter than the d/D ≤ 0.75 criterion of
-Butler & Davies / BS EN 752 that the parameter documentation claimed. Current main implements the true proportional-depth
-criterion (d/D ≤ 0.75, i.e. Q/Q_full ≤ 0.912) with Manning partial-flow geometry, so trunk pipes that were spuriously
-bumped one size up remain at the smaller diameter while every pipe still satisfies the filling limit (see the d/D max
-column: no case reaches 0.75). Where load genuinely requires it, pipes still size up.
+Diameters, now closely matched.  With the roughness (0.013) and true proportional-depth capacity criterion corrected,
+the two versions choose the same diameter on the great majority of pipes — the distributions are identical on five of
+eight cases and differ by a handful of pipes on the rest. Where they differ, current main sits one commercial size
+SMALLER on a few trunks: v0.1.20 limited the FLOW ratio to Q ≤ 0.75·Q_full (a filling degree of only d/D ≈ 0.65),
+stricter than the d/D ≤ 0.75 criterion of Butler & Davies / BS EN 752 its documentation claimed. Current main applies
+the true criterion (d/D ≤ 0.75, i.e. Q/Q_full ≤ 0.912) with Manning partial-flow geometry, so those trunks stay at the
+smaller still-compliant size (no case reaches d/D = 0.75). Where load genuinely requires it, pipes still size up.
 
 What the characteristics tables support.  Per network the report gives loading (population, per-capita specific length),
 capacity utilisation (d/D median/max), self-cleansing exposure (share of gravity length below 0.7 m/s — dominated by
