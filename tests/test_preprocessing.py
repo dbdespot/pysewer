@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2023 Helmholtz Centre for Environmental Research (UFZ)
 # SPDX-License-Identifier: GPL-3.0-only
+import itertools
 from pathlib import Path
 
 import networkx as nx
@@ -9,6 +10,7 @@ import pytest
 from shapely.geometry import LineString, Point
 
 import pysewer
+from pysewer.helper import dedupe_coords, points_close
 
 
 @pytest.fixture
@@ -216,3 +218,67 @@ def test_pump_penalty(connection_graph):
     model_domain.set_pump_penalty(1)
     connection_graph = model_domain.generate_connection_graph()
     assert connection_graph[u][v][0]["weight"] == pytest.approx(distance)
+
+
+# --- issue #4: near-duplicate vertices / zero-length pipe geometries ---
+
+
+def test_dedupe_coords_removes_float_noise_duplicate():
+    # two vertices differing only at ~1e-10 (issue #4's reported artifact)
+    a = (707752.93644460884, 1600963.52702944283)
+    b = (707752.93644460896, 1600963.52702944260)
+    c = (707800.0, 1600990.0)
+    out = dedupe_coords([a, b, c])
+    assert out == [a, c]
+
+
+def test_dedupe_coords_preserves_distinct_vertices():
+    pts = [(0.0, 0.0), (10.0, 0.0), (10.0, 10.0)]
+    assert dedupe_coords(pts) == pts
+
+
+def test_dedupe_coords_keeps_two_endpoints_when_all_collapse():
+    # a degenerate all-coincident path must still yield a constructible line
+    p = (5.0, 5.0)
+    out = dedupe_coords([p, p, p])
+    assert len(out) == 2
+
+
+def test_points_close_tolerance():
+    assert points_close((0, 0), (0, 1e-9))
+    assert not points_close((0, 0), (0, 1.0))
+
+
+def test_dedupe_reproduces_degenerate_split_geometry():
+    """Reproduce the artifact of issue #4 at the geometry-construction step: a
+    connection point landing on an existing road vertex (buildings pre-snapped
+    onto road vertices) leaves a graph path with a duplicate/near-duplicate
+    node. Building the pipe LineString from that path must not yield a
+    zero-length segment or a non-monotonic vertex sequence."""
+    u = (707752.93644460884, 1600963.52702944283)
+    # a connection point projected onto u, offset only by float noise
+    cp = (707752.93644460896, 1600963.52702944260)
+    v = (707800.0, 1600990.0)
+    # raw shortest path through the degenerate split: u -> cp(~u) -> v
+    raw_path = [u, cp, v]
+    geom = LineString(dedupe_coords(raw_path))
+    # the near-duplicate vertex is gone; distance is strictly increasing
+    coords = list(geom.coords)
+    assert coords == [u, v]
+    seglen = [
+        LineString([a, b]).length for a, b in itertools.pairwise(coords)
+    ]
+    assert all(s > 0 for s in seglen)
+
+
+def test_no_degenerate_pipe_geometries(connection_graph):
+    """Issue #4: every pipe LineString has strictly increasing curvilinear
+    distance — no zero-length pipes, no float-noise duplicate vertices."""
+    for u, v, data in connection_graph.edges(data=True):
+        geom = data.get("geometry")
+        if geom is None:
+            continue
+        assert geom.length > 0, f"zero-length pipe {u}->{v}"
+        coords = list(geom.coords)
+        for a, b in itertools.pairwise(coords):
+            assert not points_close(a, b), f"near-duplicate vertex in pipe {u}->{v}"

@@ -6,6 +6,8 @@ import itertools
 import networkx as nx
 from shapely.geometry import LineString, Point
 
+from .helper import dedupe_coords
+
 ## Code Adapted from:
 # Boeing, G. 2017. "OSMnx: New Methods for Acquiring, Constructing, Analyzing, and Visualizing Complex Street Networks." Computers, Environment and Urban Systems 65, 126-139. doi:10.1016/j.compenvurbsys.2017.05.004
 
@@ -85,8 +87,12 @@ def simplify_graph(
                 # otherwise, if there are multiple values, keep one of each value
                 edge_attributes[key] = list(set(edge_attributes[key]))
 
-        # construct the geometry and sum the lengths of the segments
-        edge_attributes["geometry"] = LineString([Point(node) for node in path])
+        # construct the geometry and sum the lengths of the segments; drop
+        # float-noise near-duplicate / zero-length vertices so curvilinear
+        # distance along the geometry is strictly increasing (issue #4).
+        edge_attributes["geometry"] = LineString(
+            [Point(node) for node in dedupe_coords(path)]
+        )
         edge_attributes["length"] = edge_attributes["geometry"].length
 
         # add the nodes and edges to their lists for processing at the end

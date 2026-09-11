@@ -19,6 +19,7 @@ from sklearn.cluster import AgglomerativeClustering
 from .config.manager import get_config
 from .helper import (
     closest_edges,
+    dedupe_coords,
     get_closest_edge_multiple,
     get_edge_gdf,
     get_node_gdf,
@@ -987,6 +988,10 @@ class ModelDomain:
             if connection_digraph.has_edge(u, v):
                 total_edges += 1
                 detailed_path = nx.shortest_path(self.connection_graph, u, v)
+                # Drop float-noise near-duplicate / zero-length vertices so the
+                # pipe geometry has strictly increasing curvilinear distance
+                # (issue #4); distance and profile derive from the same path.
+                detailed_path = dedupe_coords(detailed_path)
                 connection_digraph[u][v][0]["geometry"] = LineString(detailed_path)
                 dist = get_path_distance(detailed_path)
                 connection_digraph[u][v][0]["distance"] = dist

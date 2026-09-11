@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import itertools
+import math
 import warnings
 from operator import itemgetter
 from typing import Any
@@ -69,6 +70,45 @@ def get_path_distance(detailed_path: list[tuple]) -> float:
         path_dist += distance.euclidean(e[0], e[1])
     return path_dist
 
+
+# A conservative planar tolerance (CRS units). Two vertices closer than this are
+# treated as the same point. Well above double-precision noise at metric
+# coordinates (~1e-10 at 1e6) yet far below any real network dimension
+# (min_pipe_length is metres), so it only ever removes degenerate vertices.
+COORD_TOL = 1e-6
+
+
+def points_close(a, b, tol: float = COORD_TOL) -> bool:
+    """True if two (x, y) coordinates coincide within `tol` (CRS units)."""
+    return math.hypot(a[0] - b[0], a[1] - b[1]) <= tol
+
+
+def dedupe_coords(coords, tol: float = COORD_TOL) -> list:
+    """Drop consecutive vertices closer than `tol` (CRS units).
+
+    Pipe ``LineString`` geometries are built directly from connection-graph node
+    coordinates, so a projected connection point landing on an existing road
+    vertex — e.g. buildings pre-snapped onto road vertices — leaves a duplicate
+    vertex offset only by floating-point noise (~1e-10 at metric coordinates),
+    and a zero-length segment when it coincides exactly. Both stay OGC-valid but
+    break consumers that assume strictly increasing curvilinear distance along
+    the pipe (see issue #4). This removes such near-duplicates while always
+    preserving at least the two endpoints.
+    """
+    pts = [tuple(c) for c in coords]
+    if len(pts) < 2:
+        return pts
+    out = [pts[0]]
+    for c in pts[1:]:
+        if not points_close(out[-1], c, tol):
+            out.append(c)
+    if len(out) < 2:
+        # every vertex collapsed onto the first: keep the original endpoint so
+        # the LineString stays constructible. A genuinely zero-length pipe
+        # should be prevented upstream (see connect_to_roadnetwork), not masked
+        # here.
+        out.append(pts[-1])
+    return out
 
 def closest_edges(
     points: list, edge_gdf: gpd.GeoDataFrame, column: str = "closest_edge", tol: float = 1e-6
