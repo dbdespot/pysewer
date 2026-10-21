@@ -83,6 +83,7 @@ def _edges(*lines):
 
 def test_closest_edges_picks_truly_nearest_of_edges_sharing_a_vertex():
     from shapely.geometry import Point
+
     from pysewer.helper import closest_edges
 
     # the cross-platform case from the example dataset: A is 1.4 cm closer
@@ -95,6 +96,7 @@ def test_closest_edges_picks_truly_nearest_of_edges_sharing_a_vertex():
 
 def test_closest_edges_breaks_exact_ties_independent_of_order():
     from shapely.geometry import Point
+
     from pysewer.helper import closest_edges
 
     left = ((-1.0, 0.0), (0.0, 0.0))
@@ -104,9 +106,10 @@ def test_closest_edges_breaks_exact_ties_independent_of_order():
 
 
 def test_closest_edges_uses_segment_not_vertex_distance():
-    from shapely.geometry import Point
-    from pysewer.helper import closest_edges, ckdnearest
     import geopandas as gpd
+    from shapely.geometry import Point
+
+    from pysewer.helper import ckdnearest, closest_edges
 
     long_edge = ((0.0, 0.0), (100.0, 0.0))
     short_edge = ((48.0, 3.0), (52.0, 3.0))
