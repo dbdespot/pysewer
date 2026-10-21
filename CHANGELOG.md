@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Release workflow: a version tag now also creates the GitHub release
+  (notes from this CHANGELOG, wheel and sdist attached) after the PyPI
+  upload succeeds.
+
 ## [0.3.0] - 2026-10-21
 
 Follow-ups from the Elan integration meeting (2026-06-08) and the Elan
