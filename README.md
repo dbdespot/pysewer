@@ -27,7 +27,7 @@ SPDX-License-Identifier: GPL-3.0-only -->
 
 ## Summary
 
-![Example of an automatically generated Sewer Network](notebooks/example_data/plots/modeldomain_pumps.png)
+![Example of an automatically generated Sewer Network](https://raw.githubusercontent.com/ddspot/pysewer/main/notebooks/example_data/plots/modeldomain_pumps.png)
 
 The aim of pysewer is to provide a framework automatically generate cost-efficient sewer network layouts on minimal data requirements.
 
@@ -41,15 +41,28 @@ The documentation can be found at [ddspot.github.io/pysewer](https://ddspot.gith
 use the [internal Pages](https://wasp.pages.hzdr.de/pysewer/), which requires
 a Helmholtz AAI login).
 
-An example of how to use pysewer for generating a sewer network layout can be found here: [example_sewer_network_generation](notebooks/example_sewer_network_generation.ipynb).
+An example of how to use pysewer for generating a sewer network layout can be found here: [example_sewer_network_generation](https://github.com/ddspot/pysewer/blob/main/notebooks/example_sewer_network.ipynb).
 
 ## Installation
 
+### Quick install from PyPI
+
+```shell
+pip install pysewer            # core
+pip install "pysewer[plot]"    # with plotting (matplotlib)
+```
+
+The geospatial dependencies (GDAL via rasterio/fiona/pyogrio, GEOS via
+shapely) come as binary wheels. For a fully pinned, reproducible environment,
+or if wheels are unavailable on your platform, use the conda + uv setup below.
+
+### Development install
+
 pysewer uses a **two-layer environment**: the geospatial C-library stack
 (GDAL, PROJ, GEOS, rasterio, fiona, geopandas, shapely, …) is installed with
-conda/[mamba](https://mamba.readthedocs.io) from [environment.yml](environment.yml),
+conda/[mamba](https://mamba.readthedocs.io) from [environment.yml](https://github.com/ddspot/pysewer/blob/main/environment.yml),
 and the pure-Python layer (plus the editable install of pysewer itself) with
-[uv](https://docs.astral.sh/uv/) from [pyproject.toml](pyproject.toml).
+[uv](https://docs.astral.sh/uv/) from [pyproject.toml](https://github.com/ddspot/pysewer/blob/main/pyproject.toml).
 Never install the geospatial C-libraries with pip.
 
 ### Step 1: Clone the repository and navigate to the root directory
@@ -142,7 +155,7 @@ the `pumping_station`/`lifting_station` node flags) is the design result.
 
 ## Routing Solver
 
-![Routing Animation](/notebooks/example_data/plots/rsph.gif)
+![Routing Animation](https://raw.githubusercontent.com/ddspot/pysewer/main/notebooks/example_data/plots/rsph.gif)
 
 The package comes with two solvers to find estimates for the underlying steiner tree problem (more specifically minimum steiner arboresence).
 
@@ -167,7 +180,7 @@ python3 test_scripts/demo_pump_penalty_effect.py
 creates a small toy network in which a pumped shortcut competes with a gravity detour.  
 After the penalty escalation rerun, the solver switches to the gravity route and the pump count drops from two edges to zero.
 
-![Pump penalty demo](docs/pump_penalty_demo.svg)
+![Pump penalty demo](https://raw.githubusercontent.com/ddspot/pysewer/main/docs/pump_penalty_demo.png)
 
 The script also exports `docs/pump_penalty_demo.png` (when `matplotlib` is available) so the figure can be regenerated from source.
 
@@ -219,7 +232,7 @@ and export raw values).
 
 ## Default parameters
 
-The default or global parameters are stored in the [settings.yaml](pysewer/config/settings.yaml) file. It can be overridden with a custom settings file (e.g. [example_settings.yaml](notebooks/example_settings.yaml)) via `pysewer.set_custom_config(custom_path=...)` (or a dict via `custom_settings_dict=...`). The settings are categorized into 4 sections, namely `preprocessing`, `optimization`, `plotting` and `export`.
+The default or global parameters are stored in the [settings.yaml](https://github.com/ddspot/pysewer/blob/main/pysewer/config/settings.yaml) file. It can be overridden with a custom settings file (e.g. [example_settings.yaml](https://github.com/ddspot/pysewer/blob/main/notebooks/example_settings.yaml)) via `pysewer.set_custom_config(custom_path=...)` (or a dict via `custom_settings_dict=...`). The settings are categorized into 4 sections, namely `preprocessing`, `optimization`, `plotting` and `export`.
 
 **Set the custom config before creating the `ModelDomain`.** The
 `preprocessing` parameters `clustering` and `connect_buildings` are consumed
@@ -267,22 +280,22 @@ The table below summaries the key default parameters and their meaning.
 
 ## License
 
-GNU GPLv3-modified-UFZ. See [LICENSE](LICENSE) for details.
+GNU GPLv3-modified-UFZ. See [LICENSE](https://github.com/ddspot/pysewer/blob/main/LICENSE) for details.
 
 # How to contribute to pysewer?
 
-Please check out how [Contributing](CONTRIBUTING.md) for on how to contribute to pysewer. Please note that we have created a mirror repository on [Github](https://github.com/ddspot/pysewer) to allow for easier contribution. The original repository is hosted on [Gitlab](https://codebase.helmholtz.cloud/wasp/pysewer).
+Please check out how [Contributing](https://github.com/ddspot/pysewer/blob/main/CONTRIBUTING.md) for on how to contribute to pysewer. Please note that we have created a mirror repository on [Github](https://github.com/ddspot/pysewer) to allow for easier contribution. The original repository is hosted on [Gitlab](https://codebase.helmholtz.cloud/wasp/pysewer).
 
 ## Code of conduct
 
-Please check out our [Code of Conduct](CODE_OF_CONDUCT.md) for details.
+Please check out our [Code of Conduct](https://github.com/ddspot/pysewer/blob/main/CODE_OF_CONDUCT.md) for details.
 
 ## How to cite?
 
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.06430/status.svg)](https://doi.org/10.21105/joss.06430)
 
 pysewer is published in the Journal of Open Source Software (JOSS). If you use
-pysewer in your work, please cite (see also [CITATION.cff](CITATION.cff)):
+pysewer in your work, please cite (see also [CITATION.cff](https://github.com/ddspot/pysewer/blob/main/CITATION.cff)):
 
 > Sanne, M., Khurelbaatar, G., Despot, D., van Afferden, M., & Friesen, J.
 > (2024). Pysewer: A Python Library for Sewer Network Generation in Data

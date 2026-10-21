@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-21
+
 Follow-ups from the Elan integration meeting (2026-06-08) and the Elan
 bug report (2026-08-06).
 
@@ -96,6 +98,11 @@ bug report (2026-08-06).
   (shoring / groundwater) is acceptable.
 
 ### Fixed
+
+- Pipe geometries no longer contain float-noise duplicate vertices or
+  near-zero-length segments when a connection point lands on an existing road
+  vertex (#4). New helpers `dedupe_coords` / `points_close` (tolerance
+  `COORD_TOL` = 1e-6 CRS units) are applied where pipe LineStrings are built.
 
 - Buildings and cluster centers now connect to the road edge that is truly
   nearest (point-to-segment distance), with ties broken by edge endpoint
