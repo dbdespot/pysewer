@@ -70,6 +70,56 @@ def get_path_distance(detailed_path: list[tuple]) -> float:
     return path_dist
 
 
+def closest_edges(
+    points: list, edge_gdf: gpd.GeoDataFrame, column: str = "closest_edge", tol: float = 1e-6
+) -> list:
+    """For each point, the ``column`` value of the edge nearest to it.
+
+    Distance is the true point-to-segment distance (GEOS, via an STRtree), not
+    the distance to the nearest edge *vertex*. Edges whose distance is within
+    ``tol`` (map units) of the minimum count as tied and are resolved by their
+    endpoint coordinates, so the choice does not depend on the platform or on
+    edge order. (A KD-tree over edge vertices stores every shared junction
+    once per edge; which copy it returns on an exact tie depends on the C++
+    standard library, which made networks differ between macOS and Linux.)
+
+    Parameters
+    ----------
+    points : list of shapely.geometry.Point
+    edge_gdf : geopandas.GeoDataFrame
+        Edges with LineString geometries.
+    column : str
+        Column of ``edge_gdf`` to return for the chosen edge.
+    tol : float
+        Distance tolerance for treating edges as equally close.
+
+    Returns
+    -------
+    list
+        One ``column`` value per point.
+    """
+    edges = edge_gdf.reset_index(drop=True)
+    geoms = np.asarray(edges.geometry.values)
+    pts = np.asarray([shapely.Point(p.x, p.y) for p in points])
+    tree = shapely.STRtree(geoms)
+    (pt_idx, _), dist = tree.query_nearest(pts, return_distance=True)
+    d_min = np.empty(len(pts))
+    d_min[pt_idx] = dist
+    cand_pt, cand_edge = tree.query(pts, predicate="dwithin", distance=d_min + tol)
+
+    def _key(i: int, d: float) -> tuple:
+        coords = list(geoms[i].coords)
+        ends = sorted((round(c[0], 6), round(c[1], 6)) for c in (coords[0], coords[-1]))
+        return (round(d / tol), *ends, i)
+
+    best: dict[int, tuple] = {}
+    for p_i, e_i in zip(cand_pt.tolist(), cand_edge.tolist(), strict=True):
+        key = _key(e_i, geoms[e_i].distance(pts[p_i]))
+        if p_i not in best or key < best[p_i]:
+            best[p_i] = key
+    return [edges[column].iloc[best[i][-1]] for i in range(len(pts))]
+
+
 def get_closest_edge(G: nx.Graph, point: shapely.geometry.Point) -> tuple:
     """
     Returns the closest edge to a given point in a networkx graph.
@@ -88,9 +138,7 @@ def get_closest_edge(G: nx.Graph, point: shapely.geometry.Point) -> tuple:
     """
     edge_gdf = get_edge_gdf(G)
     edge_gdf["closest_edge"] = edge_gdf.geometry.tolist()
-    cc = ckdnearest(
-        gpd.GeoDataFrame(geometry=[point]), edge_gdf, ["closest_edge"]
-    ).iloc[0, 1]
+    cc = closest_edges([point], edge_gdf)[0]
     # Validate the returned type
     if not isinstance(cc, tuple):
         raise ValueError(
@@ -128,10 +176,7 @@ def get_closest_edge_multiple(G: nx.Graph, list_of_points: list) -> list:
         warnings.warn("Skippind due to empty or invalid list of points or edges.", stacklevel=2)
         return []
 
-    cc = ckdnearest(
-        gpd.GeoDataFrame(geometry=list_of_points), edge_gdf, ["closest_edge"]
-    )["closest_edge"].to_list()
-    return cc
+    return closest_edges(list_of_points, edge_gdf)
 
 
 def get_edge_gdf(

@@ -18,7 +18,7 @@ from sklearn.cluster import AgglomerativeClustering
 
 from .config.manager import get_config
 from .helper import (
-    ckdnearest,
+    closest_edges,
     get_closest_edge_multiple,
     get_edge_gdf,
     get_node_gdf,
@@ -873,9 +873,7 @@ class ModelDomain:
         if closest_edge is None:
             edge_gdf = get_edge_gdf(self.connection_graph)
             edge_gdf["closest_edge"] = edge_gdf.geometry.to_list()
-            closest_edge = ckdnearest(
-                gpd.GeoDataFrame(geometry=[point]), edge_gdf, ["closest_edge"]
-            ).iloc[0, 1]
+            closest_edge = closest_edges([point], edge_gdf)[0]
         conn_point = nearest_points(closest_edge, point)[0]
         # disconnect edges from node
         cluster_nodes = get_node_keys(
