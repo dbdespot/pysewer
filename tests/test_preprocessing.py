@@ -183,22 +183,28 @@ def test_edge_data_profile(connection_graph):
     assert y_t == y_r
 
 
+def _pump_edge(connection_graph):
+    """Some edge flagged needs_pump (which one depends on the layout, not the test)."""
+    for u, v, data in connection_graph.edges(data=True):
+        if data.get("needs_pump"):
+            return u, v
+    raise AssertionError("expected at least one needs_pump edge in the test network")
+
+
 def test_edge_data_needs_pump(connection_graph):
     test_u = (691535.5977087952, 2553057.6150246616)
     test_v = (691567.7330147347, 2552952.9508892866)
     assert not connection_graph[test_u][test_v][0]["needs_pump"]
-    test_u = (691384.1703000003, 2553067.1856999993)
-    test_v = (691386.9481000002, 2553059.71885)
-    # check if node exists
-    if test_u in connection_graph and test_v in connection_graph:
-        assert connection_graph[test_u][test_v][0]["needs_pump"]
+    _pump_edge(connection_graph)  # the test terrain has uphill edges
 
 
 def test_pump_penalty(connection_graph):
-    test_u = (691384.1703000003, 2553067.1856999993)
-    test_v = (691386.9481000002, 2553059.71885)
-    # default pump penalty is 1000
-    assert connection_graph[test_u][test_v][0]["weight"] == 7966.807500749309
+    u, v = _pump_edge(connection_graph)
+    distance = connection_graph[u][v][0]["distance"]
+    # default pump penalty is 1000; gravity edges are weighted by distance only
+    assert connection_graph[u][v][0]["weight"] == pytest.approx(distance * 1000)
+    gravity = next(d for _, _, d in connection_graph.edges(data=True) if not d.get("needs_pump"))
+    assert gravity["weight"] == pytest.approx(gravity["distance"])
 
     # set pump penalty to 1
     model_domain = pysewer.ModelDomain(
@@ -209,4 +215,4 @@ def test_pump_penalty(connection_graph):
     model_domain.add_sink([(691350, 2553250)])
     model_domain.set_pump_penalty(1)
     connection_graph = model_domain.generate_connection_graph()
-    assert connection_graph[test_u][test_v][0]["weight"] == 7966.807500749309 / 1000
+    assert connection_graph[u][v][0]["weight"] == pytest.approx(distance)
