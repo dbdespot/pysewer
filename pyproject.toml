@@ -3,7 +3,7 @@
 
 [project]
 name = "pysewer"
-version = "0.2.0"
+version = "0.3.0"
 description = "A Python package for automated routing and optimization of sewer networks"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -11,7 +11,12 @@ license = { text = "GPL-3.0-only" }
 authors = [
     { name = "Helmholtz Centre for Environmental Research (UFZ)" },
 ]
+keywords = ["sewer", "wastewater", "network generation", "routing", "steiner tree", "urban water", "gis"]
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Scientific/Engineering :: Hydrology",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -62,6 +67,10 @@ docs = [
 
 [project.urls]
 Repository = "https://codebase.helmholtz.cloud/wasp/pysewer"
+Documentation = "https://ddspot.github.io/pysewer/"
+Changelog = "https://github.com/ddspot/pysewer/blob/main/CHANGELOG.md"
+Issues = "https://codebase.helmholtz.cloud/wasp/pysewer/-/issues"
+"GitHub mirror" = "https://github.com/ddspot/pysewer"
 Paper = "https://doi.org/10.21105/joss.06430"
 
 [build-system]
